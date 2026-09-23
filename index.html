@@ -1162,29 +1162,81 @@ const SUPABASE_URL='https://fkwshkpmebitdvniwreh.supabase.co';
 const SUPABASE_KEY='sb_publishable_7oFuilE9oG0ZXV1frrKoYA_CFlKLXAr';
 const CLOUD_KEYS=['invoices','parties','payments','journal','settings','vouchers','stock','cheques','notes'];
 let sbClient=null,currentCloudUser=null,cloudReady=false,finpilotStarted=false;
-const cloudTimers=new Map();
+const cloudSaveChains=new Map();
+let activeCloudWrites=0;
+let cloudPullBusy=false;
 
 function supabaseConfigured(){return /^https:\/\/.+\.supabase\.co\/?$/i.test(SUPABASE_URL)&&SUPABASE_KEY&&!SUPABASE_KEY.startsWith('PASTE_');}
 function cacheKey(k){return currentCloudUser?`fp_user_${currentCloudUser.id}_${k}`:`fp_${k}`;}
+function dirtyKey(k){return cacheKey(k)+'__dirty';}
+function syncedKey(k){return cacheKey(k)+'__synced';}
+function cloudClone(v){
+  if(v===undefined)return null;
+  try{return JSON.parse(JSON.stringify(v));}catch(e){return v;}
+}
+function parseStored(raw){try{return raw===null?null:JSON.parse(raw);}catch(e){return null;}}
+function hasMeaningfulData(v){
+  if(Array.isArray(v))return v.length>0;
+  if(typeof v==='string')return v.trim().length>0;
+  if(v&&typeof v==='object')return Object.keys(v).length>0;
+  return v!==null&&v!==undefined;
+}
 function setCloudStatus(text,state=''){
   const el=document.getElementById('cloud-sync-status');if(!el)return;
   el.textContent=text;el.className='cloud-sync'+(state?' '+state:'');
 }
-async function pushCloudValue(k,v){
-  if(!cloudReady||!sbClient||!currentCloudUser)return;
-  setCloudStatus('Saving…','syncing');
-  const {error}=await sbClient.from('app_data').upsert({user_id:currentCloudUser.id,data_key:k,data:v,updated_at:new Date().toISOString()},{onConflict:'user_id,data_key'});
-  if(error){console.error('Cloud save failed:',error);setCloudStatus('Sync error','error');return;}
-  setCloudStatus('Saved','saved');
+function markCloudSynced(k,stamp,serverTime){
+  const dirty=Number(localStorage.getItem(dirtyKey(k))||0);
+  if(!dirty||dirty<=stamp)localStorage.removeItem(dirtyKey(k));
+  localStorage.setItem(syncedKey(k),String(serverTime||Date.now()));
 }
-function queueCloudSave(k,v){
+async function writeCloudValue(k,v,stamp=Date.now(),attempt=0){
+  if(!sbClient||!currentCloudUser)return false;
+  const snapshot=cloudClone(v);
+  activeCloudWrites++;
+  setCloudStatus('Saving…','syncing');
+  try{
+    const nowIso=new Date().toISOString();
+    const {error}=await sbClient.from('app_data').upsert({
+      user_id:currentCloudUser.id,
+      data_key:k,
+      data:snapshot,
+      updated_at:nowIso
+    },{onConflict:'user_id,data_key'});
+    if(error)throw error;
+    markCloudSynced(k,stamp,Date.parse(nowIso));
+    return true;
+  }catch(error){
+    console.error(`Cloud save failed for ${k}:`,error);
+    if(attempt<3){
+      await new Promise(r=>setTimeout(r,[300,800,1600][attempt]||2000));
+      return writeCloudValue(k,snapshot,stamp,attempt+1);
+    }
+    setCloudStatus('Sync error','error');
+    return false;
+  }finally{
+    activeCloudWrites=Math.max(0,activeCloudWrites-1);
+    if(activeCloudWrites===0&&document.getElementById('cloud-sync-status')?.classList.contains('syncing'))setCloudStatus('Saved','saved');
+  }
+}
+function queueCloudSave(k,v,stamp=Date.now()){
   if(!cloudReady||!currentCloudUser)return;
-  if(cloudTimers.has(k))clearTimeout(cloudTimers.get(k));
-  cloudTimers.set(k,setTimeout(()=>{cloudTimers.delete(k);pushCloudValue(k,v);},350));
+  const snapshot=cloudClone(v);
+  const previous=cloudSaveChains.get(k)||Promise.resolve();
+  const task=previous.catch(()=>{}).then(()=>writeCloudValue(k,snapshot,stamp));
+  cloudSaveChains.set(k,task);
+  task.finally(()=>{if(cloudSaveChains.get(k)===task)cloudSaveChains.delete(k);});
 }
 const DB={
-  get:k=>{try{return JSON.parse(localStorage.getItem(cacheKey(k))||'null');}catch(e){return null;}},
-  set:(k,v)=>{localStorage.setItem(cacheKey(k),JSON.stringify(v));queueCloudSave(k,v);},
+  get:k=>parseStored(localStorage.getItem(cacheKey(k))),
+  set:(k,v)=>{
+    const snapshot=cloudClone(v);
+    localStorage.setItem(cacheKey(k),JSON.stringify(snapshot));
+    const stamp=Date.now();
+    localStorage.setItem(dirtyKey(k),String(stamp));
+    queueCloudSave(k,snapshot,stamp);
+    return snapshot;
+  },
   invoices:()=>DB.get('invoices')||[],
   parties:()=>DB.get('parties')||[],
   payments:()=>DB.get('payments')||[],
@@ -1202,6 +1254,57 @@ const DB={
   saveStock:v=>DB.set('stock',v),
   saveCheques:v=>DB.set('cheques',v),
 };
+
+function refreshVisibleCloudData(keys=[]){
+  if(!finpilotStarted)return;
+  const changed=new Set(keys);
+  if(['invoices','payments','parties','vouchers','journal'].some(k=>changed.has(k)))renderDashboard();
+  const active=document.querySelector('.section.active')?.id||'';
+  if(active==='sec-invoices'&&changed.has('invoices'))renderInvoicesTable();
+  if(active==='sec-parties'&&['parties','invoices','payments','vouchers'].some(k=>changed.has(k)))renderPartiesTable();
+  if(active==='sec-payments'&&['payments','parties'].some(k=>changed.has(k)))renderPaymentHistory();
+  if(active==='sec-stock'&&changed.has('stock'))renderStockTable();
+  if(active==='sec-purchase'&&changed.has('vouchers'))renderVouchersTable('purchase');
+  if(active==='sec-sales-return'&&changed.has('vouchers'))renderVouchersTable('sales-return');
+  if(active==='sec-purchase-return'&&changed.has('vouchers'))renderVouchersTable('purchase-return');
+  if(active==='sec-statement'&&['invoices','payments','vouchers','parties'].some(k=>changed.has(k)))renderStatement();
+  if(active==='sec-due-details'&&['invoices','payments','vouchers','parties'].some(k=>changed.has(k)))renderDueDetails();
+  if(active==='sec-settings'&&changed.has('settings'))loadSettings();
+  if(active==='sec-notes'&&changed.has('notes'))initNotes();
+}
+
+async function pullCloudChanges(){
+  if(!cloudReady||!sbClient||!currentCloudUser||cloudPullBusy)return;
+  cloudPullBusy=true;
+  try{
+    const {data,error}=await sbClient.from('app_data').select('data_key,data,updated_at').eq('user_id',currentCloudUser.id);
+    if(error)throw error;
+    const changed=[];
+    for(const row of (data||[])){
+      if(!CLOUD_KEYS.includes(row.data_key))continue;
+      if(Number(localStorage.getItem(dirtyKey(row.data_key))||0)>0)continue;
+      const remoteTs=Date.parse(row.updated_at||'')||0;
+      const localSynced=Number(localStorage.getItem(syncedKey(row.data_key))||0);
+      if(remoteTs>localSynced){
+        localStorage.setItem(cacheKey(row.data_key),JSON.stringify(row.data));
+        localStorage.setItem(syncedKey(row.data_key),String(remoteTs));
+        changed.push(row.data_key);
+      }
+    }
+    if(changed.length)refreshVisibleCloudData(changed);
+    if(activeCloudWrites===0)setCloudStatus('Saved','saved');
+  }catch(e){console.error('Cloud refresh failed:',e);}
+  finally{cloudPullBusy=false;}
+}
+
+window.addEventListener('storage',e=>{
+  if(!currentCloudUser||!e.key)return;
+  const prefix=`fp_user_${currentCloudUser.id}_`;
+  if(!e.key.startsWith(prefix)||e.key.includes('__dirty')||e.key.includes('__synced'))return;
+  const k=e.key.slice(prefix.length);
+  if(CLOUD_KEYS.includes(k))refreshVisibleCloudData([k]);
+});
+window.addEventListener('focus',()=>{if(finpilotStarted)pullCloudChanges();});
 
 function authMessage(msg,type=''){
   const el=document.getElementById('auth-message');if(!el)return;
@@ -1233,24 +1336,57 @@ async function finpilotSignOut(){
 async function loadCloudData(){
   if(!sbClient||!currentCloudUser)return;
   setCloudStatus('Loading…','syncing');
-  const {data,error}=await sbClient.from('app_data').select('data_key,data').eq('user_id',currentCloudUser.id);
+  const {data,error}=await sbClient.from('app_data').select('data_key,data,updated_at').eq('user_id',currentCloudUser.id);
   if(error){console.error(error);setCloudStatus('Sync error','error');throw error;}
-  const rows=data||[];
-  if(rows.length){
-    rows.forEach(r=>localStorage.setItem(cacheKey(r.data_key),JSON.stringify(r.data)));
-  }else{
-    // First cloud login: copy the existing pre-cloud FinPilot browser data, if any.
-    const legacy={};let found=false;
-    CLOUD_KEYS.forEach(k=>{const raw=localStorage.getItem('fp_'+k);if(raw!==null){try{legacy[k]=JSON.parse(raw);found=true;}catch(e){}}});
-    if(found){
-      for(const [k,v] of Object.entries(legacy)){
-        localStorage.setItem(cacheKey(k),JSON.stringify(v));
-        const {error:upErr}=await sbClient.from('app_data').upsert({user_id:currentCloudUser.id,data_key:k,data:v,updated_at:new Date().toISOString()},{onConflict:'user_id,data_key'});
-        if(upErr)throw upErr;
+  const rows=new Map((data||[]).map(r=>[r.data_key,r]));
+  cloudReady=true;
+
+  // Reconcile every data section separately. This avoids one synced section (for example
+  // payments) preventing older local invoices/parties/stock from being migrated.
+  for(const k of CLOUD_KEYS){
+    const row=rows.get(k);
+    const localRaw=localStorage.getItem(cacheKey(k));
+    const localVal=parseStored(localRaw);
+    const dirty=Number(localStorage.getItem(dirtyKey(k))||0);
+    const legacyRaw=localStorage.getItem('fp_'+k);
+    const legacyVal=parseStored(legacyRaw);
+
+    if(dirty&&localRaw!==null){
+      await writeCloudValue(k,localVal,dirty);
+      continue;
+    }
+
+    if(!row){
+      const candidate=localRaw!==null?localVal:(legacyRaw!==null?legacyVal:null);
+      if(candidate!==null){
+        localStorage.setItem(cacheKey(k),JSON.stringify(candidate));
+        const stamp=Date.now();
+        localStorage.setItem(dirtyKey(k),String(stamp));
+        await writeCloudValue(k,candidate,stamp);
+      }
+      continue;
+    }
+
+    // Rescue meaningful browser data if the cloud copy for this section is empty.
+    // This specifically protects data created by older FinPilot builds whose sync
+    // did not successfully upload every section.
+    if(!hasMeaningfulData(row.data)){
+      const rescue=(localRaw!==null&&hasMeaningfulData(localVal))?localVal:
+                   (legacyRaw!==null&&hasMeaningfulData(legacyVal))?legacyVal:null;
+      if(rescue!==null){
+        localStorage.setItem(cacheKey(k),JSON.stringify(rescue));
+        const stamp=Date.now();
+        localStorage.setItem(dirtyKey(k),String(stamp));
+        await writeCloudValue(k,rescue,stamp);
+        continue;
       }
     }
+
+    localStorage.setItem(cacheKey(k),JSON.stringify(row.data));
+    localStorage.removeItem(dirtyKey(k));
+    localStorage.setItem(syncedKey(k),String(Date.parse(row.updated_at||'')||Date.now()));
   }
-  cloudReady=true;setCloudStatus('Saved','saved');
+  setCloudStatus('Saved','saved');
 }
 async function openFinPilotForUser(user){
   if(finpilotStarted)return;

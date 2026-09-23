@@ -1155,12 +1155,11 @@ function getNepaliDate(date=new Date()){return converterBSDate(date);}
 function getNepaliDateFull(date=new Date()){return getTodayBSFullFrom(converterBSDate(date));}
 
 // ══════════════════════════════════════════════════════
-// SUPABASE + DATA STORE
+// CLOUD AUTH + DATA STORE
 // ══════════════════════════════════════════════════════
-// Paste these two values from Supabase → Project Settings → API.
-// Use the Publishable key (or legacy anon key). NEVER put a service_role key here.
-const SUPABASE_URL='PASTE_YOUR_SUPABASE_PROJECT_URL_HERE';
-const SUPABASE_KEY='PASTE_YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY_HERE';
+// Public browser connection values. Security is enforced by database RLS.
+const SUPABASE_URL='https://fkwshkpmebitdvniwreh.supabase.co';
+const SUPABASE_KEY='sb_publishable_7oFuilE9oG0ZXV1frrKoYA_CFlKLXAr';
 const CLOUD_KEYS=['invoices','parties','payments','journal','settings','vouchers','stock','cheques','notes'];
 let sbClient=null,currentCloudUser=null,cloudReady=false,finpilotStarted=false;
 const cloudTimers=new Map();

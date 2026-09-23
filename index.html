@@ -307,12 +307,32 @@ main#content{padding:0 34px 30px;min-width:0;scroll-behavior:smooth}.workspace-b
 .auth-actions .btn-secondary{background:#f4f7fa;border:1px solid #dce5ec;color:#2f4357;box-shadow:none}.auth-actions .btn-secondary:hover{background:#eaf0f4}
 .auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0 4px;color:#a0adba;font-size:10.5px}.auth-divider:before,.auth-divider:after{content:'';height:1px;background:#e4eaf0;flex:1}
 .auth-trust{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:18px;color:#8795a4;font-size:10.5px}.auth-trust svg{width:13px;height:13px;color:#168163}
+.auth-inline-actions{display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:15px}.auth-link-btn{border:0;background:transparent;color:#087f8c;padding:4px 0;font:600 12px 'DM Sans',sans-serif;cursor:pointer}.auth-link-btn:hover{text-decoration:underline;color:#066773}.auth-link-btn:disabled{opacity:.55;cursor:not-allowed}.auth-reset-note{font-size:11.5px;line-height:1.55;color:#718096;margin:-10px 0 18px}.credential-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.credential-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.credential-hint{font-size:11.5px;color:var(--text2);line-height:1.55;margin-top:7px}@media(max-width:600px){.credential-grid{grid-template-columns:1fr}}
 .auth-message{min-height:22px;margin-top:14px;font-size:12.5px;color:#56667a;text-align:center}.auth-message.error{color:#c44558}.auth-message.ok{color:#168163}
 .auth-setup{font-size:12px;line-height:1.55;background:#fff7e8;border:1px solid #f0d49d;border-radius:10px;padding:11px 12px;margin-bottom:18px;color:#75501b}
 .cloud-sync{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}.cloud-sync:before{content:'';width:7px;height:7px;border-radius:50%;background:#94a3b8}.cloud-sync.syncing:before{background:#d69e2e}.cloud-sync.saved:before{background:#168163}.cloud-sync.error:before{background:#c44558}.sidebar-footer{flex-wrap:wrap}.sidebar-footer #logout-btn{flex-basis:100%}
 body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(.fp-authenticated) .mobile-shade{display:none!important}
 @media(max-width:820px){#auth-screen{padding:18px}.auth-shell{grid-template-columns:1fr;min-height:0;max-width:500px}.auth-showcase{display:none}.auth-panel{padding:42px 34px}.auth-mobile-brand{display:flex}}
 @media(max-width:500px){#auth-screen{padding:0;background:#fff}.auth-shell{border:0;border-radius:0;box-shadow:none;min-height:100dvh}.auth-panel{padding:38px 24px}.auth-card h2{font-size:26px}}
+</style>
+
+
+<style id="finpilot-notification-styles">
+@media screen {
+  #fp-notice-stack{position:fixed;right:18px;bottom:18px;z-index:5000;width:min(390px,calc(100vw - 24px));display:flex;flex-direction:column;gap:10px;pointer-events:none}
+  .fp-notice{--notice:var(--accent);position:relative;overflow:hidden;pointer-events:auto;background:var(--surface);color:var(--text);border:1px solid var(--border);border-left:4px solid var(--notice);border-radius:12px;box-shadow:0 18px 55px rgba(15,23,42,.24);padding:14px 15px 12px;animation:fpNoticeIn .18s ease-out}
+  .fp-notice.success{--notice:var(--green)}.fp-notice.warning{--notice:#d97706}.fp-notice.error{--notice:var(--red)}.fp-notice.info{--notice:var(--blue)}
+  .fp-notice-head{display:flex;align-items:flex-start;gap:10px}.fp-notice-icon{width:28px;height:28px;flex:0 0 28px;border-radius:8px;display:grid;place-items:center;background:color-mix(in srgb,var(--notice) 12%,transparent);color:var(--notice);font-weight:800;font-size:14px}
+  .fp-notice-copy{min-width:0;flex:1}.fp-notice-title{font-size:13px;font-weight:700;margin-bottom:3px}.fp-notice-message{font-size:12.5px;line-height:1.5;color:var(--text2);white-space:pre-line;overflow-wrap:anywhere}
+  .fp-notice-close{border:0;background:transparent;color:var(--text3);cursor:pointer;font-size:17px;line-height:1;padding:2px 0 2px 5px}.fp-notice-close:hover{color:var(--text)}
+  .fp-notice-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:12px}.fp-notice-actions .btn{min-height:34px;padding:7px 12px}.fp-notice-shortcut{margin-right:auto;font-size:10.5px;color:var(--text3);white-space:nowrap}
+  .fp-notice-input{margin-top:11px;width:100%;background:var(--surface2)}
+  .fp-notice-progress{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--notice);transform-origin:left center;animation:fpNoticeCountdown 5s linear forwards}
+  @keyframes fpNoticeIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+  @keyframes fpNoticeCountdown{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+  @media(max-width:600px){#fp-notice-stack{right:12px;bottom:12px;width:calc(100vw - 24px)}}
+}
+@media print{#fp-notice-stack{display:none!important}}
 </style>
 
 </head>
@@ -339,14 +359,26 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
       <div class="auth-card">
         <div class="auth-mobile-brand"><img src="images/favicon.png" alt="FinPilot logo"><div><h1>FinPilot</h1><p>Billing &amp; Journal</p></div></div>
         <div id="auth-setup" class="auth-setup" hidden>FinPilot cloud connection is not configured yet.</div>
-        <h2>Welcome back</h2>
-        <p class="auth-subtitle">Sign in to continue to your FinPilot workspace.</p>
-        <div class="auth-field"><label for="auth-email">Email address</label><input id="auth-email" type="email" autocomplete="email" placeholder="name@example.com"></div>
-        <div class="auth-field"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" placeholder="Enter your password"></div>
-        <div class="auth-actions">
-          <button class="btn btn-primary" type="button" onclick="finpilotSignIn()">Sign in to FinPilot</button>
-          <div class="auth-divider">NEW TO FINPILOT?</div>
-          <button class="btn btn-secondary" type="button" onclick="finpilotSignUp()">Create an account</button>
+        <div id="auth-login-box">
+          <h2>Welcome back</h2>
+          <p class="auth-subtitle">Sign in to continue to your FinPilot workspace.</p>
+          <div class="auth-field"><label for="auth-email">Email address</label><input id="auth-email" type="email" autocomplete="email" placeholder="name@example.com"></div>
+          <div class="auth-field"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" placeholder="Enter your password"></div>
+          <div class="auth-inline-actions"><button class="auth-link-btn" type="button" onclick="finpilotForgotPassword()">Forgot password?</button></div>
+          <div class="auth-actions">
+            <button class="btn btn-primary" type="button" onclick="finpilotSignIn()">Sign in to FinPilot</button>
+            <div class="auth-divider">NEW TO FINPILOT?</div>
+            <button class="btn btn-secondary" type="button" onclick="finpilotSignUp()">Create an account</button>
+          </div>
+        </div>
+        <div id="auth-reset-box" hidden>
+          <h2>Set a new password</h2>
+          <p class="auth-subtitle">Choose a new password for your FinPilot account.</p>
+          <div class="auth-reset-note">This page appears after you open the password-reset link sent to your email.</div>
+          <div class="auth-field"><label for="auth-new-password">New password</label><input id="auth-new-password" type="password" autocomplete="new-password" placeholder="At least 6 characters"></div>
+          <div class="auth-field"><label for="auth-confirm-password">Confirm new password</label><input id="auth-confirm-password" type="password" autocomplete="new-password" placeholder="Enter it again"></div>
+          <div class="auth-actions"><button class="btn btn-primary" type="button" onclick="finpilotCompletePasswordReset()">Update password</button></div>
+          <div class="auth-inline-actions" style="justify-content:center;margin-top:14px;margin-bottom:0"><button class="auth-link-btn" type="button" onclick="finpilotReturnToSignIn()">Back to sign in</button></div>
         </div>
         <div id="auth-message" class="auth-message"></div>
         <div class="auth-trust"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Secure account access and cloud sync</span></div>
@@ -880,6 +912,14 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
       </div>
     </div>
     <div class="setting-section">
+      <h3>📦 Stock Quantity Management</h3>
+      <label style="display:flex;align-items:center;gap:9px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="set-stock-qty">
+        Enable stock quantity management
+      </label>
+      <div style="font-size:11.5px;color:var(--text2);margin-top:7px;line-height:1.55">When enabled, FinPilot calculates available quantity from opening stock, purchases, sales, sales returns, and purchase returns. Negative stock is allowed after a warning.</div>
+    </div>
+    <div class="setting-section">
       <h3>🖼 Logo</h3>
       <div class="form-group">
         <input type="file" id="set-logo" accept="image/*" onchange="handleLogo(this)">
@@ -943,6 +983,18 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
           </div>
         </div>
       </div>
+    </div>
+    <div class="setting-section">
+      <h3>🔐 Change Login Credentials</h3>
+      <div class="form-group"><label>Current Login Email</label><input type="email" id="login-current-email" readonly></div>
+      <div class="form-group"><label>New Email</label><input type="email" id="login-new-email" autocomplete="email" placeholder="Leave blank to keep current email"></div>
+      <div class="form-group"><label>Current Password</label><input type="password" id="login-current-password" autocomplete="current-password" placeholder="Required to make changes"></div>
+      <div class="credential-grid">
+        <div class="form-group"><label>New Password</label><input type="password" id="login-new-password" autocomplete="new-password" placeholder="Leave blank to keep current password"></div>
+        <div class="form-group"><label>Confirm New Password</label><input type="password" id="login-confirm-password" autocomplete="new-password" placeholder="Enter new password again"></div>
+      </div>
+      <div class="credential-actions"><button class="btn btn-secondary" type="button" id="change-login-btn" onclick="changeLoginCredentials()">Update Login Credentials</button></div>
+      <div class="credential-hint">Changing your email may require confirmation by email before the new address becomes active. Your accounting data stays attached to the same FinPilot account.</div>
     </div>
     <div class="setting-section">
       <h3>✉️ Letter Pad</h3>
@@ -1018,6 +1070,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
     <h3 id="stock-modal-title">Add Stock Item</h3>
     <div class="form-group"><label>Item Name *</label><input type="text" id="sm-name" placeholder="Item name"></div>
     <div class="form-group"><label>Rate (Rs.)</label><input type="number" id="sm-rate" placeholder="0" min="0" step="1"></div>
+    <div class="form-group" id="sm-opening-qty-row" style="display:none"><label>Opening Quantity</label><input type="number" id="sm-opening-qty" placeholder="0" step="any"><div style="font-size:11px;color:var(--text3);margin-top:4px">Starting quantity before recorded transactions.</div></div>
     <div class="form-group"><label>Unit</label><input type="text" id="sm-unit" placeholder="pcs / kg / litre..."></div>
     <div class="form-group"><label>Description</label><input type="text" id="sm-desc" placeholder="Optional"></div>
     <input type="hidden" id="sm-id">
@@ -1155,13 +1208,68 @@ function getNepaliDate(date=new Date()){return converterBSDate(date);}
 function getNepaliDateFull(date=new Date()){return getTodayBSFullFrom(converterBSDate(date));}
 
 // ══════════════════════════════════════════════════════
+// BOTTOM-RIGHT NOTIFICATIONS / CONFIRMATIONS
+// ══════════════════════════════════════════════════════
+function ensureNoticeStack(){
+  let stack=document.getElementById('fp-notice-stack');
+  if(!stack){stack=document.createElement('div');stack.id='fp-notice-stack';stack.setAttribute('aria-live','polite');document.body.appendChild(stack);}
+  return stack;
+}
+function noticeMeta(type){
+  return ({success:['Success','✓'],warning:['Warning','!'],error:['Error','×'],info:['Notice','i']})[type]||['Notice','i'];
+}
+function closeNotice(card){if(!card||card.dataset.closing)return;card.dataset.closing='1';card.style.opacity='0';card.style.transform='translateY(8px)';setTimeout(()=>card.remove(),150);}
+function appNotice(message,type='info',duration=5000){
+  const stack=ensureNoticeStack(),card=document.createElement('div'),[title,icon]=noticeMeta(type);
+  card.className=`fp-notice ${type}`;card.innerHTML=`<div class="fp-notice-head"><div class="fp-notice-icon">${icon}</div><div class="fp-notice-copy"><div class="fp-notice-title">${title}</div><div class="fp-notice-message"></div></div><button type="button" class="fp-notice-close" aria-label="Close">✕</button></div>${duration>0?'<div class="fp-notice-progress"></div>':''}`;
+  card.querySelector('.fp-notice-message').textContent=String(message??'');
+  card.querySelector('.fp-notice-close').onclick=()=>closeNotice(card);
+  stack.appendChild(card);
+  if(duration>0)setTimeout(()=>closeNotice(card),duration);
+  return card;
+}
+function appAlert(message){
+  const s=String(message??'');
+  const type=/restored|saved|success|complete/i.test(s)?'success':/invalid|could not|failed|error/i.test(s)?'error':'warning';
+  return appNotice(s,type,5000);
+}
+function appConfirm(message,{yesText='Yes',noText='No',type='warning',title='Confirm'}={}){
+  return new Promise(resolve=>{
+    const stack=ensureNoticeStack(),card=document.createElement('div'),meta=noticeMeta(type);
+    card.className=`fp-notice ${type}`;card.dataset.interactive='true';
+    card.innerHTML=`<div class="fp-notice-head"><div class="fp-notice-icon">${meta[1]}</div><div class="fp-notice-copy"><div class="fp-notice-title"></div><div class="fp-notice-message"></div></div><button type="button" class="fp-notice-close" aria-label="Cancel">✕</button></div><div class="fp-notice-actions"><span class="fp-notice-shortcut">Y confirm · N cancel</span><button type="button" class="btn btn-secondary fp-no">${noText}</button><button type="button" class="btn btn-primary fp-yes">${yesText}</button></div>`;
+    card.querySelector('.fp-notice-title').textContent=title;
+    card.querySelector('.fp-notice-message').textContent=String(message??'');
+    stack.appendChild(card);
+    let done=false;
+    const finish=value=>{if(done)return;done=true;document.removeEventListener('keydown',onKey,true);closeNotice(card);resolve(value);};
+    const onKey=e=>{if(e.ctrlKey||e.altKey||e.metaKey)return;const k=e.key.toLowerCase();if(k==='y'||e.key==='Enter'){e.preventDefault();finish(true);}else if(k==='n'||e.key==='Escape'){e.preventDefault();finish(false);}};
+    card.querySelector('.fp-yes').onclick=()=>finish(true);card.querySelector('.fp-no').onclick=()=>finish(false);card.querySelector('.fp-notice-close').onclick=()=>finish(false);
+    document.addEventListener('keydown',onKey,true);card.querySelector('.fp-yes').focus();
+  });
+}
+function appPrompt(message,defaultValue='',{okText='OK',cancelText='Cancel',type='info',title='Input'}={}){
+  return new Promise(resolve=>{
+    const stack=ensureNoticeStack(),card=document.createElement('div'),meta=noticeMeta(type);
+    card.className=`fp-notice ${type}`;card.dataset.interactive='true';
+    card.innerHTML=`<div class="fp-notice-head"><div class="fp-notice-icon">${meta[1]}</div><div class="fp-notice-copy"><div class="fp-notice-title"></div><div class="fp-notice-message"></div><input class="fp-notice-input" type="text"></div><button type="button" class="fp-notice-close" aria-label="Cancel">✕</button></div><div class="fp-notice-actions"><span class="fp-notice-shortcut">Enter submit · Esc cancel</span><button type="button" class="btn btn-secondary fp-no">${cancelText}</button><button type="button" class="btn btn-primary fp-yes">${okText}</button></div>`;
+    card.querySelector('.fp-notice-title').textContent=title;card.querySelector('.fp-notice-message').textContent=String(message??'');
+    const input=card.querySelector('.fp-notice-input');input.value=defaultValue??'';stack.appendChild(card);
+    let done=false;const finish=value=>{if(done)return;done=true;document.removeEventListener('keydown',onKey,true);closeNotice(card);resolve(value);};
+    const onKey=e=>{if(e.key==='Enter'){e.preventDefault();finish(input.value);}else if(e.key==='Escape'){e.preventDefault();finish(null);}};
+    card.querySelector('.fp-yes').onclick=()=>finish(input.value);card.querySelector('.fp-no').onclick=()=>finish(null);card.querySelector('.fp-notice-close').onclick=()=>finish(null);
+    document.addEventListener('keydown',onKey,true);setTimeout(()=>{input.focus();input.select();},0);
+  });
+}
+
+// ══════════════════════════════════════════════════════
 // CLOUD AUTH + DATA STORE
 // ══════════════════════════════════════════════════════
 // Public browser connection values. Security is enforced by database RLS.
 const SUPABASE_URL='https://fkwshkpmebitdvniwreh.supabase.co';
 const SUPABASE_KEY='sb_publishable_7oFuilE9oG0ZXV1frrKoYA_CFlKLXAr';
 const CLOUD_KEYS=['invoices','parties','payments','journal','settings','vouchers','stock','cheques','notes'];
-let sbClient=null,currentCloudUser=null,cloudReady=false,finpilotStarted=false;
+let sbClient=null,currentCloudUser=null,cloudReady=false,finpilotStarted=false,passwordRecoveryMode=false;
 const cloudSaveChains=new Map();
 let activeCloudWrites=0;
 let cloudPullBusy=false;
@@ -1329,6 +1437,58 @@ async function finpilotSignUp(){
   setAuthBusy(false);if(error)return authMessage(error.message,'error');
   if(!data.session)authMessage('Account created. Check your email and confirm it, then sign in.','ok');
 }
+async function finpilotForgotPassword(){
+  if(!sbClient)return authMessage('Cloud connection is not configured yet.','error');
+  let email=(document.getElementById('auth-email')?.value||'').trim();
+  if(!email){
+    email=await appPrompt('Enter the email address used for your FinPilot account.','',{okText:'Send reset link',cancelText:'Cancel',type:'info',title:'Forgot password'});
+    if(email===null)return;
+    email=String(email).trim();
+    const emailInput=document.getElementById('auth-email');if(emailInput)emailInput.value=email;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return authMessage('Enter a valid email address.','error');
+  setAuthBusy(true);authMessage('Sending password reset email…');
+  const redirectTo=location.origin+location.pathname;
+  const {error}=await sbClient.auth.resetPasswordForEmail(email,{redirectTo});
+  setAuthBusy(false);
+  if(error)return authMessage(error.message,'error');
+  authMessage('If that account exists, a password reset link has been sent to the email address.','ok');
+}
+function showPasswordRecovery(){
+  passwordRecoveryMode=true;
+  const login=document.getElementById('auth-login-box'),reset=document.getElementById('auth-reset-box');
+  if(login)login.hidden=true;if(reset)reset.hidden=false;
+  document.getElementById('auth-screen').hidden=false;
+  authMessage('Reset link verified. Enter your new password.','ok');
+  setTimeout(()=>document.getElementById('auth-new-password')?.focus(),0);
+}
+function finpilotReturnToSignIn(){
+  if(passwordRecoveryMode){
+    appNotice('Finish the password reset or reopen FinPilot normally to sign in.','info',5000);
+    return;
+  }
+  const login=document.getElementById('auth-login-box'),reset=document.getElementById('auth-reset-box');
+  if(login)login.hidden=false;if(reset)reset.hidden=true;authMessage('');
+}
+async function finpilotCompletePasswordReset(){
+  if(!sbClient)return authMessage('Cloud connection is not configured yet.','error');
+  const password=document.getElementById('auth-new-password')?.value||'';
+  const confirmPassword=document.getElementById('auth-confirm-password')?.value||'';
+  if(password.length<6)return authMessage('Password must be at least 6 characters.','error');
+  if(password!==confirmPassword)return authMessage('The two passwords do not match.','error');
+  setAuthBusy(true);authMessage('Updating password…');
+  const {error}=await sbClient.auth.updateUser({password});
+  if(error){setAuthBusy(false);return authMessage(error.message,'error');}
+  await sbClient.auth.signOut();
+  passwordRecoveryMode=false;
+  if(history.replaceState)history.replaceState({},document.title,location.pathname);
+  const login=document.getElementById('auth-login-box'),reset=document.getElementById('auth-reset-box');
+  if(login)login.hidden=false;if(reset)reset.hidden=true;
+  document.getElementById('auth-new-password').value='';document.getElementById('auth-confirm-password').value='';
+  setAuthBusy(false);authMessage('Password changed successfully. Sign in with your new password.','ok');
+  appNotice('Your FinPilot password has been changed.','success',5000);
+}
+
 async function finpilotSignOut(){
   if(sbClient)await sbClient.auth.signOut();
   location.reload();
@@ -1402,11 +1562,18 @@ async function openFinPilotForUser(user){
 async function bootCloudAuth(){
   const setup=document.getElementById('auth-setup');
   if(!supabaseConfigured()){setup.hidden=false;authMessage('Configure the cloud connection, then reload this page.');return;}
+  passwordRecoveryMode=/type=recovery/i.test(location.hash)||new URLSearchParams(location.search).get('type')==='recovery';
   sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   sbClient.auth.onAuthStateChange((event,session)=>{
-    if(event==='SIGNED_IN'&&session?.user&&!finpilotStarted)setTimeout(()=>openFinPilotForUser(session.user),0);
+    if(event==='PASSWORD_RECOVERY'){passwordRecoveryMode=true;setTimeout(showPasswordRecovery,0);return;}
+    if(event==='USER_UPDATED'&&session?.user){
+      currentCloudUser=session.user;
+      const emailField=document.getElementById('login-current-email');if(emailField)emailField.value=session.user.email||'';
+    }
+    if(event==='SIGNED_IN'&&session?.user&&!finpilotStarted&&!passwordRecoveryMode)setTimeout(()=>openFinPilotForUser(session.user),0);
   });
   const {data:{session}}=await sbClient.auth.getSession();
+  if(passwordRecoveryMode){showPasswordRecovery();return;}
   if(session?.user)await openFinPilotForUser(session.user);
 }
 
@@ -1645,7 +1812,8 @@ function acItem(inp,rowIdx){
 
   filtered.forEach((s)=>{
     const li=document.createElement('li');
-    li.textContent=s.name+(s.rate?` — Rs. ${fmtI(s.rate)}`:'')+( s.unit?` (${s.unit})`:'');
+    const qtyInfo=stockQuantityEnabled()?` · Qty ${fmtQty(getStockQuantityByName(s.name))}${s.unit?' '+s.unit:''}`:'';
+    li.textContent=s.name+(s.rate?` — Rs. ${fmtI(s.rate)}`:'')+qtyInfo+(!stockQuantityEnabled()&&s.unit?` (${s.unit})`:'');
     li.onclick=()=>{
       inp.value=s.name;
       invItems[rowIdx].name=s.name;
@@ -1714,6 +1882,44 @@ function autoCreateStockItem(name,rowIdx){
 function addPartyQuick(name){
   const p={id:uid(),name:name.trim(),phone:'',address:''};
   const parties=DB.parties();parties.push(p);DB.saveParties(parties);return p.id;
+}
+
+// Optional stock quantity management. When disabled, the rest of FinPilot behaves exactly as before.
+function stockQuantityEnabled(){return !!DB.settings().stockQuantityManagement;}
+function stockNameKey(name){return String(name||'').trim().toLowerCase();}
+function fmtQty(n){const v=Number(n)||0;return String(parseFloat(v.toFixed(3)));}
+function stockItemForName(name){const key=stockNameKey(name);return DB.stock().find(s=>stockNameKey(s.name)===key);}
+function getStockQuantityByName(name,{excludeInvoiceId='',excludeVoucherId=''}={}){
+  const key=stockNameKey(name);if(!key)return 0;
+  const item=stockItemForName(name);let qty=Number(item?.openingQty)||0;
+  DB.invoices().forEach(inv=>{
+    if(excludeInvoiceId&&inv.id===excludeInvoiceId)return;
+    (inv.items||[]).forEach(row=>{if(stockNameKey(row.name)===key)qty-=Number(row.qty)||0;});
+  });
+  DB.vouchers().forEach(v=>{
+    if(excludeVoucherId&&v.id===excludeVoucherId)return;
+    const sign=v.type==='purchase'||v.type==='sales-return'?1:v.type==='purchase-return'?-1:0;
+    if(!sign)return;
+    (v.items||[]).forEach(row=>{if(stockNameKey(row.name)===key)qty+=sign*(Number(row.qty)||0);});
+  });
+  return qty;
+}
+function groupedItemQuantities(items){
+  const grouped=new Map();
+  (items||[]).forEach(row=>{const name=String(row.name||'').trim(),key=stockNameKey(name),qty=Number(row.qty)||0;if(!key||qty<=0)return;const old=grouped.get(key)||{name,qty:0};old.qty+=qty;grouped.set(key,old);});
+  return [...grouped.values()];
+}
+async function confirmNegativeStock(items,kind,{excludeInvoiceId='',excludeVoucherId=''}={}){
+  if(!stockQuantityEnabled())return true;
+  const problems=[];
+  for(const row of groupedItemQuantities(items)){
+    const current=getStockQuantityByName(row.name,{excludeInvoiceId,excludeVoucherId});
+    const projected=current-row.qty;
+    if(projected<0){const stock=stockItemForName(row.name);problems.push(`${row.name}: ${fmtQty(current)} → ${fmtQty(projected)}${stock?.unit?' '+stock.unit:''}`);}
+  }
+  if(!problems.length)return true;
+  const label=kind==='purchase-return'?'purchase return':'sale';
+  return appConfirm(`This ${label} will create negative stock:\n\n${problems.join('\n')}\n\nNegative stock is allowed. Continue anyway?`,{yesText:'Continue',noText:'Cancel',type:'warning',title:'Negative stock'});
 }
 
 // ══════════════════════════════════════════════════════
@@ -1861,13 +2067,14 @@ function renderInvAdjustments(){
   el.innerHTML=invAdjustments.map((a,i)=>`<div style="display:flex;gap:6px;margin-bottom:6px"><input type="text" value="${escH(a.name||'')}" placeholder="Note, e.g. Delivery Charge" oninput="invAdjustments[${i}].name=this.value" style="flex:1"><input type="text" value="${escH(a.value===undefined?'':String(a.value))}" placeholder="+150 or -2" oninput="invAdjustments[${i}].value=this.value;calcInvTotals()" style="width:110px"><button type="button" class="btn btn-danger btn-sm btn-icon" onclick="removeInvAdjustment(${i})">✕</button></div>`).join('');
   calcInvTotals();
 }
-function saveInvoice(){
+async function saveInvoice(){
   const partyName=document.getElementById('inv-party-input').value.trim();
-  if(!partyName){alert('Please select or enter a party name.');return;}
+  if(!partyName){appAlert('Please select or enter a party name.');return;}
   let pid=document.getElementById('inv-party-id').value;if(!pid){pid=addPartyQuick(partyName);document.getElementById('inv-party-id').value=pid;}
-  if(!editingInvId&&!checkCreditLimit(pid,partyName))return;
+  if(!editingInvId&&!await checkCreditLimit(pid,partyName))return;
   const validItems=invItems.filter(i=>(i.name||'').trim()&&parseFloat(i.qty)>0&&parseFloat(i.rate)>0);
-  if(!validItems.length){alert('Please add at least one valid item.');return;}
+  if(!validItems.length){appAlert('Please add at least one valid item.');return;}
+  if(!await confirmNegativeStock(validItems,'sale',{excludeInvoiceId:editingInvId||''}))return;
   let sub=0,disc=0;
   validItems.forEach(i=>{sub+=(parseFloat(i.qty)||0)*(parseFloat(i.rate)||0);disc+=parseFloat(i.discAmt)||0;});
   const netBeforeAdjust=sub-disc;
@@ -1993,8 +2200,8 @@ function editInvoice(id){
   },50);
 }
 
-function deleteInvoice(id){
-  if(!confirm('Delete this invoice?'))return;
+async function deleteInvoice(id){
+  if(!await appConfirm('Delete this invoice?',{yesText:'Delete',noText:'Cancel',type:'warning',title:'Delete invoice'}))return;
   DB.saveInvoices(DB.invoices().filter(i=>i.id!==id));
   DB.saveJournal(DB.journal().filter(j=>j.refId!==id));
   renderInvoicesTable();
@@ -2014,13 +2221,13 @@ function openPartyModal(id){
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');if(id==='voucher-modal'&&journalReturn)closeJournalItem();}
 function saveParty(){
-  const name=document.getElementById('pm-name').value.trim();if(!name){alert('Name required');return;}
+  const name=document.getElementById('pm-name').value.trim();if(!name){appAlert('Name required');return;}
   const parties=DB.parties();const eid=document.getElementById('pm-id').value;
   if(eid){const idx=parties.findIndex(p=>p.id===eid);if(idx>-1){parties[idx].name=name;parties[idx].phone=document.getElementById('pm-phone').value;parties[idx].address=document.getElementById('pm-address').value;}}
   else{parties.push({id:uid(),name,phone:document.getElementById('pm-phone').value,address:document.getElementById('pm-address').value});}
   DB.saveParties(parties);closeModal('party-modal');renderPartiesTable();
 }
-function deleteParty(id){if(!confirm('Delete this party?'))return;DB.saveParties(DB.parties().filter(p=>p.id!==id));renderPartiesTable();}
+async function deleteParty(id){if(!await appConfirm('Delete this party?',{yesText:'Delete',noText:'Cancel',type:'warning',title:'Delete account'}))return;DB.saveParties(DB.parties().filter(p=>p.id!==id));renderPartiesTable();}
 function getTotalSalesReturn(pid){
   return DB.vouchers().filter(v=>v.type==='sales-return'&&v.partyId===pid).reduce((s,v)=>s+(v.total||0),0);
 }
@@ -2168,7 +2375,7 @@ function clearDueFilters(){
 }
 
 function exportDueExcel(){
-  if(typeof XLSX==='undefined'){alert('SheetJS not loaded.');return;}
+  if(typeof XLSX==='undefined'){appAlert('SheetJS not loaded.');return;}
   const fullView=(document.getElementById('due-full-view')||{}).checked;
   const rows=getFilteredDueRows();
   const s=DB.settings();
@@ -2267,9 +2474,9 @@ function loadPartyBalance(){
 function savePayment(){
   const pid=document.getElementById('pay-party-id').value;
   const pname=document.getElementById('pay-party-input').value.trim();
-  if(!pid||!pname){alert('Please select an account.');return;}
+  if(!pid||!pname){appAlert('Please select an account.');return;}
   const amount=parseFloat(document.getElementById('pay-amount').value)||0;
-  if(amount<=0){alert('Please enter a valid amount.');return;}
+  if(amount<=0){appAlert('Please enter a valid amount.');return;}
   const discount=parseFloat(document.getElementById('pay-discount').value)||0;
   const methodRaw=document.getElementById('pay-method').value;
   const othersText=document.getElementById('pay-others-text').value.trim();
@@ -2283,7 +2490,7 @@ function savePayment(){
   const jDesc=`Payment Received (${method})${receipt?' Ref:'+receipt:''}${note?': '+note:''}`;
   if(editId){
     const idx=payments.findIndex(p=>p.id===editId);
-    if(idx===-1){alert('The payment being edited could not be found.');return;}
+    if(idx===-1){appAlert('The payment being edited could not be found.');return;}
     payments[idx]={...payments[idx],partyId:pid,partyName:pname,amount,discount,method,receipt,note,dateBS};
     DB.savePayments(payments);
     DB.saveJournal(DB.journal().filter(j=>j.refId!==editId));
@@ -2330,8 +2537,8 @@ function editPayment(id){
   loadPartyBalance();
   document.getElementById('pay-party-input').scrollIntoView({behavior:'smooth',block:'center'});
 }
-function deletePayment(id){
-  if(!confirm('Delete this payment?'))return;
+async function deletePayment(id){
+  if(!await appConfirm('Delete this payment?',{yesText:'Delete',noText:'Cancel',type:'warning',title:'Delete payment'}))return;
   DB.savePayments(DB.payments().filter(p=>p.id!==id));
   DB.saveJournal(DB.journal().filter(j=>j.refId!==id));
   renderPaymentHistory();loadPartyBalance();
@@ -2395,9 +2602,9 @@ function printReceiptData(p){if(p)printDocument('<div class="receipt-sheet">'+re
 
 function printPaymentReceipt(){
   const pname=document.getElementById('pay-party-input').value.trim();
-  if(!pname){alert('Please select an account first.');return;}
+  if(!pname){appAlert('Please select an account first.');return;}
   const amount=parseFloat(document.getElementById('pay-amount').value)||0;
-  if(amount<=0){alert('Please enter a valid amount first.');return;}
+  if(amount<=0){appAlert('Please enter a valid amount first.');return;}
   const methodRaw=document.getElementById('pay-method').value;
   const others=document.getElementById('pay-others-text').value.trim();
   const p={
@@ -2432,46 +2639,46 @@ function addJournalEntry(date,party,desc,debitAcc,creditAcc,amount,refId,isUpdat
 // STOCK ITEMS
 // ══════════════════════════════════════════════════════
 function openStockModal(id){
+  const qtyOn=stockQuantityEnabled();
+  const qtyRow=document.getElementById('sm-opening-qty-row');if(qtyRow)qtyRow.style.display=qtyOn?'block':'none';
   if(id){
     const s=DB.stock().find(x=>x.id===id);
-    if(s){document.getElementById('stock-modal-title').textContent='Edit Item';document.getElementById('sm-name').value=s.name;document.getElementById('sm-rate').value=s.rate||'';document.getElementById('sm-unit').value=s.unit||'';document.getElementById('sm-desc').value=s.desc||'';document.getElementById('sm-id').value=s.id;}
+    if(s){document.getElementById('stock-modal-title').textContent='Edit Item';document.getElementById('sm-name').value=s.name;document.getElementById('sm-rate').value=s.rate||'';document.getElementById('sm-unit').value=s.unit||'';document.getElementById('sm-desc').value=s.desc||'';document.getElementById('sm-id').value=s.id;document.getElementById('sm-opening-qty').value=qtyOn?(s.openingQty??0):'';}
   }else{
-    document.getElementById('stock-modal-title').textContent='Add Stock Item';document.getElementById('sm-name').value='';document.getElementById('sm-rate').value='';document.getElementById('sm-unit').value='';document.getElementById('sm-desc').value='';document.getElementById('sm-id').value='';
+    document.getElementById('stock-modal-title').textContent='Add Stock Item';document.getElementById('sm-name').value='';document.getElementById('sm-rate').value='';document.getElementById('sm-unit').value='';document.getElementById('sm-desc').value='';document.getElementById('sm-id').value='';document.getElementById('sm-opening-qty').value=qtyOn?'0':'';
   }
   document.getElementById('stock-modal').classList.add('open');
 }
 function saveStockItem(){
-  const name=document.getElementById('sm-name').value.trim();if(!name){alert('Name required');return;}
+  const name=document.getElementById('sm-name').value.trim();if(!name){appAlert('Name required');return;}
   const stock=DB.stock();const eid=document.getElementById('sm-id').value;
   const item={name,rate:parseFloat(document.getElementById('sm-rate').value)||0,unit:document.getElementById('sm-unit').value,desc:document.getElementById('sm-desc').value,updatedAt:getNepaliDate()};
+  if(stockQuantityEnabled())item.openingQty=parseFloat(document.getElementById('sm-opening-qty').value)||0;
   if(eid){const idx=stock.findIndex(s=>s.id===eid);if(idx>-1){stock[idx]={...stock[idx],...item};}}
   else{stock.push({id:uid(),...item});}
   DB.saveStock(stock);closeModal('stock-modal');renderStockTable();
 }
-function deleteStockItem(id){if(!confirm('Delete?'))return;DB.saveStock(DB.stock().filter(s=>s.id!==id));renderStockTable();}
+async function deleteStockItem(id){if(!await appConfirm('Delete this stock item?',{yesText:'Delete',noText:'Cancel',type:'warning',title:'Delete item'}))return;DB.saveStock(DB.stock().filter(s=>s.id!==id));renderStockTable();}
 function renderStockTable(){
   const q=(document.getElementById('stock-search')||{value:''}).value.toLowerCase();
   const tbody=document.getElementById('stock-tbody');
+  const table=tbody?.closest('table'),thead=table?.querySelector('thead');
+  const qtyOn=stockQuantityEnabled();
+  if(thead)thead.innerHTML=qtyOn?'<tr><th>Item Name</th><th class="amount">Last Rate (Rs.)</th><th class="amount">Quantity</th><th>Last Updated</th><th>Actions</th></tr>':'<tr><th>Item Name</th><th class="amount">Last Rate (Rs.)</th><th>Last Updated</th><th>Actions</th></tr>';
   const items=DB.stock().filter(s=>!q||s.name.toLowerCase().includes(q));
   tbody.innerHTML='';
-  if(!items.length){tbody.innerHTML=`<tr><td colspan="5"><div class="empty-state"><div class="icon">📦</div><p>No stock items yet. They auto-populate from invoices.</p></div></td></tr>`;return;}
+  if(!items.length){tbody.innerHTML=`<tr><td colspan="${qtyOn?5:4}"><div class="empty-state"><div class="icon">📦</div><p>No stock items yet. They auto-populate from invoices.</p></div></td></tr>`;return;}
   items.forEach(s=>{
-    const tr=document.createElement('tr');
-    tr.style.cursor='pointer';
+    const tr=document.createElement('tr');tr.style.cursor='pointer';
+    const qty=qtyOn?getStockQuantityByName(s.name):0;
+    const qtyCell=qtyOn?`<td class="amount" style="font-weight:700;color:${qty<0?'var(--red)':qty===0?'var(--text2)':'var(--green)'}">${fmtQty(qty)}${s.unit?' '+escH(s.unit):''}${qty<0?' <span class="badge badge-red" style="margin-left:5px">Negative</span>':''}</td>`:'';
     tr.innerHTML=`
       <td><strong>${s.name}</strong>${s.unit?` <span style="color:var(--text3);font-size:11px">(${s.unit})</span>`:''}</td>
       <td class="amount">Rs. ${fmtI(s.rate)}</td>
+      ${qtyCell}
       <td class="mono">${s.updatedAt||'-'}</td>
-      <td>
-        <div class="flex-gap">
-          <button class="btn btn-blue btn-sm" onclick="event.stopPropagation();openStockStatement('${s.id}')">📊 Statement</button>
-          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openStockModal('${s.id}')">✏️</button>
-          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteStockItem('${s.id}')">🗑</button>
-        </div>
-      </td>
-    `;
-    tr.onclick=()=>openStockStatement(s.id);
-    tbody.appendChild(tr);
+      <td><div class="flex-gap"><button class="btn btn-blue btn-sm" onclick="event.stopPropagation();openStockStatement('${s.id}')">📊 Statement</button><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openStockModal('${s.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteStockItem('${s.id}')">🗑</button></div></td>`;
+    tr.onclick=()=>openStockStatement(s.id);tbody.appendChild(tr);
   });
 }
 
@@ -2479,6 +2686,7 @@ function openStockStatement(stockId){
   const stock=DB.stock().find(s=>s.id===stockId);
   if(!stock)return;
   const name=stock.name.toLowerCase();
+  const qtyOn=stockQuantityEnabled(),openingQty=Number(stock.openingQty)||0;
   document.getElementById('stock-stmt-title').textContent=`📊 ${stock.name} — Item Statement`;
   const rows=[];
   let totalQtySold=0,totalRevenue=0,totalQtyPurchased=0;
@@ -2525,8 +2733,14 @@ function openStockStatement(stockId){
     });
   });
   rows.sort((a,b)=>a.date.localeCompare(b.date));
+  if(qtyOn){let running=openingQty;rows.forEach(r=>{const effect=(r.type==='Purchase'||r.type==='Credit Note'?1:-1)*(Number(r.qty)||0);running+=effect;r.balanceQty=running;});}
+  const stmtTable=document.getElementById('stock-stmt-tbody')?.closest('table');
+  const stmtHead=stmtTable?.querySelector('thead');
+  if(stmtHead)stmtHead.innerHTML=qtyOn?'<tr><th>Date (BS)</th><th>Type</th><th>Account</th><th>Ref No.</th><th class="amount">Qty</th><th class="amount">Balance Qty</th><th class="amount">Rate</th><th class="amount">Amount</th></tr>':'<tr><th>Date (BS)</th><th>Type</th><th>Account</th><th>Ref No.</th><th class="amount">Qty</th><th class="amount">Rate</th><th class="amount">Amount</th></tr>';
   const sumEl=document.getElementById('stock-stmt-summary');
+  const quantitySummary=qtyOn?`<span>Opening Qty: <strong>${fmtQty(openingQty)}${stock.unit?' '+escH(stock.unit):''}</strong></span><span style="color:${getStockQuantityByName(stock.name)<0?'var(--red)':'var(--green)'}">Available: <strong>${fmtQty(getStockQuantityByName(stock.name))}${stock.unit?' '+escH(stock.unit):''}</strong></span>`:'';
   sumEl.innerHTML=`
+    ${quantitySummary}
     <span>Total Entries: <strong>${rows.length}</strong></span>
     <span style="color:var(--red)">Total Sold: <strong>${fmtI(totalQtySold)} units</strong></span>
     <span style="color:var(--green)">Total Purchased: <strong>${fmtI(totalQtyPurchased)} units</strong></span>
@@ -2535,7 +2749,7 @@ function openStockStatement(stockId){
   `;
   const tbody=document.getElementById('stock-stmt-tbody');
   tbody.innerHTML='';
-  if(!rows.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="icon">📦</div><p>No transactions found for "${stock.name}"</p></div></td></tr>`;document.getElementById('stock-stmt-modal').classList.add('open');return;}
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="${qtyOn?8:7}"><div class="empty-state"><div class="icon">📦</div><p>No transactions found for "${stock.name}"</p></div></td></tr>`;document.getElementById('stock-stmt-modal').classList.add('open');return;}
   rows.forEach(r=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`
@@ -2543,7 +2757,8 @@ function openStockStatement(stockId){
       <td><span class="badge ${r.typeColor}">${r.type}</span></td>
       <td>${r.party}</td>
       <td class="mono" style="font-size:12px">${r.ref}</td>
-      <td class="amount">${fmtI(r.qty)}</td>
+      <td class="amount">${fmtQty(r.qty)}</td>
+      ${qtyOn?`<td class="amount" style="font-weight:700;color:${r.balanceQty<0?'var(--red)':'var(--text)'}">${fmtQty(r.balanceQty)}</td>`:''}
       <td class="amount">Rs. ${fmtI(r.rate)}</td>
       <td class="amount ${r.type==='Sale'?'text-green':'text-red'}">Rs. ${fmtI(r.amount)}</td>
     `;
@@ -2619,11 +2834,11 @@ function calcVmTotals(){
   document.getElementById('vm-subtotal').textContent=fmtI(sub);
   document.getElementById('vm-total').textContent=fmtI(sub);
 }
-function saveVoucher(){
+async function saveVoucher(){
   const type=document.getElementById('vm-type').value;
   const pname=document.getElementById('vm-party-input').value.trim();
   const validItems=vmItems.filter(i=>(i.name||'').trim()&&parseFloat(i.qty)>0&&parseFloat(i.rate)>0);
-  if(!validItems.length){alert('Add at least one valid item.');return;}
+  if(!validItems.length){appAlert('Add at least one valid item.');return;}
   let pid=document.getElementById('vm-party-id').value;
   if(pname&&!pid)pid=addPartyQuick(pname);
   const total=validItems.reduce((s,i)=>s+(i.total||0),0);
@@ -2631,6 +2846,7 @@ function saveVoucher(){
   const refNo=document.getElementById('vm-no').value;
   const ref=document.getElementById('vm-ref').value;
   const editId=document.getElementById('vm-editing-id').value;
+  if(type==='purchase-return'&&!await confirmNegativeStock(validItems,'purchase-return',{excludeVoucherId:editId||''}))return;
   const vouchers=DB.vouchers();
   // sync stock
   if(type==='purchase'){validItems.forEach(item=>syncStockFromItem(item.name.trim(),parseFloat(item.rate)||0,dateBS));}
@@ -2668,8 +2884,8 @@ function renderVouchersTable(type){
     tbody.appendChild(tr);
   });
 }
-function deleteVoucher(id,type){
-  if(!confirm('Delete?'))return;
+async function deleteVoucher(id,type){
+  if(!await appConfirm('Delete this voucher?',{yesText:'Delete',noText:'Cancel',type:'warning',title:'Delete voucher'}))return;
   DB.saveVouchers(DB.vouchers().filter(v=>v.id!==id));
   DB.saveJournal(DB.journal().filter(j=>j.refId!==id));
   renderVouchersTable(type);
@@ -2796,6 +3012,8 @@ function loadSettings(){
   const panEl=document.getElementById('set-pan');if(panEl)panEl.value=s.pan||'';
   document.getElementById('set-username').value=s.username||'';
   document.getElementById('set-today-bs').value=s.todayBS||getTodayBS();
+  const loginEmail=document.getElementById('login-current-email');if(loginEmail)loginEmail.value=currentCloudUser?.email||'';
+  const sq=document.getElementById('set-stock-qty');if(sq)sq.checked=!!s.stockQuantityManagement;
   const lp=document.getElementById('set-letter-pad');if(lp)lp.checked=!!s.letterPad;
   const ltc=document.getElementById('set-letter-text-color');if(ltc)ltc.value=s.letterTextColor||'#222222';
   const rtc=document.getElementById('set-receipt-text-color');if(rtc)rtc.value=s.receiptTextColor||'#222222';
@@ -2819,6 +3037,7 @@ function saveSettings(){
   const ltc=document.getElementById('set-letter-text-color');s.letterTextColor=ltc?ltc.value:'#222222';
   s.receiptTemplate=s.invoiceTemplate||'classic';
   const rtc=document.getElementById('set-receipt-text-color');s.receiptTextColor=rtc?rtc.value:'#222222';
+  const sq=document.getElementById('set-stock-qty');s.stockQuantityManagement=!!(sq&&sq.checked);
   s.useStock=true;
   const sel=document.getElementById('set-template');
   s.invoiceTemplate=sel?sel.value:'classic';
@@ -2827,8 +3046,42 @@ function saveSettings(){
   const dd=document.getElementById('dash-date');if(dd)dd.textContent=getTodayBSFull();
   applyStockVisibility();
   if(typeof renderDashboard==='function')renderDashboard();
-  alert('Settings saved!');
+  if(document.querySelector('.section.active')?.id==='sec-stock')renderStockTable();
+  appAlert('Settings saved!');
 }
+async function changeLoginCredentials(){
+  if(!sbClient||!currentCloudUser)return appNotice('You must be signed in to change login credentials.','error',5000);
+  const currentEmail=currentCloudUser.email||'';
+  let newEmail=(document.getElementById('login-new-email')?.value||'').trim();
+  const currentPassword=document.getElementById('login-current-password')?.value||'';
+  const newPassword=document.getElementById('login-new-password')?.value||'';
+  const confirmPassword=document.getElementById('login-confirm-password')?.value||'';
+  if(newEmail&&newEmail.toLowerCase()===currentEmail.toLowerCase())newEmail='';
+  if(!newEmail&&!newPassword)return appNotice('Enter a new email or a new password first.','warning',5000);
+  if(newEmail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail))return appNotice('Enter a valid new email address.','error',5000);
+  if(!currentPassword)return appNotice('Enter your current password to confirm this change.','warning',5000);
+  if(newPassword&&newPassword.length<6)return appNotice('New password must be at least 6 characters.','error',5000);
+  if(newPassword!==confirmPassword)return appNotice('The new passwords do not match.','error',5000);
+  const btn=document.getElementById('change-login-btn');if(btn){btn.disabled=true;btn.textContent='Updating…';}
+  try{
+    const {error:verifyError}=await sbClient.auth.signInWithPassword({email:currentEmail,password:currentPassword});
+    if(verifyError)throw new Error('Current password is incorrect.');
+    const attrs={};if(newEmail)attrs.email=newEmail;if(newPassword){attrs.password=newPassword;attrs.current_password=currentPassword;}
+    const {data,error}=await sbClient.auth.updateUser(attrs);
+    if(error)throw error;
+    if(data?.user)currentCloudUser=data.user;
+    const emailField=document.getElementById('login-current-email');if(emailField)emailField.value=currentCloudUser?.email||currentEmail;
+    document.getElementById('login-new-email').value='';
+    document.getElementById('login-current-password').value='';
+    document.getElementById('login-new-password').value='';
+    document.getElementById('login-confirm-password').value='';
+    if(newEmail&&newPassword)appNotice('Password updated. Check your email to confirm the new login email.','success',5000);
+    else if(newEmail)appNotice('Email change requested. Check your email for the confirmation link.','success',5000);
+    else appNotice('Login password updated successfully.','success',5000);
+  }catch(error){appNotice(error?.message||'Could not update login credentials.','error',5000);}
+  finally{if(btn){btn.disabled=false;btn.textContent='Update Login Credentials';}}
+}
+
 function applyStockVisibility(){
   const on=true;
   const li=document.getElementById('nav-li-stock');
@@ -3400,10 +3653,10 @@ document.addEventListener('keydown',function(e){
 },true);
 
 function exportStatementXLSX(){
-  if(typeof XLSX==='undefined'){alert('SheetJS not loaded.');return;}
+  if(typeof XLSX==='undefined'){appAlert('SheetJS not loaded.');return;}
   const pid=document.getElementById('stmt-party-id').value;
   const pname=document.getElementById('stmt-party-input').value.trim();
-  if(!pid){alert('Please select an account first.');return;}
+  if(!pid){appAlert('Please select an account first.');return;}
   const entries=getStatementEntries();
   const data=[['Date (BS)','Type','Ref No.','Description','Debit (Rs.)','Credit (Rs.)','Balance (Rs.)']];
   entries.forEach(e=>data.push([e.date,e.type,e.ref,e.desc,e.debit||0,e.credit||0,e.balance]));
@@ -3423,7 +3676,7 @@ function exportStatementXLSX(){
 function printStatement(){
   const pid=document.getElementById('stmt-party-id').value;
   const pname=document.getElementById('stmt-party-input').value.trim();
-  if(!pid){alert('Please select an account first.');return;}
+  if(!pid){appAlert('Please select an account first.');return;}
   const entries=getStatementEntries();
   const s=DB.settings();
   const from=document.getElementById('stmt-from').value||'—';
@@ -3587,7 +3840,7 @@ async function renderAndDownloadInvoiceImage(inv){
   document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
  }catch(error){
   console.error('Invoice image export failed:',error);
-  alert('Could not save the invoice image. '+(error.message||'Please try again.'));
+  appAlert('Could not save the invoice image. '+(error.message||'Please try again.'));
  }finally{
   stage?.remove();previous.forEach(({btn,disabled})=>{btn.disabled=disabled;btn.removeAttribute('aria-busy');});invoiceImageExportBusy=false;
  }
@@ -3764,7 +4017,7 @@ function renderTodaySales(){
 // ══════════════════════════════════════════════════════
 // CREDIT LIMIT — 20 DAYS WARNING
 // ══════════════════════════════════════════════════════
-function checkCreditLimit(partyId,partyName){
+async function checkCreditLimit(partyId,partyName){
   // Find oldest unpaid invoice for this party
   const unpaid=DB.invoices().filter(i=>i.partyId===partyId&&!i.paid).sort((a,b)=>(a.dateBS||'').localeCompare(b.dateBS||''));
   if(!unpaid.length)return true;
@@ -3772,7 +4025,7 @@ function checkCreditLimit(partyId,partyName){
   const days=bsDaysDiff(oldest.dateBS||'');
   const due=getTotalBilled(partyId)-getTotalPaid(partyId);
   if(days>=20&&due>0){
-    return confirm(`⚠️ Credit Limit Warning!\n\n${partyName} has an overdue balance of Rs. ${fmtI(due)}\nOldest unpaid invoice: ${oldest.invNo} (${oldest.dateBS}) — ${days} days overdue.\n\nDo you still want to create a new invoice?`);
+    return appConfirm(`${partyName} has an overdue balance of Rs. ${fmtI(due)}\nOldest unpaid invoice: ${oldest.invNo} (${oldest.dateBS}) — ${days} days overdue.\n\nDo you still want to create a new invoice?`,{yesText:'Continue',noText:'Cancel',type:'warning',title:'Credit limit warning'});
   }
   return true;
 }
@@ -3959,10 +4212,10 @@ function exportBackup(){
 function importBackup(inp){
   const file=inp.files[0];if(!file)return;
   const reader=new FileReader();
-  reader.onload=e=>{
+  reader.onload=async e=>{
     try{
       const data=JSON.parse(e.target.result);
-      if(!confirm('This will REPLACE all current data. Continue?'))return;
+      if(!await appConfirm('This will replace all current FinPilot data with the selected backup. Continue?',{yesText:'Replace data',noText:'Cancel',type:'warning',title:'Restore backup'}))return;
       if(data.invoices)DB.saveInvoices(data.invoices);
       if(data.parties)DB.saveParties(data.parties);
       if(data.payments)DB.savePayments(data.payments);
@@ -3972,8 +4225,8 @@ function importBackup(inp){
       if(data.stock)DB.saveStock(data.stock);
       if(data.cheques)DB.saveCheques(data.cheques);
       if(typeof data.notes==='string')DB.set('notes',data.notes);
-      alert('Restored!');location.reload();
-    }catch(e){alert('Invalid backup file.');}
+      appNotice('Backup restored. Reloading…','success',1200);setTimeout(()=>location.reload(),1200);
+    }catch(e){appAlert('Invalid backup file.');}
   };
   reader.readAsText(file);inp.value='';
 }
@@ -4035,10 +4288,10 @@ document.addEventListener('keydown',function(e){
 
 <script id="finpilot-auth-enter">
 document.addEventListener('keydown',function(e){
-  if(e.key==='Enter' && !document.getElementById('auth-screen')?.hidden && (document.activeElement?.id==='auth-email' || document.activeElement?.id==='auth-password')){
-    e.preventDefault();
-    finpilotSignIn();
-  }
+  if(e.key!=='Enter'||document.getElementById('auth-screen')?.hidden)return;
+  const id=document.activeElement?.id;
+  if(id==='auth-email'||id==='auth-password'){e.preventDefault();finpilotSignIn();}
+  if(id==='auth-new-password'||id==='auth-confirm-password'){e.preventDefault();finpilotCompletePasswordReset();}
 });
 </script>
 </body>

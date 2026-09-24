@@ -261,66 +261,113 @@ main#content{padding:0 34px 30px;min-width:0;scroll-behavior:smooth}.workspace-b
 
 <style id="finpilot-cloud-auth">
 #auth-screen{
-  position:fixed;inset:0;z-index:5000;display:grid;place-items:center;
-  padding:28px;background:
-    radial-gradient(circle at 12% 18%,rgba(59,211,192,.18),transparent 28%),
-    radial-gradient(circle at 88% 82%,rgba(35,94,138,.16),transparent 32%),
-    #edf3f7;font-family:'DM Sans',sans-serif;color:#182638;overflow:auto
+  --mx:0px;--my:0px;--auth-ink:#f7fbff;--auth-muted:#9db2c6;--auth-cyan:#55e6d2;--auth-blue:#77a8ff;--auth-purple:#9c7cff;
+  position:fixed;inset:0;z-index:5000;display:grid;place-items:center;padding:24px;
+  font-family:'DM Sans',sans-serif;color:var(--auth-ink);overflow:auto;
+  background:
+    radial-gradient(circle at 15% 18%,rgba(60,219,198,.22),transparent 26%),
+    radial-gradient(circle at 82% 15%,rgba(119,168,255,.19),transparent 28%),
+    radial-gradient(circle at 72% 86%,rgba(156,124,255,.17),transparent 32%),
+    linear-gradient(135deg,#050a12 0%,#07131f 45%,#0a1624 100%);
+  animation:authBgShift 14s ease-in-out infinite alternate
 }
 #auth-screen[hidden]{display:none!important}
+#auth-screen:before{
+  content:'';position:absolute;inset:-15%;pointer-events:none;opacity:.42;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:44px 44px;transform:translate(calc(var(--mx)*.12),calc(var(--my)*.12)) rotate(-3deg);
+  mask-image:radial-gradient(circle at center,#000 15%,transparent 73%);animation:authGridDrift 24s linear infinite
+}
+#auth-screen:after{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.17;
+  background:repeating-linear-gradient(120deg,transparent 0 48px,rgba(255,255,255,.035) 49px,transparent 50px 96px)
+}
+.auth-ambient{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.auth-orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.6;mix-blend-mode:screen;will-change:transform}
+.auth-orb.o1{width:260px;height:260px;left:4%;top:8%;background:radial-gradient(circle at 30% 30%,#58efd7,transparent 68%);animation:authFloat1 10s ease-in-out infinite}
+.auth-orb.o2{width:330px;height:330px;right:3%;bottom:1%;background:radial-gradient(circle at 50% 50%,#7aa4ff,transparent 70%);animation:authFloat2 13s ease-in-out infinite}
+.auth-orb.o3{width:200px;height:200px;right:30%;top:6%;background:radial-gradient(circle at 45% 45%,#a47cff,transparent 68%);animation:authFloat3 11s ease-in-out infinite}
+.auth-noise{position:absolute;inset:0;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E")}
 .auth-shell{
-  width:min(1040px,100%);min-height:620px;display:grid;grid-template-columns:1.08fr .92fr;
-  background:#fff;border:1px solid rgba(255,255,255,.75);border-radius:28px;overflow:hidden;
-  box-shadow:0 35px 100px rgba(17,35,52,.18),0 8px 28px rgba(17,35,52,.08)
+  position:relative;z-index:2;width:min(1180px,100%);min-height:690px;display:grid;grid-template-columns:1.12fr .88fr;
+  border:1px solid rgba(255,255,255,.13);border-radius:34px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(13,28,44,.76),rgba(8,18,30,.74));
+  box-shadow:0 50px 130px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.08);backdrop-filter:blur(24px) saturate(140%);
+  transform:translate(calc(var(--mx)*.025),calc(var(--my)*.025));animation:authShellIn .9s cubic-bezier(.2,.75,.2,1) both
 }
-.auth-showcase{
-  position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:48px;
-  color:#fff;background:linear-gradient(145deg,#0b1e32 0%,#102b44 55%,#0d4e56 100%);overflow:hidden
-}
-.auth-showcase:before{content:'';position:absolute;width:390px;height:390px;border-radius:50%;right:-150px;top:-130px;background:rgba(69,221,199,.13);filter:blur(2px)}
-.auth-showcase:after{content:'';position:absolute;width:320px;height:320px;border-radius:50%;left:-140px;bottom:-170px;background:rgba(116,172,255,.10)}
-.auth-brand,.auth-pitch,.auth-proof{position:relative;z-index:1}
-.auth-brand{display:flex;align-items:center;gap:14px}
-.auth-brand-logo{width:54px;height:54px;object-fit:contain;display:block;filter:drop-shadow(0 8px 20px rgba(0,0,0,.18))}
-.auth-brand-copy h1{font-size:28px;line-height:1;font-weight:700;letter-spacing:-.9px;color:#fff}
-.auth-brand-copy p{font-size:12px;color:#a9bfd2;margin-top:7px;letter-spacing:.15px}
-.auth-pitch{max-width:480px;margin:58px 0 40px}
-.auth-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(255,255,255,.07);font-size:11px;color:#bfe7e2;margin-bottom:20px}
-.auth-kicker:before{content:'';width:7px;height:7px;border-radius:50%;background:#55dbc8;box-shadow:0 0 0 5px rgba(85,219,200,.10)}
-.auth-pitch h2{font-size:42px;line-height:1.08;letter-spacing:-1.7px;font-weight:700;max-width:430px;color:#fff}
-.auth-pitch p{font-size:14px;line-height:1.75;color:#b6c8d8;max-width:430px;margin-top:18px}
-.auth-proof{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.auth-proof-item{padding:14px 13px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.055);border-radius:14px;backdrop-filter:blur(8px)}
-.auth-proof-item b{display:block;font-size:12px;color:#fff;margin-bottom:4px}.auth-proof-item span{font-size:10.5px;color:#91a8ba;line-height:1.4}
-.auth-panel{display:flex;align-items:center;justify-content:center;padding:54px 48px;background:linear-gradient(180deg,#fff 0%,#fbfdff 100%)}
-.auth-card{width:min(390px,100%)}
-.auth-mobile-brand{display:none;align-items:center;gap:11px;margin-bottom:28px}.auth-mobile-brand img{width:42px;height:42px;object-fit:contain}.auth-mobile-brand h1{font-size:22px;line-height:1}.auth-mobile-brand p{font-size:11px;color:#7b8a9b;margin-top:4px}
-.auth-card h2{font-size:29px;line-height:1.15;letter-spacing:-.8px;margin:0 0 8px;color:#172638}
-.auth-subtitle{color:#718096;font-size:13px;line-height:1.6;margin-bottom:28px}
-.auth-field{margin-bottom:17px}.auth-field label{text-transform:none;letter-spacing:0;font-size:12px;font-weight:600;color:#405267;margin-bottom:7px}
-.auth-field input{width:100%;min-height:48px;padding:0 14px;border:1px solid #dbe4ec;border-radius:11px;background:#fff;color:#182638;font-size:13.5px;box-shadow:0 1px 2px rgba(22,38,56,.02);transition:border-color .18s,box-shadow .18s,background .18s}
-.auth-field input::placeholder{color:#9aa8b7}.auth-field input:focus{border-color:#168f98;box-shadow:0 0 0 4px rgba(22,143,152,.10);background:#fff}
-.auth-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:23px}
-.auth-actions .btn{width:100%;min-height:48px;border-radius:11px;justify-content:center;font-size:13px;font-weight:700}
-.auth-actions .btn-primary{background:linear-gradient(135deg,#087f8c,#0a6e78);box-shadow:0 8px 22px rgba(8,127,140,.22)}
-.auth-actions .btn-primary:hover{background:linear-gradient(135deg,#096f7a,#075f69);box-shadow:0 10px 26px rgba(8,127,140,.28)}
-.auth-actions .btn-secondary{background:#f4f7fa;border:1px solid #dce5ec;color:#2f4357;box-shadow:none}.auth-actions .btn-secondary:hover{background:#eaf0f4}
-.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0 4px;color:#a0adba;font-size:10.5px}.auth-divider:before,.auth-divider:after{content:'';height:1px;background:#e4eaf0;flex:1}
-.auth-trust{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:18px;color:#8795a4;font-size:10.5px}.auth-trust svg{width:13px;height:13px;color:#168163}
-.auth-inline-actions{display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:15px}.auth-link-btn{border:0;background:transparent;color:#087f8c;padding:4px 0;font:600 12px 'DM Sans',sans-serif;cursor:pointer}.auth-link-btn:hover{text-decoration:underline;color:#066773}.auth-link-btn:disabled{opacity:.55;cursor:not-allowed}.auth-reset-note{font-size:11.5px;line-height:1.55;color:#718096;margin:-10px 0 18px}.credential-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.credential-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.credential-hint{font-size:11.5px;color:var(--text2);line-height:1.55;margin-top:7px}@media(max-width:600px){.credential-grid{grid-template-columns:1fr}}
-.auth-message{min-height:22px;margin-top:14px;font-size:12.5px;color:#56667a;text-align:center}.auth-message.error{color:#c44558}.auth-message.ok{color:#168163}
-.auth-google{width:100%;min-height:48px;border:1px solid #dbe4ec;border-radius:11px;background:#fff;color:#26384a;display:flex;align-items:center;justify-content:center;gap:10px;font:700 13px 'DM Sans',sans-serif;cursor:pointer;transition:.18s;box-shadow:0 1px 2px rgba(22,38,56,.03)}
-.auth-google:hover{background:#f8fafc;border-color:#c9d5df;box-shadow:0 6px 18px rgba(15,23,42,.07)}.auth-google svg{width:18px;height:18px;flex:0 0 18px}
-.auth-method-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:#a0adba;font-size:10.5px}.auth-method-divider:before,.auth-method-divider:after{content:'';height:1px;background:#e4eaf0;flex:1}
-.auth-passwordless{display:flex;justify-content:center;margin-top:12px}.auth-passwordless .auth-link-btn{font-size:12.5px}
-.auth-otp-box{margin-top:19px;padding:16px;border:1px solid #dfe8ef;background:#f8fbfd;border-radius:13px}.auth-otp-box[hidden]{display:none!important}.auth-otp-title{font-size:13px;font-weight:700;color:#26384a;margin-bottom:4px}.auth-otp-copy{font-size:11.5px;line-height:1.55;color:#718096;margin-bottom:12px}.auth-otp-row{display:grid;grid-template-columns:1fr auto;gap:8px}.auth-otp-row input{letter-spacing:5px;text-align:center;font-family:'DM Mono',monospace;font-size:17px;font-weight:700}.auth-otp-row .btn{min-height:48px}.auth-otp-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:12px}.auth-otp-actions .auth-link-btn{font-size:11.5px}
-.auth-copyright{margin-top:19px;padding-top:16px;border-top:1px solid #edf1f5;text-align:center;font-size:10.5px;line-height:1.6;color:#9aa7b5}.sidebar-copyright{flex-basis:100%;text-align:center;color:#6f849b;font-size:9.5px;line-height:1.45;padding:5px 6px 0}.sidebar-copyright strong{color:#91a8ba;font-weight:600}
-@media(max-width:500px){.auth-otp-row{grid-template-columns:1fr}.auth-otp-actions{align-items:flex-start;flex-direction:column}}
-.auth-setup{font-size:12px;line-height:1.55;background:#fff7e8;border:1px solid #f0d49d;border-radius:10px;padding:11px 12px;margin-bottom:18px;color:#75501b}
+.auth-showcase{position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:46px 52px 44px;overflow:hidden;border-right:1px solid rgba(255,255,255,.09)}
+.auth-showcase:before{content:'';position:absolute;width:520px;height:520px;left:-260px;bottom:-260px;border-radius:50%;border:1px solid rgba(85,230,210,.13);box-shadow:0 0 0 70px rgba(85,230,210,.025),0 0 0 140px rgba(119,168,255,.018);animation:authHalo 12s linear infinite}
+.auth-showcase:after{content:'';position:absolute;inset:auto -90px 88px auto;width:230px;height:230px;border:1px solid rgba(255,255,255,.07);border-radius:34px;transform:rotate(18deg);animation:authTileSpin 18s ease-in-out infinite}
+.auth-brand,.auth-pitch,.auth-proof{position:relative;z-index:2}
+.auth-brand{display:flex;align-items:center;gap:16px;animation:authReveal .75s .08s both}
+.auth-logo-stage{position:relative;width:68px;height:68px;display:grid;place-items:center;isolation:isolate}
+.auth-logo-stage:before,.auth-logo-stage:after{content:'';position:absolute;border-radius:50%;inset:-8px;border:1px solid rgba(85,230,210,.42);animation:authOrbit 8s linear infinite}
+.auth-logo-stage:after{inset:-17px;border-style:dashed;border-color:rgba(119,168,255,.25);animation-duration:14s;animation-direction:reverse}
+.auth-brand-logo{width:54px;height:54px;object-fit:contain;display:block;filter:drop-shadow(0 10px 24px rgba(65,229,205,.22));animation:authLogoBreathe 3.6s ease-in-out infinite}
+.auth-brand-copy h1{font-size:30px;line-height:1;font-weight:800;letter-spacing:-1.25px;color:#fff}.auth-brand-copy p{font-size:11px;color:#91a8bd;margin-top:7px;letter-spacing:2.2px;text-transform:uppercase}
+.auth-pitch{max-width:540px;margin:54px 0 34px;animation:authReveal .8s .18s both}
+.auth-kicker{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.055);font-size:10.5px;color:#c5d4e2;margin-bottom:22px;box-shadow:inset 0 1px rgba(255,255,255,.05)}
+.auth-kicker:before{content:'';width:7px;height:7px;border-radius:50%;background:var(--auth-cyan);box-shadow:0 0 0 6px rgba(85,230,210,.10),0 0 20px var(--auth-cyan);animation:authPulseDot 2s ease-in-out infinite}
+.auth-pitch h2{font-size:52px;line-height:1.02;letter-spacing:-2.7px;font-weight:750;max-width:530px;color:#fff;margin:0}
+.auth-pitch h2 .auth-gradient-word{background:linear-gradient(100deg,#fff 5%,#6ff0df 48%,#8cafff 82%,#fff 100%);background-size:220% auto;color:transparent;background-clip:text;-webkit-background-clip:text;animation:authTextFlow 6s linear infinite}
+.auth-pitch p{font-size:14px;line-height:1.8;color:#9eb3c6;max-width:480px;margin-top:20px}
+.auth-live-strip{display:flex;gap:9px;align-items:center;margin-top:24px;flex-wrap:wrap}
+.auth-live-pill{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;color:#c9d6e2;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.045);border-radius:999px;padding:7px 10px;backdrop-filter:blur(8px)}
+.auth-live-pill i{width:6px;height:6px;border-radius:50%;background:#55e6d2;box-shadow:0 0 12px rgba(85,230,210,.8)}
+.auth-proof{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;animation:authReveal .85s .3s both}
+.auth-proof-item{position:relative;overflow:hidden;padding:15px 14px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border-radius:16px;backdrop-filter:blur(10px);transition:transform .25s,border-color .25s,background .25s;animation:authFloatCard 6s ease-in-out infinite}
+.auth-proof-item:nth-child(2){animation-delay:-2s}.auth-proof-item:nth-child(3){animation-delay:-4s}.auth-proof-item:hover{transform:translateY(-5px);border-color:rgba(85,230,210,.35);background:rgba(255,255,255,.09)}
+.auth-proof-item:after{content:'';position:absolute;width:60px;height:60px;border-radius:50%;right:-26px;top:-28px;background:radial-gradient(circle,rgba(85,230,210,.2),transparent 70%)}
+.auth-proof-icon{font-size:17px;margin-bottom:11px;display:block}.auth-proof-item b{display:block;font-size:12.5px;color:#fff;margin-bottom:5px}.auth-proof-item span{font-size:10.5px;color:#91a8ba;line-height:1.5}
+.auth-panel{position:relative;display:flex;align-items:center;justify-content:center;padding:46px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(245,249,252,.96));color:#172638;overflow:hidden}
+.auth-panel:before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 90% 3%,rgba(85,230,210,.14),transparent 28%),radial-gradient(circle at 6% 94%,rgba(119,168,255,.12),transparent 33%);pointer-events:none}
+.auth-panel:after{content:'';position:absolute;width:170px;height:170px;border-radius:50%;right:-80px;top:90px;border:22px solid rgba(8,127,140,.035);animation:authPanelRing 9s ease-in-out infinite}
+.auth-card{position:relative;z-index:2;width:min(408px,100%);animation:authCardIn .85s .12s cubic-bezier(.2,.75,.2,1) both}
+.auth-card:before{content:'';position:absolute;inset:-22px -20px;border-radius:28px;background:rgba(255,255,255,.32);border:1px solid rgba(255,255,255,.52);box-shadow:0 24px 70px rgba(18,40,60,.07);z-index:-1;backdrop-filter:blur(14px)}
+.auth-mobile-brand{display:none;align-items:center;gap:11px;margin-bottom:26px}.auth-mobile-brand img{width:43px;height:43px;object-fit:contain}.auth-mobile-brand h1{font-size:22px;line-height:1}.auth-mobile-brand p{font-size:10px;color:#7b8a9b;margin-top:4px;letter-spacing:1.2px;text-transform:uppercase}
+.auth-eyebrow{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#087f8c;margin-bottom:12px}.auth-eyebrow:before{content:'';width:20px;height:2px;border-radius:99px;background:linear-gradient(90deg,#55d9c5,#087f8c)}
+.auth-card h2{font-size:33px;line-height:1.08;letter-spacing:-1.3px;margin:0 0 8px;color:#142538;font-weight:800}.auth-subtitle{color:#718096;font-size:13px;line-height:1.65;margin-bottom:25px}
+.auth-field{position:relative;margin-bottom:17px}.auth-field label{text-transform:none;letter-spacing:0;font-size:11px;font-weight:750;color:#405267;margin-bottom:7px}
+.auth-field input{width:100%;min-height:50px;padding:0 14px;border:1px solid #d8e3eb;border-radius:13px;background:rgba(255,255,255,.86);color:#182638;font-size:13.5px;box-shadow:0 4px 16px rgba(22,38,56,.035);transition:border-color .22s,box-shadow .22s,background .22s,transform .22s}
+.auth-field input::placeholder{color:#a0adba}.auth-field input:hover{border-color:#b9ccd8}.auth-field input:focus{border-color:#168f98;box-shadow:0 0 0 4px rgba(22,143,152,.10),0 10px 24px rgba(8,127,140,.08);background:#fff;transform:translateY(-1px)}
+.auth-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:21px}.auth-actions .btn{position:relative;overflow:hidden;width:100%;min-height:50px;border-radius:13px;justify-content:center;font-size:13px;font-weight:800;letter-spacing:.1px}
+.auth-actions .btn-primary{background:linear-gradient(120deg,#087f8c,#13a195,#087f8c);background-size:220% 100%;box-shadow:0 12px 28px rgba(8,127,140,.24);animation:authButtonFlow 5s linear infinite}.auth-actions .btn-primary:after{content:'';position:absolute;inset:-50% auto -50% -35%;width:28%;transform:rotate(18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.32),transparent);animation:authShine 3.8s ease-in-out infinite}.auth-actions .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(8,127,140,.3)}
+.auth-actions .btn-secondary{background:rgba(255,255,255,.75);border:1px solid #d8e3eb;color:#2f4357;box-shadow:0 5px 16px rgba(22,38,56,.035)}.auth-actions .btn-secondary:hover{background:#fff;border-color:#a9c0cf;transform:translateY(-1px)}
+.auth-divider,.auth-method-divider{display:flex;align-items:center;gap:12px;color:#99a8b7;font-size:9.5px;letter-spacing:1.1px;font-weight:750}.auth-divider{margin:18px 0 4px}.auth-method-divider{margin:18px 0 14px}.auth-divider:before,.auth-divider:after,.auth-method-divider:before,.auth-method-divider:after{content:'';height:1px;background:linear-gradient(90deg,transparent,#dfe7ed,transparent);flex:1}
+.auth-inline-actions{display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:14px}.auth-link-btn{border:0;background:transparent;color:#087f8c;padding:4px 0;font:700 11.5px 'DM Sans',sans-serif;cursor:pointer;transition:.18s}.auth-link-btn:hover{color:#055f69;transform:translateY(-1px)}.auth-link-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.auth-google{position:relative;overflow:hidden;width:100%;min-height:49px;border:1px solid #d8e3eb;border-radius:13px;background:rgba(255,255,255,.9);color:#26384a;display:flex;align-items:center;justify-content:center;gap:10px;font:800 13px 'DM Sans',sans-serif;cursor:pointer;transition:transform .22s,box-shadow .22s,border-color .22s;background:#fff;box-shadow:0 6px 18px rgba(15,23,42,.045)}
+.auth-google:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(66,133,244,.05),transparent);transform:translateX(-120%);transition:transform .45s}.auth-google:hover:before{transform:translateX(120%)}.auth-google:hover{border-color:#b9c9d6;box-shadow:0 10px 24px rgba(15,23,42,.085);transform:translateY(-2px)}.auth-google svg{width:18px;height:18px;flex:0 0 18px}
+.auth-otp-box{margin-top:18px;padding:17px;border:1px solid #d8e6ed;background:linear-gradient(145deg,#fbfdff,#f4faf9);border-radius:15px;box-shadow:0 10px 28px rgba(8,127,140,.06);animation:authOtpIn .32s cubic-bezier(.2,.8,.2,1)}.auth-otp-box[hidden]{display:none!important}.auth-otp-title{font-size:13px;font-weight:800;color:#26384a;margin-bottom:4px}.auth-otp-copy{font-size:11.5px;line-height:1.55;color:#718096;margin-bottom:12px}.auth-otp-row{display:grid;grid-template-columns:1fr auto;gap:8px}.auth-otp-row input{letter-spacing:5px;text-align:center;font-family:'DM Mono',monospace;font-size:17px;font-weight:800}.auth-otp-row .btn{min-height:48px}.auth-otp-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:12px}.auth-otp-actions .auth-link-btn{font-size:11px}
+.auth-message{min-height:22px;margin-top:13px;font-size:12px;color:#56667a;text-align:center}.auth-message.error{color:#c44558}.auth-message.ok{color:#168163}.auth-message:not(:empty){animation:authMsgIn .25s ease-out}
+.auth-trust{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:17px;color:#8795a4;font-size:10px}.auth-trust svg{width:13px;height:13px;color:#168163;filter:drop-shadow(0 0 7px rgba(22,129,99,.25))}
+.auth-copyright{margin-top:17px;padding-top:15px;border-top:1px solid #edf1f5;text-align:center;font-size:10px;line-height:1.6;color:#9aa7b5}.auth-legal{margin-top:7px}.auth-legal button{border:0;background:none;padding:0 4px;color:inherit;text-decoration:none;cursor:pointer;font:inherit}.auth-legal button:hover{color:#087f8c;text-decoration:underline}.sidebar-copyright{flex-basis:100%;text-align:center;color:#6f849b;font-size:9.5px;line-height:1.45;padding:5px 6px 0}.sidebar-copyright strong{color:#91a8ba;font-weight:600}
+.auth-setup{font-size:11.5px;line-height:1.55;background:#fff8eb;border:1px solid #efd499;border-radius:12px;padding:11px 12px;margin-bottom:17px;color:#75501b;box-shadow:0 8px 22px rgba(149,104,28,.07)}
+.auth-reset-note{font-size:11.5px;line-height:1.55;color:#718096;margin:-9px 0 17px}.credential-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.credential-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.credential-hint{font-size:11.5px;color:var(--text2);line-height:1.55;margin-top:7px}@media(max-width:600px){.credential-grid{grid-template-columns:1fr}}
 .cloud-sync{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}.cloud-sync:before{content:'';width:7px;height:7px;border-radius:50%;background:#94a3b8}.cloud-sync.syncing:before{background:#d69e2e}.cloud-sync.saved:before{background:#168163}.cloud-sync.error:before{background:#c44558}.sidebar-footer{flex-wrap:wrap}.sidebar-footer #logout-btn{flex-basis:100%}
 body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(.fp-authenticated) .mobile-shade{display:none!important}
-@media(max-width:820px){#auth-screen{padding:18px}.auth-shell{grid-template-columns:1fr;min-height:0;max-width:500px}.auth-showcase{display:none}.auth-panel{padding:42px 34px}.auth-mobile-brand{display:flex}}
-@media(max-width:500px){#auth-screen{padding:0;background:#fff}.auth-shell{border:0;border-radius:0;box-shadow:none;min-height:100dvh}.auth-panel{padding:38px 24px}.auth-card h2{font-size:26px}}
+@keyframes authBgShift{0%{background-position:0 0,0 0,0 0,0 0}100%{background-position:30px -20px,-25px 24px,25px 18px,0 0}}
+@keyframes authGridDrift{to{transform:translate(calc(var(--mx)*.12 + 44px),calc(var(--my)*.12 + 44px)) rotate(-3deg)}}
+@keyframes authFloat1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(45px,34px,0) scale(1.12)}}
+@keyframes authFloat2{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-50px,-35px,0) scale(.9)}}
+@keyframes authFloat3{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(25px,45px,0) scale(1.15)}}
+@keyframes authShellIn{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:translate(calc(var(--mx)*.025),calc(var(--my)*.025)) scale(1)}}
+@keyframes authReveal{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes authCardIn{from{opacity:0;transform:translateX(28px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes authOrbit{to{transform:rotate(360deg)}}
+@keyframes authLogoBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.055)}}
+@keyframes authPulseDot{0%,100%{box-shadow:0 0 0 5px rgba(85,230,210,.09),0 0 10px rgba(85,230,210,.35)}50%{box-shadow:0 0 0 9px rgba(85,230,210,.03),0 0 22px rgba(85,230,210,.8)}}
+@keyframes authTextFlow{to{background-position:220% center}}
+@keyframes authHalo{to{transform:rotate(360deg)}}
+@keyframes authTileSpin{0%,100%{transform:rotate(18deg) translateY(0)}50%{transform:rotate(25deg) translateY(-18px)}}
+@keyframes authFloatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes authPanelRing{0%,100%{transform:scale(1)}50%{transform:scale(1.12) rotate(18deg)}}
+@keyframes authButtonFlow{to{background-position:220% center}}
+@keyframes authShine{0%,55%{left:-35%;opacity:0}65%{opacity:1}100%{left:125%;opacity:0}}
+@keyframes authOtpIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes authMsgIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media(max-width:900px){#auth-screen{padding:18px}.auth-shell{grid-template-columns:1fr;min-height:0;max-width:520px}.auth-showcase{display:none}.auth-panel{min-height:690px;padding:48px 36px}.auth-mobile-brand{display:flex}.auth-card:before{inset:-18px -16px}}
+@media(max-width:520px){#auth-screen{padding:0}.auth-shell{border:0;border-radius:0;box-shadow:none;min-height:100dvh;width:100%;background:#f8fbfd}.auth-panel{min-height:100dvh;padding:34px 23px;background:linear-gradient(165deg,#f8fbfd,#fff)}.auth-panel:after{display:none}.auth-card:before{display:none}.auth-card h2{font-size:29px}.auth-otp-row{grid-template-columns:1fr}.auth-otp-actions{align-items:flex-start;flex-direction:column}.auth-mobile-brand{margin-bottom:30px}}
+@media(prefers-reduced-motion:reduce){#auth-screen,.auth-shell,.auth-brand,.auth-pitch,.auth-proof,.auth-proof-item,.auth-brand-logo,.auth-logo-stage:before,.auth-logo-stage:after,.auth-orb,.auth-showcase:before,.auth-showcase:after,.auth-panel:after,.auth-actions .btn-primary,.auth-actions .btn-primary:after,.auth-otp-box,.auth-message:not(:empty){animation:none!important}.auth-shell{transform:none!important}#auth-screen:before{transform:none!important}}
 </style>
 
 
@@ -342,24 +389,47 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
 @media print{#fp-notice-stack{display:none!important}}
 </style>
 
+
+<style id="finpilot-security-notes">
+.cloud-sync.offline:before{background:#d69e2e}.cloud-sync.offline{color:var(--text2)}
+.auth-legal{margin-top:8px;font-size:10.5px;color:#93a1b1}.auth-legal button{border:0;background:none;padding:0 4px;color:inherit;text-decoration:underline;cursor:pointer;font:inherit}.auth-legal button:hover{color:var(--accent)}
+.notes-toolbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:9px;border:1px solid var(--border);border-bottom:0;border-radius:10px 10px 0 0;background:var(--surface2)}
+.notes-toolbar button,.notes-toolbar select,.notes-toolbar input[type=color]{width:auto;min-height:32px;height:32px;padding:5px 9px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);cursor:pointer}
+.notes-toolbar button{min-width:34px;font-weight:700}.notes-toolbar button:hover{border-color:var(--accent);color:var(--accent)}
+#notes-editor{min-height:450px;padding:18px;border:1px solid var(--border);border-radius:0 0 10px 10px;background:var(--surface);color:var(--text);outline:none;line-height:1.75;overflow-wrap:anywhere}
+#notes-editor:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}#notes-editor:empty:before{content:attr(data-placeholder);color:var(--text3)}
+.security-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.security-card{border:1px solid var(--border);border-radius:10px;padding:13px;background:var(--surface2)}.security-card b{display:block;margin-bottom:5px}.security-card span{font-size:12px;color:var(--text2);overflow-wrap:anywhere}
+.audit-list{max-height:250px;overflow:auto;border:1px solid var(--border);border-radius:8px}.audit-row{display:grid;grid-template-columns:125px 140px 1fr;gap:10px;padding:9px 10px;border-bottom:1px solid var(--border);font-size:11.5px}.audit-row:last-child{border-bottom:0}.audit-row .mono{font-size:10.5px;color:var(--text2)}
+.danger-zone{border:1px solid var(--red);background:var(--red-bg);border-radius:10px;padding:14px}.danger-zone h4{color:var(--red);margin-bottom:6px}.danger-zone p{font-size:12px;color:var(--text2);margin-bottom:10px}
+@media(max-width:700px){.security-grid{grid-template-columns:1fr}.audit-row{grid-template-columns:1fr}.audit-row .mono{font-size:10px}}
+</style>
+
 </head>
 <body data-theme="light">
 <div id="auth-screen">
+  <div class="auth-ambient" aria-hidden="true">
+    <div class="auth-orb o1"></div><div class="auth-orb o2"></div><div class="auth-orb o3"></div><div class="auth-noise"></div>
+  </div>
   <div class="auth-shell">
     <section class="auth-showcase" aria-label="FinPilot">
       <div class="auth-brand">
-        <img class="auth-brand-logo" src="images/favicon.png" alt="FinPilot logo">
+        <div class="auth-logo-stage"><img class="auth-brand-logo" src="images/favicon.png" alt="FinPilot logo"></div>
         <div class="auth-brand-copy"><h1>FinPilot</h1><p>Billing &amp; Journal</p></div>
       </div>
       <div class="auth-pitch">
-        <div class="auth-kicker">Your finance workspace</div>
-        <h2>Run your accounts with less friction.</h2>
-        <p>Invoices, payments, inventory, journals and reports stay together in one clean workspace, ready wherever you sign in.</p>
+        <div class="auth-kicker">Live cloud workspace</div>
+        <h2>Finance that feels <span class="auth-gradient-word">effortless.</span></h2>
+        <p>Invoice, collect, track stock, journal every move and keep your numbers synced across devices without turning accounting into a punishment.</p>
+        <div class="auth-live-strip">
+          <span class="auth-live-pill"><i></i> Cloud sync ready</span>
+          <span class="auth-live-pill">⌁ Multi-device</span>
+          <span class="auth-live-pill">↗ Fast billing</span>
+        </div>
       </div>
       <div class="auth-proof">
-        <div class="auth-proof-item"><b>Private</b><span>Your workspace stays tied to your account.</span></div>
-        <div class="auth-proof-item"><b>Synced</b><span>Changes are kept across your devices.</span></div>
-        <div class="auth-proof-item"><b>Focused</b><span>Built for everyday billing and books.</span></div>
+        <div class="auth-proof-item"><span class="auth-proof-icon">◈</span><b>Private workspace</b><span>Your books stay tied to your authenticated account.</span></div>
+        <div class="auth-proof-item"><span class="auth-proof-icon">◎</span><b>Always in motion</b><span>Sales, payments and stock move together as you work.</span></div>
+        <div class="auth-proof-item"><span class="auth-proof-icon">◇</span><b>Built to focus</b><span>Less clutter between you and the numbers that matter.</span></div>
       </div>
     </section>
     <section class="auth-panel">
@@ -367,14 +437,13 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
         <div class="auth-mobile-brand"><img src="images/favicon.png" alt="FinPilot logo"><div><h1>FinPilot</h1><p>Billing &amp; Journal</p></div></div>
         <div id="auth-setup" class="auth-setup" hidden>FinPilot cloud connection is not configured yet.</div>
         <div id="auth-login-box">
-          <h2>Welcome back</h2>
-          <p class="auth-subtitle">Sign in to continue to your FinPilot workspace.</p>
+          <div class="auth-eyebrow">Secure workspace</div>
+          <h2>Welcome back.</h2>
+          <p class="auth-subtitle">Sign in and pick up exactly where your books left off.</p>
           <div class="auth-field"><label for="auth-email">Email address</label><input id="auth-email" type="email" autocomplete="email" placeholder="name@example.com"></div>
           <div class="auth-field"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" placeholder="Enter your password"></div>
           <div class="auth-inline-actions"><button class="auth-link-btn" type="button" onclick="finpilotForgotPassword()">Forgot password?</button></div>
-          <div class="auth-actions">
-            <button class="btn btn-primary" type="button" onclick="finpilotSignIn()">Sign in to FinPilot</button>
-          </div>
+          <div class="auth-actions"><button class="btn btn-primary" type="button" onclick="finpilotSignIn()">Sign in to FinPilot</button></div>
           <div class="auth-divider">NEW TO FINPILOT?</div>
           <div class="auth-actions" style="margin-top:10px"><button class="btn btn-secondary" type="button" onclick="finpilotSignUp()">Create an account</button></div>
           <div id="auth-otp-box" class="auth-otp-box" hidden>
@@ -383,15 +452,16 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
             <div class="auth-otp-row"><input id="auth-otp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="OTP CODE"><button class="btn btn-primary" type="button" onclick="finpilotVerifyOtp()">Confirm email</button></div>
             <div class="auth-otp-actions"><button class="auth-link-btn" type="button" onclick="finpilotResendSignupOtp()">Resend code</button><button class="auth-link-btn" type="button" onclick="finpilotHideOtp()">Back to sign in</button></div>
           </div>
-          <div class="auth-method-divider">OR</div>
+          <div class="auth-method-divider">OR CONTINUE WITH</div>
           <button class="auth-google" type="button" onclick="finpilotGoogleSignIn()" aria-label="Continue with Google">
             <svg viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.482h4.844a4.14 4.14 0 0 1-1.797 2.715v2.258h2.909c1.703-1.568 2.684-3.878 2.684-6.614Z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.181l-2.909-2.258c-.806.54-1.836.859-3.047.859-2.344 0-4.328-1.585-5.037-3.714H.956v2.332A9 9 0 0 0 9 18Z"/><path fill="#FBBC05" d="M3.963 10.706A5.42 5.42 0 0 1 3.682 9c0-.592.102-1.167.281-1.706V4.962H.956A9 9 0 0 0 0 9c0 1.452.347 2.827.956 4.038l3.007-2.332Z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.507.454 3.441 1.346l2.581-2.581C13.463.892 11.426 0 9 0A9 9 0 0 0 .956 4.962l3.007 2.332C4.672 5.165 6.656 3.58 9 3.58Z"/></svg>
             Continue with Google
           </button>
         </div>
         <div id="auth-reset-box" hidden>
-          <h2>Set a new password</h2>
-          <p class="auth-subtitle">Choose a new password for your FinPilot account.</p>
+          <div class="auth-eyebrow">Account recovery</div>
+          <h2>Set a new password.</h2>
+          <p class="auth-subtitle">Choose something strong enough to keep curious humans out of your books.</p>
           <div class="auth-reset-note">This page appears after you open the password-reset link sent to your email.</div>
           <div class="auth-field"><label for="auth-new-password">New password</label><input id="auth-new-password" type="password" autocomplete="new-password" placeholder="At least 6 characters"></div>
           <div class="auth-field"><label for="auth-confirm-password">Confirm new password</label><input id="auth-confirm-password" type="password" autocomplete="new-password" placeholder="Enter it again"></div>
@@ -400,11 +470,13 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
         </div>
         <div id="auth-message" class="auth-message"></div>
         <div class="auth-trust"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Secure account access and cloud sync</span></div>
-        <div class="auth-copyright">© 2026 Arbin Niroula · FinPilot. All rights reserved.</div>
+        <div class="auth-copyright">© 2026 Arbin Niroula · FinPilot. All rights reserved.<div class="auth-legal"><button type="button" onclick="openLegalModal('terms-modal')">Terms</button> · <button type="button" onclick="openLegalModal('privacy-modal')">Privacy</button></div></div>
       </div>
     </section>
   </div>
 </div>
+<div id="terms-modal" class="modal-overlay" aria-hidden="true"><div class="modal" style="max-width:650px"><button class="close-btn" onclick="closeModal('terms-modal')">✕</button><h3>FinPilot Terms</h3><p style="color:var(--text2);line-height:1.75">FinPilot is an accounting and billing workspace. You are responsible for the accuracy of entries, maintaining appropriate backups, and using the service lawfully. Features are provided as available and should be reviewed before relying on them for statutory or tax reporting.</p><p style="color:var(--text2);line-height:1.75;margin-top:12px">Your account is personal to you. Keep your login credentials secure and do not intentionally attempt to access another user’s data.</p></div></div>
+<div id="privacy-modal" class="modal-overlay" aria-hidden="true"><div class="modal" style="max-width:650px"><button class="close-btn" onclick="closeModal('privacy-modal')">✕</button><h3>FinPilot Privacy</h3><p style="color:var(--text2);line-height:1.75">FinPilot stores the information needed to provide login, cloud sync, billing, inventory, notes, and reporting features. Your accounting data can exist in your browser cache and in the configured cloud backend. Authentication and transactional email are handled by the services configured for FinPilot.</p><p style="color:var(--text2);line-height:1.75;margin-top:12px">Use the backup and account controls in Settings to export your data or request permanent account deletion.</p></div></div>
 <button id="menu-btn" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false" onclick="toggleNav()">☰</button>
 <div class="mobile-shade no-print" onclick="toggleNav()" aria-hidden="true"></div>
 <div id="app">
@@ -905,8 +977,25 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
 
 <!-- NOTES -->
 <div id="sec-notes" class="section">
- <div class="page-header"><div><h2>Notes</h2><p>Write anything. Your notes save automatically on this browser.</p></div><button class="btn btn-print no-print" onclick="printNotes()">🖨 Print Notes</button></div>
- <div class="card"><label for="notes-text">Your notes</label><textarea id="notes-text" rows="22" placeholder="Start writing..." style="min-height:450px;line-height:1.8;resize:vertical" oninput="saveNotes()"></textarea><p id="notes-status" role="status" style="margin-top:10px;color:var(--text2)"></p></div>
+ <div class="page-header"><div><h2>Notes</h2><p>Rich-text notes sync with your FinPilot account.</p></div><button class="btn btn-print no-print" onclick="printNotes()">🖨 Print Notes</button></div>
+ <div class="card">
+   <div class="notes-toolbar no-print" role="toolbar" aria-label="Note formatting">
+     <button type="button" onclick="noteCommand('bold')" title="Bold"><b>B</b></button>
+     <button type="button" onclick="noteCommand('italic')" title="Italic"><i>I</i></button>
+     <button type="button" onclick="noteCommand('underline')" title="Underline"><u>U</u></button>
+     <button type="button" onclick="noteCommand('strikeThrough')" title="Strikethrough"><s>S</s></button>
+     <select onchange="noteCommand('formatBlock',this.value);this.value=''" aria-label="Text style"><option value="">Style</option><option value="p">Normal</option><option value="h2">Heading</option><option value="h3">Subheading</option><option value="blockquote">Quote</option></select>
+     <input type="color" value="#182638" onchange="noteCommand('foreColor',this.value)" title="Text color" aria-label="Text color">
+     <button type="button" onclick="noteCommand('justifyLeft')" title="Align left">≡</button>
+     <button type="button" onclick="noteCommand('justifyCenter')" title="Align center">≡</button>
+     <button type="button" onclick="noteCommand('justifyRight')" title="Align right">≡</button>
+     <button type="button" onclick="noteCommand('insertUnorderedList')" title="Bullets">• List</button>
+     <button type="button" onclick="noteCommand('insertOrderedList')" title="Numbered list">1. List</button>
+     <button type="button" onclick="noteCommand('removeFormat')" title="Clear formatting">Clear</button>
+   </div>
+   <div id="notes-editor" contenteditable="true" data-placeholder="Start writing..." oninput="saveNotes()" spellcheck="true"></div>
+   <p id="notes-status" role="status" style="margin-top:10px;color:var(--text2)"></p>
+ </div>
 </div>
 
 <div id="sec-settings" class="section">
@@ -958,6 +1047,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
           <option value="ledger">Ledger — Two-column header, ruled table</option>
           <option value="elegant">Elegant — Serif fonts, thin lines, refined</option>
           <option value="colorband">Color Band — Full-color top bar with company</option>
+          <option value="bw-signature">B&amp;W Signature — Clean black &amp; white with authorized signature</option>
         </select>
         <div style="font-size:11.5px;color:var(--text2);margin-top:5px">Applied to all printed invoices and Save as Image.</div>
       </div>
@@ -1002,6 +1092,14 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
             <div style="border:1px solid var(--border);padding:2px 4px">▰▰▰▰▰▰</div>
           </div>
         </div>
+        <div onclick="document.getElementById('set-template').value='bw-signature';previewTemplate('bw-signature')" id="tpl-preview-bw-signature" style="cursor:pointer;border:2px solid var(--border);border-radius:8px;padding:10px;background:var(--surface2)">
+          <div style="font-size:11px;font-weight:700;margin-bottom:4px;color:var(--text2)">B&amp;W Signature</div>
+          <div style="font-size:9px;line-height:1.6;color:var(--text2)">
+            <div style="text-align:center;font-weight:700;border-bottom:1px solid #222;padding-bottom:3px;margin-bottom:3px">COMPANY</div>
+            <div style="border-bottom:1px solid #222;padding:2px 0">Item · Qty · Rate · Amt</div>
+            <div style="text-align:right;margin-top:5px">________<br>Authorized</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="setting-section">
@@ -1015,6 +1113,21 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
       </div>
       <div class="credential-actions"><button class="btn btn-secondary" type="button" id="change-login-btn" onclick="changeLoginCredentials()">Update Login Credentials</button></div>
       <div class="credential-hint">Changing your email may require confirmation by email before the new address becomes active. Your accounting data stays attached to the same FinPilot account.</div>
+    </div>
+    <div class="setting-section" id="security-data-settings">
+      <h3>🛡 Session, Security &amp; Data</h3>
+      <div class="security-grid">
+        <div class="security-card"><b>Last sign in</b><span id="security-last-login">—</span></div>
+        <div class="security-card"><b>Current browser session</b><span id="security-current-session">Active</span></div>
+      </div>
+      <div class="form-group" style="margin-top:14px"><label>Automatic logout after inactivity</label><select id="set-auto-logout"><option value="0">Off</option><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option><option value="120">2 hours</option></select></div>
+      <div class="flex-gap" style="margin-bottom:14px"><button class="btn btn-secondary btn-sm" type="button" onclick="signOutOtherSessions()">Sign out other devices</button><button class="btn btn-secondary btn-sm" type="button" onclick="signOutEverywhere()">Sign out everywhere</button></div>
+      <div class="flex-gap" style="margin-bottom:14px"><button class="btn btn-secondary btn-sm" type="button" onclick="exportBackup()">Export All Data</button><button class="btn btn-secondary btn-sm" type="button" onclick="document.getElementById('restore-file').click()">Restore Backup</button><button class="btn btn-secondary btn-sm" type="button" onclick="downloadDiagnosticLog()">Download Diagnostic Log</button></div>
+      <div style="font-size:11.5px;color:var(--text2);line-height:1.55">FinPilot reminds you about a backup roughly once every 30 days. Authentication email/OTP requests also use a local cooldown in addition to Supabase server-side rate limits.</div>
+      <h4 style="margin:18px 0 8px">Recent activity</h4>
+      <div id="audit-log" class="audit-list"><div class="empty-state" style="padding:16px"><p>No activity recorded yet.</p></div></div>
+      <div class="flex-gap" style="margin-top:9px"><button class="btn btn-secondary btn-sm" type="button" onclick="exportAuditLog()">Export Audit Log</button></div>
+      <div class="danger-zone" style="margin-top:18px"><h4>Delete FinPilot Account</h4><p>Permanently deletes your FinPilot cloud data and authentication account. Export a backup first. This cannot be undone.</p><button class="btn btn-danger btn-sm" type="button" onclick="deleteFinPilotAccount()">Delete My Account</button></div>
     </div>
     <div class="setting-section">
       <h3>✉️ Letter Pad</h3>
@@ -1098,15 +1211,6 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
       <button class="btn btn-primary" onclick="saveStockItem()">💾 Save</button>
       <button class="btn btn-secondary" onclick="closeModal('stock-modal')">Cancel</button>
     </div>
-  </div>
-</div>
-
-<!-- STOCK ITEM STATEMENT MODAL -->
-<div class="modal-overlay" id="stock-stmt-modal">
-  <div class="modal" style="max-width:680px">
-    <button class="close-btn" onclick="closeModal('stock-stmt-modal')">✕</button>
-    <h3 id="stock-stmt-title">Item Statement</h3>
-    <div id="stock-stmt-content"></div>
   </div>
 </div>
 
@@ -1288,8 +1392,8 @@ function appPrompt(message,defaultValue='',{okText='OK',cancelText='Cancel',type
 // Public browser connection values. Security is enforced by database RLS.
 const SUPABASE_URL='https://fkwshkpmebitdvniwreh.supabase.co';
 const SUPABASE_KEY='sb_publishable_7oFuilE9oG0ZXV1frrKoYA_CFlKLXAr';
-const CLOUD_KEYS=['invoices','parties','payments','journal','settings','vouchers','stock','cheques','notes'];
-let sbClient=null,currentCloudUser=null,cloudReady=false,finpilotStarted=false,passwordRecoveryMode=false;
+const CLOUD_KEYS=['invoices','parties','payments','journal','settings','vouchers','stock','cheques','notes','audit'];
+let sbClient=null,currentCloudUser=null,currentCloudSession=null,cloudReady=false,finpilotStarted=false,passwordRecoveryMode=false;
 let authOtpEmail='';
 const cloudSaveChains=new Map();
 let activeCloudWrites=0;
@@ -1336,7 +1440,7 @@ async function writeCloudValue(k,v,stamp=Date.now(),attempt=0){
     markCloudSynced(k,stamp,Date.parse(nowIso));
     return true;
   }catch(error){
-    console.error(`Cloud save failed for ${k}:`,error);
+    console.error(`Cloud save failed for ${k}:`,error);logAppError(`cloud.save.${k}`,error);
     if(attempt<3){
       await new Promise(r=>setTimeout(r,[300,800,1600][attempt]||2000));
       return writeCloudValue(k,snapshot,stamp,attempt+1);
@@ -1374,6 +1478,7 @@ const DB={
   vouchers:()=>DB.get('vouchers')||[],
   stock:()=>DB.get('stock')||[],
   cheques:()=>DB.get('cheques')||[],
+  audit:()=>DB.get('audit')||[],
   saveInvoices:v=>DB.set('invoices',v),
   saveParties:v=>DB.set('parties',v),
   savePayments:v=>DB.set('payments',v),
@@ -1382,7 +1487,70 @@ const DB={
   saveVouchers:v=>DB.set('vouchers',v),
   saveStock:v=>DB.set('stock',v),
   saveCheques:v=>DB.set('cheques',v),
+  saveAudit:v=>DB.set('audit',v),
 };
+
+function auditDetailText(details){
+  if(details===undefined||details===null)return '';
+  if(typeof details==='string')return details;
+  try{return Object.entries(details).map(([k,v])=>`${k}: ${v}`).join(' · ');}catch(e){return String(details);}
+}
+function addAudit(action,details=''){
+  try{
+    const list=DB.audit();
+    list.push({id:uid(),at:new Date().toISOString(),action:String(action||'Activity'),details:auditDetailText(details),email:currentCloudUser?.email||''});
+    if(list.length>300)list.splice(0,list.length-300);
+    DB.saveAudit(list);
+    if(document.querySelector('.section.active')?.id==='sec-settings')renderAuditLog();
+  }catch(e){logAppError('audit',e);}
+}
+function renderAuditLog(){
+  const el=document.getElementById('audit-log');if(!el)return;
+  const rows=DB.audit().slice().reverse().slice(0,80);
+  el.innerHTML=rows.length?rows.map(x=>`<div class="audit-row"><div class="mono">${escH(new Date(x.at).toLocaleString())}</div><strong>${escH(x.action||'Activity')}</strong><div>${escH(x.details||'')}</div></div>`).join(''):'<div class="empty-state" style="padding:16px"><p>No activity recorded yet.</p></div>';
+}
+function exportAuditLog(){
+  const rows=DB.audit();const data=[['Time','Action','Details','Email'],...rows.map(x=>[x.at,x.action,x.details,x.email||''])];
+  if(typeof XLSX!=='undefined'){const ws=XLSX.utils.aoa_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Audit Log');XLSX.writeFile(wb,`FinPilot-Audit-${getTodayBS()}.xlsx`);return;}
+  const blob=new Blob([JSON.stringify(rows,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='FinPilot-Audit.json';a.click();URL.revokeObjectURL(a.href);
+}
+function diagnosticKey(){return `fp_diag_${currentCloudUser?.id||'guest'}`;}
+function logAppError(context,error){
+  try{const list=parseStored(localStorage.getItem(diagnosticKey()))||[];list.push({at:new Date().toISOString(),context:String(context||'app'),message:String(error?.message||error||'Unknown error'),stack:String(error?.stack||'').slice(0,2500)});if(list.length>120)list.splice(0,list.length-120);localStorage.setItem(diagnosticKey(),JSON.stringify(list));}catch(e){}
+}
+function downloadDiagnosticLog(){const rows=parseStored(localStorage.getItem(diagnosticKey()))||[];const blob=new Blob([JSON.stringify(rows,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`FinPilot-Diagnostics-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);}
+window.addEventListener('error',e=>logAppError('window.error',e.error||e.message));window.addEventListener('unhandledrejection',e=>logAppError('unhandledrejection',e.reason));
+
+function cooldownKey(name){return `fp_cooldown_${name}_${(document.getElementById('auth-email')?.value||authOtpEmail||'').trim().toLowerCase()}`;}
+function checkCooldown(name,seconds=60){const k=cooldownKey(name),last=Number(localStorage.getItem(k)||0),remain=Math.ceil((seconds*1000-(Date.now()-last))/1000);if(remain>0){authMessage(`Please wait ${remain}s before trying again.`,'error');return false;}localStorage.setItem(k,String(Date.now()));return true;}
+
+let inactivityTimer=null;
+function setupInactivityLogout(){
+  if(inactivityTimer)clearTimeout(inactivityTimer);
+  const mins=Number(DB.settings().autoLogoutMinutes??30);if(!mins||!currentCloudUser)return;
+  inactivityTimer=setTimeout(async()=>{appNotice('Signed out after a period of inactivity.','info',5000);try{await sbClient?.auth.signOut({scope:'local'});}finally{location.reload();}},mins*60000);
+}
+['pointerdown','keydown','touchstart','scroll'].forEach(ev=>document.addEventListener(ev,()=>{if(finpilotStarted)setupInactivityLogout();},{passive:true}));
+async function refreshSecurityPanel(){
+  const last=document.getElementById('security-last-login'),cur=document.getElementById('security-current-session');
+  if(last)last.textContent=currentCloudUser?.last_sign_in_at?new Date(currentCloudUser.last_sign_in_at).toLocaleString():'Not available';
+  if(cur){const {data}=await sbClient.auth.getSession();const ses=data?.session;cur.textContent=ses?`Active · expires ${new Date((ses.expires_at||0)*1000).toLocaleString()}`:'Not signed in';}
+  renderAuditLog();
+}
+async function signOutOtherSessions(){if(!sbClient)return;const {error}=await sbClient.auth.signOut({scope:'others'});if(error){logAppError('signout.others',error);return appNotice(error.message,'error',5000);}addAudit('Security','Signed out other devices');appNotice('Other sessions have been signed out.','success',5000);}
+async function signOutEverywhere(){if(!await appConfirm('Sign out this account on every device?',{title:'Sign out everywhere'}))return;addAudit('Security','Signed out everywhere');await sbClient.auth.signOut({scope:'global'});location.reload();}
+async function flushDirtyCloudData(){if(!cloudReady||!currentCloudUser||!navigator.onLine)return;for(const k of CLOUD_KEYS){const stamp=Number(localStorage.getItem(dirtyKey(k))||0);if(stamp){const raw=localStorage.getItem(cacheKey(k));if(raw!==null)await writeCloudValue(k,parseStored(raw),stamp);}}}
+window.addEventListener('offline',()=>setCloudStatus('Offline','offline'));window.addEventListener('online',async()=>{setCloudStatus('Reconnecting…','syncing');await flushDirtyCloudData();await pullCloudChanges();if(activeCloudWrites===0)setCloudStatus('Saved','saved');});
+function backupStampKey(){return `fp_backup_stamp_${currentCloudUser?.id||'guest'}`;}
+function backupReminderKey(){return `fp_backup_reminder_${currentCloudUser?.id||'guest'}`;}
+async function maybeBackupReminder(){const now=Date.now(),month=30*86400000,last=Number(localStorage.getItem(backupStampKey())||0),rem=Number(localStorage.getItem(backupReminderKey())||0);if(!last&&!rem){localStorage.setItem(backupReminderKey(),String(now));return;}if(now-Math.max(last,rem)<month)return;setTimeout(async()=>{const yes=await appConfirm('It has been about a month since your last FinPilot backup. Export one now?',{title:'Backup reminder',type:'info',yesText:'Export backup',noText:'Later'});localStorage.setItem(backupReminderKey(),String(Date.now()));if(yes)exportBackup();},800);}
+function openLegalModal(id){const el=document.getElementById(id);if(el){el.classList.add('open');el.setAttribute('aria-hidden','false');}}
+async function deleteFinPilotAccount(){
+  if(!sbClient||!currentCloudUser)return appNotice('You must be signed in.','error',5000);
+  const typed=await appPrompt('Type DELETE to permanently remove your FinPilot account and cloud data. Export a backup first.','',{title:'Delete account',type:'warning',okText:'Delete permanently'});if(typed===null)return;if(String(typed).trim()!=='DELETE')return appNotice('Account deletion cancelled. Type DELETE exactly to confirm.','warning',5000);
+  if(!await appConfirm('This cannot be undone. Permanently delete this account?',{title:'Final confirmation',type:'warning',yesText:'Delete account',noText:'Cancel'}))return;
+  try{const userId=currentCloudUser.id;const {error}=await sbClient.functions.invoke('delete-account',{body:{confirmation:'DELETE'}});if(error)throw error;Object.keys(localStorage).filter(k=>k.includes(userId)||k.startsWith('fp_cooldown_')||k===backupStampKey()||k===backupReminderKey()).forEach(k=>localStorage.removeItem(k));await sbClient.auth.signOut({scope:'local'}).catch(()=>{});location.reload();}catch(error){logAppError('delete-account',error);appNotice('Account deletion backend is not deployed or returned an error. See the included delete-account Edge Function.','error',0);}
+}
 
 function refreshVisibleCloudData(keys=[]){
   if(!finpilotStarted)return;
@@ -1422,7 +1590,7 @@ async function pullCloudChanges(){
     }
     if(changed.length)refreshVisibleCloudData(changed);
     if(activeCloudWrites===0)setCloudStatus('Saved','saved');
-  }catch(e){console.error('Cloud refresh failed:',e);}
+  }catch(e){console.error('Cloud refresh failed:',e);logAppError('cloud.refresh',e);setCloudStatus(navigator.onLine?'Sync error':'Offline',navigator.onLine?'error':'offline');}
   finally{cloudPullBusy=false;}
 }
 
@@ -1462,6 +1630,7 @@ async function finpilotResendSignupOtp(){
   if(!sbClient)return authMessage('Cloud connection is not configured yet.','error');
   const email=(authOtpEmail||document.getElementById('auth-email')?.value||'').trim();
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return authMessage('Enter a valid email address first.','error');
+  if(!checkCooldown('signup-otp',60))return;
   setAuthBusy(true);authMessage('Sending a new confirmation code…');
   const {error}=await sbClient.auth.resend({type:'signup',email,options:{emailRedirectTo:location.origin+location.pathname}});
   setAuthBusy(false);
@@ -1513,6 +1682,7 @@ async function finpilotForgotPassword(){
     const emailInput=document.getElementById('auth-email');if(emailInput)emailInput.value=email;
   }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return authMessage('Enter a valid email address.','error');
+  if(!checkCooldown('password-reset',60))return;
   setAuthBusy(true);authMessage('Sending password reset email…');
   const redirectTo=location.origin+location.pathname;
   const {error}=await sbClient.auth.resetPasswordForEmail(email,{redirectTo});
@@ -1556,14 +1726,14 @@ async function finpilotCompletePasswordReset(){
 }
 
 async function finpilotSignOut(){
-  if(sbClient)await sbClient.auth.signOut();
+  if(sbClient)await sbClient.auth.signOut({scope:'local'});
   location.reload();
 }
 async function loadCloudData(){
   if(!sbClient||!currentCloudUser)return;
   setCloudStatus('Loading…','syncing');
   const {data,error}=await sbClient.from('app_data').select('data_key,data,updated_at').eq('user_id',currentCloudUser.id);
-  if(error){console.error(error);setCloudStatus('Sync error','error');throw error;}
+  if(error){console.error(error);logAppError('cloud.load',error);setCloudStatus(navigator.onLine?'Sync error':'Offline',navigator.onLine?'error':'offline');throw error;}
   const rows=new Map((data||[]).map(r=>[r.data_key,r]));
   cloudReady=true;
 
@@ -1619,18 +1789,22 @@ async function openFinPilotForUser(user){
   currentCloudUser=user;
   const userEl=document.getElementById('workspace-user');if(userEl)userEl.textContent=user.email||'Signed in';
   try{await loadCloudData();}
-  catch(e){authMessage('Could not load your cloud data. Please check the backend configuration.','error');return;}
+  catch(e){logAppError('cloud.load',e);authMessage('Could not load your cloud data. Please check the backend configuration.','error');return;}
   document.body.classList.add('fp-authenticated');
   document.getElementById('auth-screen').hidden=true;
   finpilotStarted=true;
   startFinPilot();
+  setupInactivityLogout();
+  refreshSecurityPanel();
+  maybeBackupReminder();
+  if(!sessionStorage.getItem('fp_session_audit')){sessionStorage.setItem('fp_session_audit','1');addAudit('Sign in',user.email||'Account signed in');}
 }
 async function bootCloudAuth(){
   const setup=document.getElementById('auth-setup');
   if(!supabaseConfigured()){setup.hidden=false;authMessage('Configure the cloud connection, then reload this page.');return;}
   passwordRecoveryMode=/type=recovery/i.test(location.hash)||new URLSearchParams(location.search).get('type')==='recovery';
   sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-  sbClient.auth.onAuthStateChange((event,session)=>{
+  sbClient.auth.onAuthStateChange((event,session)=>{currentCloudSession=session||currentCloudSession;
     if(event==='PASSWORD_RECOVERY'){passwordRecoveryMode=true;setTimeout(showPasswordRecovery,0);return;}
     if(event==='USER_UPDATED'&&session?.user){
       currentCloudUser=session.user;
@@ -1638,7 +1812,7 @@ async function bootCloudAuth(){
     }
     if(event==='SIGNED_IN'&&session?.user&&!finpilotStarted&&!passwordRecoveryMode)setTimeout(()=>openFinPilotForUser(session.user),0);
   });
-  const {data:{session}}=await sbClient.auth.getSession();
+  const {data:{session}}=await sbClient.auth.getSession();currentCloudSession=session||null;
   if(passwordRecoveryMode){showPasswordRecovery();return;}
   if(session?.user)await openFinPilotForUser(session.user);
 }
@@ -2154,9 +2328,9 @@ async function saveInvoice(){
   const payload={invNo,dateBS,partyId:pid,partyName,note,items:validItems,sub,disc,net:calculatedTotal,grandTotal,paid:isPaid,taxInvoice:false,taxTotal:0,adjustments};
   if(editingInvId){
     const idx=invoices.findIndex(i=>i.id===editingInvId);
-    if(idx>-1){const oldPaid=invoices[idx].paid;invoices[idx]={...invoices[idx],...payload};DB.saveInvoices(invoices);addJournalEntry(dateBS,partyName,`Sales Invoice ${invNo}`,'Accounts Receivable','Sales',grandTotal,invoices[idx].id,true,'invoice');if(isPaid&&!oldPaid)recordPaymentForInvoice(pid,partyName,grandTotal,payMethod,dateBS,invoices[idx].id);}
+    if(idx>-1){const oldPaid=invoices[idx].paid;invoices[idx]={...invoices[idx],...payload};DB.saveInvoices(invoices);addAudit('Invoice edited',{invoice:invNo,party:partyName,total:grandTotal});addJournalEntry(dateBS,partyName,`Sales Invoice ${invNo}`,'Accounts Receivable','Sales',grandTotal,invoices[idx].id,true,'invoice');if(isPaid&&!oldPaid)recordPaymentForInvoice(pid,partyName,grandTotal,payMethod,dateBS,invoices[idx].id);}
   }else{
-    const inv={id:uid(),...payload,createdAt:Date.now()};invoices.push(inv);DB.saveInvoices(invoices);addJournalEntry(dateBS,partyName,`Sales Invoice ${invNo}`,'Accounts Receivable','Sales',grandTotal,inv.id,false,'invoice');if(isPaid)recordPaymentForInvoice(pid,partyName,grandTotal,payMethod,dateBS,inv.id);
+    const inv={id:uid(),...payload,createdAt:Date.now()};invoices.push(inv);DB.saveInvoices(invoices);addAudit('Invoice created',{invoice:invNo,party:partyName,total:grandTotal});addJournalEntry(dateBS,partyName,`Sales Invoice ${invNo}`,'Accounts Receivable','Sales',grandTotal,inv.id,false,'invoice');if(isPaid)recordPaymentForInvoice(pid,partyName,grandTotal,payMethod,dateBS,inv.id);
   }
   editingInvId=null;resetInvoiceForm();nav('invoices',null);
 }
@@ -2267,9 +2441,11 @@ function editInvoice(id){
 }
 
 async function deleteInvoice(id){
+  const old=DB.invoices().find(i=>i.id===id);
   if(!await appConfirm('Delete this invoice?',{yesText:'Delete',noText:'Cancel',type:'warning',title:'Delete invoice'}))return;
   DB.saveInvoices(DB.invoices().filter(i=>i.id!==id));
   DB.saveJournal(DB.journal().filter(j=>j.refId!==id));
+  if(old)addAudit('Invoice deleted',{invoice:old.invNo||id,party:old.partyName||'',total:old.grandTotal??old.net??0});
   renderInvoicesTable();
 }
 
@@ -2558,13 +2734,13 @@ function savePayment(){
     const idx=payments.findIndex(p=>p.id===editId);
     if(idx===-1){appAlert('The payment being edited could not be found.');return;}
     payments[idx]={...payments[idx],partyId:pid,partyName:pname,amount,discount,method,receipt,note,dateBS};
-    DB.savePayments(payments);
+    DB.savePayments(payments);addAudit('Payment edited',{party:pname,amount,method});
     DB.saveJournal(DB.journal().filter(j=>j.refId!==editId));
     addJournalEntry(dateBS,pname,jDesc,method,'Accounts Receivable',amount,editId,false,'payment');
     if(discount>0)addJournalEntry(dateBS,pname,'Discount Allowed','Discount','Accounts Receivable',discount,editId,false,'payment');
   }else{
     const pay={id:uid(),partyId:pid,partyName:pname,amount,discount,method,receipt,note,dateBS,createdAt:Date.now()};
-    payments.push(pay);DB.savePayments(payments);
+    payments.push(pay);DB.savePayments(payments);addAudit('Payment created',{party:pname,amount,method});
     addJournalEntry(dateBS,pname,jDesc,method,'Accounts Receivable',amount,pay.id,false,'payment');
     if(discount>0)addJournalEntry(dateBS,pname,'Discount Allowed','Discount','Accounts Receivable',discount,pay.id,false,'payment');
   }
@@ -2604,9 +2780,11 @@ function editPayment(id){
   document.getElementById('pay-party-input').scrollIntoView({behavior:'smooth',block:'center'});
 }
 async function deletePayment(id){
+  const old=DB.payments().find(p=>p.id===id);
   if(!await appConfirm('Delete this payment?',{yesText:'Delete',noText:'Cancel',type:'warning',title:'Delete payment'}))return;
   DB.savePayments(DB.payments().filter(p=>p.id!==id));
   DB.saveJournal(DB.journal().filter(j=>j.refId!==id));
+  if(old)addAudit('Payment deleted',{party:old.partyName||'',amount:old.amount||0,method:old.method||''});
   renderPaymentHistory();loadPartyBalance();
 }
 function renderPaymentHistory(){
@@ -3059,12 +3237,13 @@ function calcTaxCalcTotals(){let ta=0,tx=0,gt=0;taxCalcItems.forEach(x=>{ta+=par
 // ══════════════════════════════════════════════════════
 // LETTER PAD
 // ══════════════════════════════════════════════════════
-function initNotes(){document.getElementById('notes-text').value=DB.get('notes')||'';}
-function saveNotes(){
- try{DB.set('notes',document.getElementById('notes-text').value);document.getElementById('notes-status').textContent='Saved';}
- catch(e){document.getElementById('notes-status').textContent='Could not save. Browser storage may be full. Copy your notes before leaving.';}
+function sanitizeNotesHtml(html){
+ const doc=new DOMParser().parseFromString(`<div>${html||''}</div>`,'text/html'),root=doc.body.firstElementChild;root.querySelectorAll('script,style,iframe,object,embed,form,input,button,meta,link').forEach(x=>x.remove());root.querySelectorAll('*').forEach(el=>{[...el.attributes].forEach(a=>{if(/^on/i.test(a.name)||(a.name==='href'&&/^javascript:/i.test(a.value)))el.removeAttribute(a.name);});});return root.innerHTML;
 }
-function printNotes(){printDocument(buildReportHTML('Notes','<div style="white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8">'+escH(document.getElementById('notes-text').value)+'</div>'),'Notes');}
+function initNotes(){const ed=document.getElementById('notes-editor');if(!ed)return;const saved=DB.get('notes')||'';const looksHtml=/<[a-z][\s\S]*>/i.test(saved);ed.innerHTML=looksHtml?sanitizeNotesHtml(saved):escH(saved).replace(/\n/g,'<br>');}
+function saveNotes(){try{const ed=document.getElementById('notes-editor');DB.set('notes',sanitizeNotesHtml(ed?.innerHTML||''));document.getElementById('notes-status').textContent='Saved';}catch(e){logAppError('notes.save',e);document.getElementById('notes-status').textContent='Could not save. Copy your notes before leaving.';}}
+function noteCommand(cmd,value=null){const ed=document.getElementById('notes-editor');if(!ed)return;ed.focus();document.execCommand(cmd,false,value);saveNotes();}
+function printNotes(){const html=sanitizeNotesHtml(document.getElementById('notes-editor')?.innerHTML||'');printDocument(buildReportHTML('Notes','<div style="overflow-wrap:anywhere;line-height:1.8">'+html+'</div>'),'Notes');}
 function syncCompanyBrand(){
  const s=DB.settings();document.getElementById('nav-company-name').textContent=s.company||'Your Company';
  const img=document.getElementById('nav-company-logo');img.hidden=!s.logo;if(s.logo)img.src=s.logo;else img.removeAttribute('src');
@@ -3080,6 +3259,7 @@ function loadSettings(){
   document.getElementById('set-today-bs').value=s.todayBS||getTodayBS();
   const loginEmail=document.getElementById('login-current-email');if(loginEmail)loginEmail.value=currentCloudUser?.email||'';
   const sq=document.getElementById('set-stock-qty');if(sq)sq.checked=!!s.stockQuantityManagement;
+  const autoLogout=document.getElementById('set-auto-logout');if(autoLogout)autoLogout.value=String(s.autoLogoutMinutes??30);
   const lp=document.getElementById('set-letter-pad');if(lp)lp.checked=!!s.letterPad;
   const ltc=document.getElementById('set-letter-text-color');if(ltc)ltc.value=s.letterTextColor||'#222222';
   const rtc=document.getElementById('set-receipt-text-color');if(rtc)rtc.value=s.receiptTextColor||'#222222';
@@ -3089,7 +3269,9 @@ function loadSettings(){
   previewTemplate(tpl);
   if(s.accentColor)applyTheme(s.accentColor,s.accentBg||'#f5f2ee',s.accentDark||false);
   if(s.logo){const img=document.getElementById('logo-preview');img.src=s.logo;img.style.display='block';}
+  refreshSecurityPanel();
 }
+
 function saveSettings(){
   const s=DB.settings();
   s.company=document.getElementById('set-company').value.trim()||'Your Company';
@@ -3105,6 +3287,7 @@ function saveSettings(){
   const rtc=document.getElementById('set-receipt-text-color');s.receiptTextColor=rtc?rtc.value:'#222222';
   const sq=document.getElementById('set-stock-qty');s.stockQuantityManagement=!!(sq&&sq.checked);
   s.useStock=true;
+  const autoLogout=document.getElementById('set-auto-logout');s.autoLogoutMinutes=Number(autoLogout?.value??30);
   const sel=document.getElementById('set-template');
   s.invoiceTemplate=sel?sel.value:'classic';
   DB.saveSettings(s);
@@ -3113,6 +3296,7 @@ function saveSettings(){
   applyStockVisibility();
   if(typeof renderDashboard==='function')renderDashboard();
   if(document.querySelector('.section.active')?.id==='sec-stock')renderStockTable();
+  setupInactivityLogout();renderAuditLog();
   appAlert('Settings saved!');
 }
 async function changeLoginCredentials(){
@@ -3141,6 +3325,7 @@ async function changeLoginCredentials(){
     document.getElementById('login-current-password').value='';
     document.getElementById('login-new-password').value='';
     document.getElementById('login-confirm-password').value='';
+    if(newEmail)addAudit('Login credentials','Email change requested');if(newPassword)addAudit('Login credentials','Password changed');
     if(newEmail&&newPassword)appNotice('Password updated. Check your email to confirm the new login email.','success',5000);
     else if(newEmail)appNotice('Email change requested. Check your email for the confirmation link.','success',5000);
     else appNotice('Login password updated successfully.','success',5000);
@@ -3164,7 +3349,7 @@ function handleLogo(inp){
 // INVOICE TEMPLATE SELECTOR
 // ══════════════════════════════════════════════════════
 function previewTemplate(tpl){
-  ['classic','modern','minimal','bold','ledger','elegant','colorband'].forEach(t=>{
+  ['classic','modern','minimal','bold','ledger','elegant','colorband','bw-signature'].forEach(t=>{
     const el=document.getElementById(`tpl-preview-${t}`);
     if(el)el.style.borderColor=t===tpl?'var(--accent)':'var(--border)';
   });
@@ -3234,6 +3419,7 @@ function buildInvoiceHTMLByTemplate(inv){
   const s=DB.settings();
   const tpl=s.invoiceTemplate||'classic';
   if(tpl==='modern')return addInvoicePrintExtras(buildInvoiceModern(inv,s),inv,s);
+  if(tpl==='bw-signature')return buildInvoiceBWSimple(inv,s);
   return buildRefinedInvoice(inv,s,tpl);
 }
 
@@ -3523,6 +3709,21 @@ function buildInvoiceColorBand(inv,s){
     </div></div>`;
   });
   return html;
+}
+
+
+function buildInvoiceBWSimple(inv,s){
+  const party=DB.parties().find(p=>p.id===inv.partyId)||{},items=inv.items||[],pages=_pageChunks(items,19),hasDisc=Number(inv.disc||0)>0,total=inv.grandTotal??inv.net??0;
+  const money=v=>'Rs. '+fmt(Number(v)||0);let html='';
+  pages.forEach((pg,pi)=>{const last=pi===pages.length-1,start=pi*19;const rows=pg.map((it,j)=>`<tr><td>${start+j+1}</td><td>${escH(it.name||'')}</td><td class="r">${escH(String(it.qty??0))}</td><td class="r">${money(it.rate)}</td>${hasDisc?`<td class="r">${escH(String(it.disc||0))}%</td>`:''}<td class="r">${money(it.total)}</td></tr>`).join('');const adjustments=(inv.adjustments||[]).filter(a=>Number(a.value)!==0).map(a=>`<tr><td>${escH(a.name||'Adjustment')}</td><td class="r">${Number(a.value)<0?'− ':'+ '}${money(Math.abs(Number(a.value)||0))}</td></tr>`).join('');
+    html+=`<div class="print-page print-invoice" style="font-family:Arial,Helvetica,sans-serif;color:#000;background:#fff">
+      <div style="text-align:center;border-bottom:1.5px solid #000;padding-bottom:10px;margin-bottom:14px"><div style="font-size:20pt;font-weight:700;letter-spacing:.3px">${escH(s.company||'Company')}</div><div style="font-size:8.5pt;margin-top:4px">${escH(s.address||'')}${s.phone?' · '+escH(s.phone):''}${s.pan?' · PAN/VAT: '+escH(s.pan):''}</div></div>
+      <div style="display:flex;justify-content:space-between;gap:25px;margin-bottom:14px;font-size:9pt"><div style="flex:1"><div style="font-size:7.5pt;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Bill To</div><strong style="font-size:11pt">${escH(inv.partyName||'')}</strong>${party.address?`<br>${escH(party.address)}`:''}${party.phone?`<br>${escH(party.phone)}`:''}${inv.note?`<br><span style="font-style:italic">${escH(inv.note)}</span>`:''}</div><div style="text-align:right"><div style="font-size:7.5pt;text-transform:uppercase;letter-spacing:1px">Invoice</div><strong style="font:700 13pt 'Courier New',monospace">${escH(inv.invNo||'')}</strong><div style="margin-top:3px">${escH(inv.dateBS||'')} (BS)</div>${inv.paid?'<div style="margin-top:5px;font-weight:700">PAID</div>':''}</div></div>
+      ${pages.length>1?`<div style="font-size:8pt;text-align:right;margin-bottom:4px">Page ${pi+1} of ${pages.length}</div>`:''}
+      <table style="width:100%;border-collapse:collapse;font-size:9pt"><thead><tr style="border-top:1.5px solid #000;border-bottom:1.5px solid #000"><th style="padding:7px 5px;text-align:left;width:28px">SN</th><th style="padding:7px 5px;text-align:left">Particulars</th><th style="padding:7px 5px;text-align:right">Qty</th><th style="padding:7px 5px;text-align:right">Rate</th>${hasDisc?'<th style="padding:7px 5px;text-align:right">Disc.</th>':''}<th style="padding:7px 5px;text-align:right">Amount</th></tr></thead><tbody>${rows}</tbody></table>
+      ${last?`<div style="display:flex;justify-content:flex-end;margin-top:12px"><table style="width:245px;border-collapse:collapse;font-size:9pt"><tr><td style="padding:4px 5px">Subtotal</td><td class="r" style="padding:4px 5px">${money(inv.sub)}</td></tr>${hasDisc?`<tr><td style="padding:4px 5px">Discount</td><td class="r" style="padding:4px 5px">− ${money(inv.disc)}</td></tr>`:''}${adjustments}<tr style="border-top:1.5px solid #000"><td style="padding:7px 5px;font-weight:700">Total</td><td class="r" style="padding:7px 5px;font-weight:700;font-size:11pt">${money(total)}</td></tr></table></div><div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:42px"><div style="font-size:8pt">Printed by: ${escH(s.username||'Admin')}</div><div style="width:175px;text-align:center"><div style="border-top:1px solid #000;padding-top:6px;font-size:9pt;font-weight:600">Authorized Signature</div></div></div>`:'<div style="text-align:right;font-size:8pt;margin-top:7px">Continued on next page…</div>'}
+    </div>`;
+  });return html;
 }
 
 function printInvoice(id){
@@ -4263,7 +4464,7 @@ function printThermalReceipt(){
 }
 
 function exportBackup(){
-  const data={invoices:DB.invoices(),parties:DB.parties(),payments:DB.payments(),journal:DB.journal(),settings:DB.settings(),vouchers:DB.vouchers(),stock:DB.stock(),cheques:DB.cheques(),notes:DB.get('notes')||'',exportedAt:new Date().toISOString()};
+  const data={invoices:DB.invoices(),parties:DB.parties(),payments:DB.payments(),journal:DB.journal(),settings:DB.settings(),vouchers:DB.vouchers(),stock:DB.stock(),cheques:DB.cheques(),notes:DB.get('notes')||'',audit:DB.audit(),exportedAt:new Date().toISOString()};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   const s=DB.settings();
@@ -4273,7 +4474,8 @@ function exportBackup(){
   const monthName=parts.length>=2?BS_MONTHS[parseInt(parts[1])-1]||parts[1]:'';
   const year=parts[0]||'';
   a.download=`Backup-${company}-${monthName}-${year}.json`;
-  a.click();
+  a.click();URL.revokeObjectURL(a.href);
+  localStorage.setItem(backupStampKey(),String(Date.now()));localStorage.setItem(backupReminderKey(),String(Date.now()));addAudit('Backup exported',a.download);
 }
 function importBackup(inp){
   const file=inp.files[0];if(!file)return;
@@ -4291,6 +4493,7 @@ function importBackup(inp){
       if(data.stock)DB.saveStock(data.stock);
       if(data.cheques)DB.saveCheques(data.cheques);
       if(typeof data.notes==='string')DB.set('notes',data.notes);
+      if(Array.isArray(data.audit))DB.saveAudit(data.audit);
       appNotice('Backup restored. Reloading…','success',1200);setTimeout(()=>location.reload(),1200);
     }catch(e){appAlert('Invalid backup file.');}
   };
@@ -4361,5 +4564,26 @@ document.addEventListener('keydown',function(e){
   if(id==='auth-new-password'||id==='auth-confirm-password'){e.preventDefault();finpilotCompletePasswordReset();}
 });
 </script>
+
+<script id="finpilot-auth-motion">
+(()=>{
+ const screen=document.getElementById('auth-screen');
+ if(!screen||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ let raf=0;
+ screen.addEventListener('pointermove',e=>{
+   if(raf)return;
+   raf=requestAnimationFrame(()=>{
+     const r=screen.getBoundingClientRect();
+     const x=((e.clientX-r.left)/r.width-.5)*18;
+     const y=((e.clientY-r.top)/r.height-.5)*18;
+     screen.style.setProperty('--mx',x.toFixed(2)+'px');
+     screen.style.setProperty('--my',y.toFixed(2)+'px');
+     raf=0;
+   });
+ },{passive:true});
+ screen.addEventListener('pointerleave',()=>{screen.style.setProperty('--mx','0px');screen.style.setProperty('--my','0px');},{passive:true});
+})();
+</script>
+
 </body>
 </html>

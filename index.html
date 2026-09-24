@@ -309,6 +309,13 @@ main#content{padding:0 34px 30px;min-width:0;scroll-behavior:smooth}.workspace-b
 .auth-trust{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:18px;color:#8795a4;font-size:10.5px}.auth-trust svg{width:13px;height:13px;color:#168163}
 .auth-inline-actions{display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:15px}.auth-link-btn{border:0;background:transparent;color:#087f8c;padding:4px 0;font:600 12px 'DM Sans',sans-serif;cursor:pointer}.auth-link-btn:hover{text-decoration:underline;color:#066773}.auth-link-btn:disabled{opacity:.55;cursor:not-allowed}.auth-reset-note{font-size:11.5px;line-height:1.55;color:#718096;margin:-10px 0 18px}.credential-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.credential-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.credential-hint{font-size:11.5px;color:var(--text2);line-height:1.55;margin-top:7px}@media(max-width:600px){.credential-grid{grid-template-columns:1fr}}
 .auth-message{min-height:22px;margin-top:14px;font-size:12.5px;color:#56667a;text-align:center}.auth-message.error{color:#c44558}.auth-message.ok{color:#168163}
+.auth-google{width:100%;min-height:48px;border:1px solid #dbe4ec;border-radius:11px;background:#fff;color:#26384a;display:flex;align-items:center;justify-content:center;gap:10px;font:700 13px 'DM Sans',sans-serif;cursor:pointer;transition:.18s;box-shadow:0 1px 2px rgba(22,38,56,.03)}
+.auth-google:hover{background:#f8fafc;border-color:#c9d5df;box-shadow:0 6px 18px rgba(15,23,42,.07)}.auth-google svg{width:18px;height:18px;flex:0 0 18px}
+.auth-method-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:#a0adba;font-size:10.5px}.auth-method-divider:before,.auth-method-divider:after{content:'';height:1px;background:#e4eaf0;flex:1}
+.auth-passwordless{display:flex;justify-content:center;margin-top:12px}.auth-passwordless .auth-link-btn{font-size:12.5px}
+.auth-otp-box{margin-top:19px;padding:16px;border:1px solid #dfe8ef;background:#f8fbfd;border-radius:13px}.auth-otp-box[hidden]{display:none!important}.auth-otp-title{font-size:13px;font-weight:700;color:#26384a;margin-bottom:4px}.auth-otp-copy{font-size:11.5px;line-height:1.55;color:#718096;margin-bottom:12px}.auth-otp-row{display:grid;grid-template-columns:1fr auto;gap:8px}.auth-otp-row input{letter-spacing:5px;text-align:center;font-family:'DM Mono',monospace;font-size:17px;font-weight:700}.auth-otp-row .btn{min-height:48px}.auth-otp-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:12px}.auth-otp-actions .auth-link-btn{font-size:11.5px}
+.auth-copyright{margin-top:19px;padding-top:16px;border-top:1px solid #edf1f5;text-align:center;font-size:10.5px;line-height:1.6;color:#9aa7b5}.sidebar-copyright{flex-basis:100%;text-align:center;color:#6f849b;font-size:9.5px;line-height:1.45;padding:5px 6px 0}.sidebar-copyright strong{color:#91a8ba;font-weight:600}
+@media(max-width:500px){.auth-otp-row{grid-template-columns:1fr}.auth-otp-actions{align-items:flex-start;flex-direction:column}}
 .auth-setup{font-size:12px;line-height:1.55;background:#fff7e8;border:1px solid #f0d49d;border-radius:10px;padding:11px 12px;margin-bottom:18px;color:#75501b}
 .cloud-sync{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}.cloud-sync:before{content:'';width:7px;height:7px;border-radius:50%;background:#94a3b8}.cloud-sync.syncing:before{background:#d69e2e}.cloud-sync.saved:before{background:#168163}.cloud-sync.error:before{background:#c44558}.sidebar-footer{flex-wrap:wrap}.sidebar-footer #logout-btn{flex-basis:100%}
 body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(.fp-authenticated) .mobile-shade{display:none!important}
@@ -367,9 +374,20 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
           <div class="auth-inline-actions"><button class="auth-link-btn" type="button" onclick="finpilotForgotPassword()">Forgot password?</button></div>
           <div class="auth-actions">
             <button class="btn btn-primary" type="button" onclick="finpilotSignIn()">Sign in to FinPilot</button>
-            <div class="auth-divider">NEW TO FINPILOT?</div>
-            <button class="btn btn-secondary" type="button" onclick="finpilotSignUp()">Create an account</button>
           </div>
+          <div class="auth-divider">NEW TO FINPILOT?</div>
+          <div class="auth-actions" style="margin-top:10px"><button class="btn btn-secondary" type="button" onclick="finpilotSignUp()">Create an account</button></div>
+          <div id="auth-otp-box" class="auth-otp-box" hidden>
+            <div class="auth-otp-title">Confirm your email</div>
+            <div id="auth-otp-copy" class="auth-otp-copy">Enter the verification code sent to your email address.</div>
+            <div class="auth-otp-row"><input id="auth-otp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="OTP CODE"><button class="btn btn-primary" type="button" onclick="finpilotVerifyOtp()">Confirm email</button></div>
+            <div class="auth-otp-actions"><button class="auth-link-btn" type="button" onclick="finpilotResendSignupOtp()">Resend code</button><button class="auth-link-btn" type="button" onclick="finpilotHideOtp()">Back to sign in</button></div>
+          </div>
+          <div class="auth-method-divider">OR</div>
+          <button class="auth-google" type="button" onclick="finpilotGoogleSignIn()" aria-label="Continue with Google">
+            <svg viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.482h4.844a4.14 4.14 0 0 1-1.797 2.715v2.258h2.909c1.703-1.568 2.684-3.878 2.684-6.614Z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.181l-2.909-2.258c-.806.54-1.836.859-3.047.859-2.344 0-4.328-1.585-5.037-3.714H.956v2.332A9 9 0 0 0 9 18Z"/><path fill="#FBBC05" d="M3.963 10.706A5.42 5.42 0 0 1 3.682 9c0-.592.102-1.167.281-1.706V4.962H.956A9 9 0 0 0 0 9c0 1.452.347 2.827.956 4.038l3.007-2.332Z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.507.454 3.441 1.346l2.581-2.581C13.463.892 11.426 0 9 0A9 9 0 0 0 .956 4.962l3.007 2.332C4.672 5.165 6.656 3.58 9 3.58Z"/></svg>
+            Continue with Google
+          </button>
         </div>
         <div id="auth-reset-box" hidden>
           <h2>Set a new password</h2>
@@ -382,6 +400,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
         </div>
         <div id="auth-message" class="auth-message"></div>
         <div class="auth-trust"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Secure account access and cloud sync</span></div>
+        <div class="auth-copyright">© 2026 Arbin Niroula · FinPilot. All rights reserved.</div>
       </div>
     </section>
   </div>
@@ -418,6 +437,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
     <button onclick="document.getElementById('restore-file').click()">📂 Restore</button>
     <input type="file" id="restore-file" accept=".json" style="display:none" onchange="importBackup(this)">
     <button id="logout-btn" onclick="finpilotSignOut()">↪ Sign out</button>
+    <div class="sidebar-copyright">© 2026 <strong>Arbin Niroula · FinPilot</strong><br>All rights reserved.</div>
   </div>
 </nav>
 
@@ -1270,6 +1290,7 @@ const SUPABASE_URL='https://fkwshkpmebitdvniwreh.supabase.co';
 const SUPABASE_KEY='sb_publishable_7oFuilE9oG0ZXV1frrKoYA_CFlKLXAr';
 const CLOUD_KEYS=['invoices','parties','payments','journal','settings','vouchers','stock','cheques','notes'];
 let sbClient=null,currentCloudUser=null,cloudReady=false,finpilotStarted=false,passwordRecoveryMode=false;
+let authOtpEmail='';
 const cloudSaveChains=new Map();
 let activeCloudWrites=0;
 let cloudPullBusy=false;
@@ -1419,6 +1440,48 @@ function authMessage(msg,type=''){
   el.textContent=msg;el.className='auth-message'+(type?' '+type:'');
 }
 function setAuthBusy(busy){document.querySelectorAll('#auth-screen button').forEach(b=>b.disabled=busy);}
+async function finpilotGoogleSignIn(){
+  if(!sbClient)return authMessage('Cloud connection is not configured yet.','error');
+  setAuthBusy(true);authMessage('Opening Google sign-in…');
+  const redirectTo=location.origin+location.pathname;
+  const {error}=await sbClient.auth.signInWithOAuth({provider:'google',options:{redirectTo}});
+  if(error){setAuthBusy(false);return authMessage(error.message,'error');}
+}
+function finpilotShowOtp(email){
+  authOtpEmail=String(email||'').trim();
+  const box=document.getElementById('auth-otp-box'),copy=document.getElementById('auth-otp-copy'),code=document.getElementById('auth-otp-code');
+  if(box)box.hidden=false;
+  if(copy)copy.textContent=`Account created. Enter the verification code sent to ${authOtpEmail}.`;
+  if(code){code.value='';setTimeout(()=>code.focus(),0);}
+}
+function finpilotHideOtp(){
+  const box=document.getElementById('auth-otp-box');if(box)box.hidden=true;
+  authOtpEmail='';
+}
+async function finpilotResendSignupOtp(){
+  if(!sbClient)return authMessage('Cloud connection is not configured yet.','error');
+  const email=(authOtpEmail||document.getElementById('auth-email')?.value||'').trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return authMessage('Enter a valid email address first.','error');
+  setAuthBusy(true);authMessage('Sending a new confirmation code…');
+  const {error}=await sbClient.auth.resend({type:'signup',email,options:{emailRedirectTo:location.origin+location.pathname}});
+  setAuthBusy(false);
+  if(error)return authMessage(error.message,'error');
+  finpilotShowOtp(email);
+  authMessage('A new confirmation code was sent.','ok');
+}
+async function finpilotVerifyOtp(){
+  if(!sbClient)return authMessage('Cloud connection is not configured yet.','error');
+  const email=(authOtpEmail||document.getElementById('auth-email')?.value||'').trim();
+  const token=(document.getElementById('auth-otp-code')?.value||'').replace(/\s+/g,'');
+  if(!email)return authMessage('Enter your email address first.','error');
+  if(!/^\d{6,8}$/.test(token))return authMessage('Enter the confirmation code from your email.','error');
+  setAuthBusy(true);authMessage('Confirming your email…');
+  const {error}=await sbClient.auth.verifyOtp({email,token,type:'email'});
+  setAuthBusy(false);
+  if(error)return authMessage(error.message,'error');
+  authMessage('Email confirmed. Signing you in…','ok');
+}
+
 async function finpilotSignIn(){
   if(!sbClient)return authMessage('Cloud connection is not configured yet.','error');
   const email=document.getElementById('auth-email').value.trim(),password=document.getElementById('auth-password').value;
@@ -1435,7 +1498,10 @@ async function finpilotSignUp(){
   setAuthBusy(true);authMessage('Creating account…');
   const {data,error}=await sbClient.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});
   setAuthBusy(false);if(error)return authMessage(error.message,'error');
-  if(!data.session)authMessage('Account created. Check your email and confirm it, then sign in.','ok');
+  if(!data.session){
+    finpilotShowOtp(email);
+    authMessage('Account created. Enter the confirmation code sent to your email.','ok');
+  }
 }
 async function finpilotForgotPassword(){
   if(!sbClient)return authMessage('Cloud connection is not configured yet.','error');
@@ -4291,6 +4357,7 @@ document.addEventListener('keydown',function(e){
   if(e.key!=='Enter'||document.getElementById('auth-screen')?.hidden)return;
   const id=document.activeElement?.id;
   if(id==='auth-email'||id==='auth-password'){e.preventDefault();finpilotSignIn();}
+  if(id==='auth-otp-code'){e.preventDefault();finpilotVerifyOtp();}
   if(id==='auth-new-password'||id==='auth-confirm-password'){e.preventDefault();finpilotCompletePasswordReset();}
 });
 </script>

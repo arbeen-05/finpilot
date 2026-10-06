@@ -3260,8 +3260,12 @@ function voucherPrintModel(v){
   const sub=items.reduce((a,i)=>a+(Number(i.qty)||0)*(Number(i.rate)||0),0),disc=items.reduce((a,i)=>a+(Number(i.discAmt)||((Number(i.qty)||0)*(Number(i.rate)||0)*(Number(i.disc)||0)/100)),0);
   return {id:v.id,invNo:v.refNo,dateBS:v.dateBS,partyId:v.partyId,partyName:v.partyName,items,sub,disc,net:v.total,grandTotal:v.total,note:v.ref?`Reference: ${v.ref}`:'',termsHtml:v.termsHtml??DB.settings().defaultInvoiceNoteHtml??'',paid:false,adjustments:[],documentTitle:titleMap[v.type]||'DOCUMENT',billToLabel:labelMap[v.type]||'ACCOUNT'};
 }
-function printVoucher(id){const v=DB.vouchers().find(x=>x.id===id);if(!v)return;const model=voucherPrintModel(v);printDocument(buildInvoiceHTMLByTemplate(model),model.documentTitle);}
-function printCurrentVoucher(){const type=document.getElementById('vm-type').value,pname=document.getElementById('vm-party-input').value.trim(),pid=document.getElementById('vm-party-id').value,refNo=document.getElementById('vm-no').value,dateBS=document.getElementById('vm-date').value||getNepaliDate(),ref=document.getElementById('vm-ref').value,termsHtml=getRichEditorHtml('vm-terms-editor');const items=vmItems.filter(i=>(i.name||'').trim()&&Number(i.qty)>0&&Number(i.rate)>0).map(i=>({...i,total:Number(i.total)||0}));if(!items.length)return appAlert('Add at least one valid item before printing.');const total=items.reduce((a,i)=>a+(Number(i.total)||0),0);const model=voucherPrintModel({id:'preview',type,refNo,dateBS,partyId:pid,partyName:pname,items,total,ref,termsHtml});printDocument(buildInvoiceHTMLByTemplate(model),model.documentTitle);}
+function exportFileBase(partyName,refNo){
+  const clean=value=>String(value||'').replace(/[<>:"/\\|?*\x00-\x1F]/g,'-').replace(/\s+/g,' ').trim().replace(/[. ]+$/g,'');
+  return `${clean(partyName)||'Account'} - ${clean(refNo)||'Invoice'}`;
+}
+function printVoucher(id){const v=DB.vouchers().find(x=>x.id===id);if(!v)return;const model=voucherPrintModel(v);printDocument(buildInvoiceHTMLByTemplate(model),exportFileBase(model.partyName,model.invNo));}
+function printCurrentVoucher(){const type=document.getElementById('vm-type').value,pname=document.getElementById('vm-party-input').value.trim(),pid=document.getElementById('vm-party-id').value,refNo=document.getElementById('vm-no').value,dateBS=document.getElementById('vm-date').value||getNepaliDate(),ref=document.getElementById('vm-ref').value,termsHtml=getRichEditorHtml('vm-terms-editor');const items=vmItems.filter(i=>(i.name||'').trim()&&Number(i.qty)>0&&Number(i.rate)>0).map(i=>({...i,total:Number(i.total)||0}));if(!items.length)return appAlert('Add at least one valid item before printing.');const total=items.reduce((a,i)=>a+(Number(i.total)||0),0);const model=voucherPrintModel({id:'preview',type,refNo,dateBS,partyId:pid,partyName:pname,items,total,ref,termsHtml});printDocument(buildInvoiceHTMLByTemplate(model),exportFileBase(model.partyName,model.invNo));}
 
 async function deleteVoucher(id,type){
   if(!await appConfirm('Delete this voucher?',{yesText:'Delete',noText:'Cancel',type:'warning',title:'Delete voucher'}))return;
@@ -3884,7 +3888,7 @@ function printInvoice(id){
   const inv=DB.invoices().find(i=>i.id===id);if(!inv)return;
   const area=document.getElementById('print-area');
   area.innerHTML=buildInvoiceHTMLByTemplate(inv);area.style.display='block';
-  printDocument(area.innerHTML,'Invoice');
+  printDocument(area.innerHTML,exportFileBase(inv.partyName,inv.invNo));
 }
 
 function printCurrentInvoice(){
@@ -3898,7 +3902,7 @@ function printCurrentInvoice(){
   const calculated=(sub-disc)+adjustments.reduce((a,x)=>a+x.value,0);
   const grandTotal=Math.round(calculated);
   const fakeInv={id:'preview',invNo,dateBS,partyName,note,termsHtml:getRichEditorHtml('inv-terms-editor'),items:vItems,sub,disc,net:calculated,grandTotal,paid:isPaid,taxInvoice:false,taxTotal:0,adjustments};
-  const area=document.getElementById('print-area');area.innerHTML=buildInvoiceHTMLByTemplate(fakeInv);area.style.display='block';printDocument(area.innerHTML,'Invoice');
+  const area=document.getElementById('print-area');area.innerHTML=buildInvoiceHTMLByTemplate(fakeInv);area.style.display='block';printDocument(area.innerHTML,exportFileBase(fakeInv.partyName,fakeInv.invNo));
 }
 // ══════════════════════════════════════════════════════
 // PARTY STATEMENT
@@ -4309,8 +4313,7 @@ async function renderAndDownloadInvoiceImage(inv){
   const canvas=await html2canvas(stage,{backgroundColor:'#ffffff',scale,width,height,windowWidth:1200,scrollX:0,scrollY:0,useCORS:true,allowTaint:false,logging:false,imageTimeout:15000});
   const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('The PNG image could not be created.')),'image/png'));
   const url=URL.createObjectURL(blob),link=document.createElement('a');
-  const clean=value=>String(value||'').replace(/[<>:"/\\|?*\x00-\x1F]/g,'_').replace(/\s+/g,'_');
-  link.href=url;link.download=[s.company||'Company',inv.invNo||'Invoice',inv.dateBS||getTodayBS()].map(clean).join('_')+'.png';
+  link.href=url;link.download=exportFileBase(inv.partyName,inv.invNo)+'.png';
   document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
  }catch(error){
   console.error('Invoice image export failed:',error);

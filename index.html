@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FinPilot — Billing & Journal</title>
+<title>FinPilot — Billing & Ledger</title>
 <link rel="icon" href="images/favicon.png" type="image/png">
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -469,7 +469,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
     <section class="auth-showcase" aria-label="FinPilot">
       <div class="auth-brand">
         <div class="auth-logo-stage"><img class="auth-brand-logo" src="images/favicon.png" alt="FinPilot logo"></div>
-        <div class="auth-brand-copy"><h1>FinPilot</h1><p>Billing &amp; Journal</p></div>
+        <div class="auth-brand-copy"><h1>FinPilot</h1><p>Billing &amp; Ledger</p></div>
       </div>
       <div class="auth-pitch">
         <div class="auth-kicker">Live cloud workspace</div>
@@ -489,7 +489,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
     </section>
     <section class="auth-panel">
       <div class="auth-card">
-        <div class="auth-mobile-brand"><img src="images/favicon.png" alt="FinPilot logo"><div><h1>FinPilot</h1><p>Billing &amp; Journal</p></div></div>
+        <div class="auth-mobile-brand"><img src="images/favicon.png" alt="FinPilot logo"><div><h1>FinPilot</h1><p>Billing &amp; Ledger</p></div></div>
         <div id="auth-setup" class="auth-setup" hidden>FinPilot cloud connection is not configured yet.</div>
         <div id="auth-login-box">
           <div class="auth-eyebrow">Secure workspace</div>
@@ -554,7 +554,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
     <li><a href="#" onclick="nav('payments',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 10h18M15 15h3"/></svg></span> Payments <span style="margin-left:auto;font-size:10px;opacity:.45;font-family:'DM Mono',monospace">F9</span></a></li>
     <li><a href="#" onclick="nav('contra',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h14M14 3l4 4-4 4M20 17H6M10 13l-4 4 4 4"/></svg></span> Contra <span style="margin-left:auto;font-size:10px;opacity:.45;font-family:'DM Mono',monospace">F10</span></a></li>
     <li><a href="#" onclick="nav('due-details',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg></span> Due Details <span style="margin-left:auto;font-size:10px;opacity:.45;font-family:'DM Mono',monospace">F11</span></a></li>
-    <li><a href="#" onclick="nav('statement',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h16v18H4zM8 3v18M11 8h6M11 12h6M11 16h6"/></svg></span> Journal <span style="margin-left:auto;font-size:10px;opacity:.45;font-family:'DM Mono',monospace">F12</span></a></li>
+    <li><a href="#" onclick="nav('statement',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h16v18H4zM8 3v18M11 8h6M11 12h6M11 16h6"/></svg></span> Ledger <span style="margin-left:auto;font-size:10px;opacity:.45;font-family:'DM Mono',monospace">F12</span></a></li>
     <li class="nav-label">WORKSPACE</li><li><a href="#" onclick="nav('tax-calculator',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg></span> VAT Billing</a></li>
 <li><a href="#" onclick="nav('settings',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></span> Settings</a></li>
 
@@ -1074,7 +1074,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
 <!-- JOURNAL (formerly "Party Statement" — the old system-wide Journal page has been retired in favor of this per-party ledger) -->
 <div id="sec-statement" class="section">
   <div class="page-header">
-    <div><h2>Journal</h2><p>Full transaction ledger per party. Open or delete linked entries directly from the journal.</p></div>
+    <div><h2>Ledger</h2><p>Complete transaction ledger per account. Open linked entries directly from the ledger.</p></div>
     <div class="flex-gap">
       <button class="btn btn-secondary" onclick="printStatement()">🖨 Print</button>
       <button class="btn btn-green" onclick="exportStatementXLSX()">📊 Export Excel</button>
@@ -1271,18 +1271,14 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
       <div style="font-size:11.5px;color:var(--text2);line-height:1.55">The printed VAT invoice always shows pre-VAT Rate and Total, then discount, taxable amount, tax and grand total.</div>
     </div>
     <div class="setting-section">
-      <h3>📚 Fiscal Year System</h3>
-      <label class="setting-check"><input type="checkbox" id="set-fiscal-enabled" onchange="toggleFiscalSettingsUI()"> Enable fiscal year closing system</label>
+      <h3>📚 Fiscal Years</h3>
+      <label class="setting-check"><input type="checkbox" id="set-fiscal-enabled" onchange="toggleFiscalSettingsUI()"> Enable fiscal year system</label>
       <div id="fiscal-settings-fields" style="margin-top:12px">
-        <div class="form-group"><label>Fiscal Year Name</label><input type="text" id="set-fiscal-label" placeholder="e.g. 2083/84"></div>
-        <div class="form-row">
-          <div class="form-group"><label>Start Date (BS)</label><input type="text" id="set-fiscal-start" placeholder="YYYY-MM-DD"></div>
-          <div class="form-group"><label>End Date (BS)</label><input type="text" id="set-fiscal-end" placeholder="YYYY-MM-DD"></div>
-        </div>
-        <div class="flex-gap"><button type="button" class="btn btn-secondary btn-sm" onclick="createFiscalClosureNow()">Create Closing / Opening Now</button><button type="button" class="btn btn-secondary btn-sm" onclick="printLatestFiscalConfirmation()">Print Confirmation Letters</button></div>
-        <div id="fiscal-history" style="margin-top:12px"></div>
+        <div id="fiscal-current-summary" class="inline-info" style="margin-bottom:10px"></div>
+        <div style="font-size:11.5px;color:var(--text2);line-height:1.6;margin-bottom:10px">Fiscal years are automatic and begin on <strong>Shrawan 1</strong>. The current fiscal year is always shown. Older fiscal-year records stay hidden unless you enable their checkbox below. Their closing balance is automatically carried forward as the next year's opening balance.</div>
+        <input type="hidden" id="set-fiscal-label"><input type="hidden" id="set-fiscal-start"><input type="hidden" id="set-fiscal-end">
+        <div id="fiscal-history"></div>
       </div>
-      <div style="font-size:11.5px;color:var(--text2);margin-top:8px;line-height:1.55">When enabled, FinPilot automatically stores closing balances after the configured end date and carries the same balances forward as opening balances. Source invoices and payments remain unchanged.</div>
     </div>
     <div class="setting-section">
       <h3>🎨 Invoice Print Template</h3>
@@ -1376,7 +1372,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
       <h4 style="margin:18px 0 8px">Recent activity</h4>
       <div id="audit-log" class="audit-list"><div class="empty-state" style="padding:16px"><p>No activity recorded yet.</p></div></div>
       <div class="flex-gap" style="margin-top:9px"><button class="btn btn-secondary btn-sm" type="button" onclick="exportAuditLog()">Export Audit Log</button></div>
-      <div class="danger-zone" style="margin-top:18px"><h4>Delete FinPilot Account</h4><p>Permanently deletes your FinPilot cloud data and authentication account. Export a backup first. This cannot be undone.</p><button class="btn btn-danger btn-sm" type="button" onclick="deleteFinPilotAccount()">Delete My Account</button></div>
+      <div class="danger-zone" style="margin-top:18px"><h4>Delete FinPilot Account</h4><p>Account deletion is handled by FinPilot support. Clicking below opens a ready-to-send deletion request addressed to finpilot@niroulaarbin.com.np.</p><button class="btn btn-danger btn-sm" type="button" onclick="requestFinPilotAccountDeletion()">Request Account Deletion</button></div>
     </div>
     <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
   </div>
@@ -2980,7 +2976,7 @@ function openAccountDetails(id){
  const money=n=>'Rs. '+fmt(n);
  const stat=(label,value)=>`<div class="stat-card"><div class="label">${label}</div><div class="value" style="font-size:20px">${money(value)}</div></div>`;
  const entries=[...invoices.map(x=>({type:'invoice',id:x.id,date:x.dateBS,label:x.invNo,amount:x.grandTotal??x.net??0})),...payments.map(x=>({type:'payment',id:x.id,date:x.dateBS,label:'Payment · '+x.method,amount:x.amount})),...vouchers.map(x=>({type:x.type,id:x.id,date:x.dateBS,label:({'sales-return':'Credit Note','purchase-return':'Debit Note',purchase:'Purchase'})[x.type]||'Voucher',amount:x.total}))].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
- modal.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="account-detail-title" style="max-width:940px"><div class="page-header"><div><h2 id="account-detail-title">${escH(p.name)}</h2><p>${escH(p.phone||'No phone')} · ${escH(p.address||'No address')}${p.panVat?' · PAN/VAT: '+escH(p.panVat):''}</p></div><button class="btn btn-secondary" data-action="close" aria-label="Close account details">✕</button></div><div class="stats-grid">${stat('Total sales',sales)}${stat('Credit notes',credits)}${stat('Net billed',getTotalBilled(id))}${stat('Payments received',received)}${stat('Discounts allowed',discount)}${stat(due<0?'Credit balance':'Outstanding due',Math.abs(due))}</div><div class="flex-gap" style="margin-bottom:20px"><button class="btn btn-primary" data-action="statement">View statement</button><button class="btn btn-secondary" data-action="payment">Receive payment</button><button class="btn btn-secondary" data-action="invoice">New invoice</button><button class="btn btn-secondary" data-action="edit">Edit account</button></div><h3 style="margin-bottom:12px">Transactions (${entries.length})</h3><div class="table-wrap" style="max-height:320px;overflow:auto"><table><thead><tr><th>Date (BS)</th><th>Document</th><th class="amount">Amount</th></tr></thead><tbody>${entries.map((x,i)=>`<tr><td>${escH(x.date||'')}</td><td><button class="btn btn-secondary btn-sm" data-entry="${i}">${escH(x.label||x.type)}</button></td><td class="amount">${money(x.amount)}</td></tr>`).join('')||'<tr><td colspan="3">No transactions yet.</td></tr>'}</tbody></table></div></div>`;
+ modal.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="account-detail-title" style="max-width:940px"><div class="page-header"><div><h2 id="account-detail-title">${escH(p.name)}</h2><p>${escH(p.phone||'No phone')} · ${escH(p.address||'No address')}${p.panVat?' · PAN/VAT: '+escH(p.panVat):''}</p></div><button class="btn btn-secondary" data-action="close" aria-label="Close account details">✕</button></div><div class="stats-grid">${stat('Total sales',sales)}${stat('Credit notes',credits)}${stat('Net billed',getTotalBilled(id))}${stat('Payments received',received)}${stat('Discounts allowed',discount)}${stat(due<0?'Credit balance':'Outstanding due',Math.abs(due))}</div><div class="flex-gap" style="margin-bottom:20px"><button class="btn btn-primary" data-action="statement">View Ledger</button><button class="btn btn-secondary" data-action="payment">Receive payment</button><button class="btn btn-secondary" data-action="invoice">New invoice</button><button class="btn btn-secondary" data-action="edit">Edit account</button></div><h3 style="margin-bottom:12px">Transactions (${entries.length})</h3><div class="table-wrap" style="max-height:320px;overflow:auto"><table><thead><tr><th>Date (BS)</th><th>Document</th><th class="amount">Amount</th></tr></thead><tbody>${entries.map((x,i)=>`<tr><td>${escH(x.date||'')}</td><td><button class="btn btn-secondary btn-sm" data-entry="${i}">${escH(x.label||x.type)}</button></td><td class="amount">${money(x.amount)}</td></tr>`).join('')||'<tr><td colspan="3">No transactions yet.</td></tr>'}</tbody></table></div></div>`;
  const close=()=>{modal.classList.remove('open');};
  modal.querySelectorAll('[data-action]').forEach(btn=>btn.onclick=()=>{
   const action=btn.dataset.action;close();
@@ -4306,7 +4302,7 @@ function renderStatement(){
       <td class="amount ${e.debit?'text-red':''}">${e.debit?`Rs. ${fmtI(e.debit)}`:'—'}</td>
       <td class="amount ${e.credit?'text-green':''}">${e.credit?`Rs. ${fmtI(e.credit)}`:'—'}</td>
       <td class="amount" style="font-weight:600;color:${e.balance>0?'var(--red)':'var(--green)'}">Rs. ${fmtI(Math.abs(e.balance))} ${e.balance>0?'Dr':'Cr'}</td>
-      <td class="no-print" style="text-align:center;white-space:nowrap"><div class="flex-gap" style="justify-content:center;flex-wrap:nowrap">${canOpen?'<span style="color:var(--text3);align-self:center" title="Open entry">↗</span>':''}${canDelete?'<button type="button" class="btn btn-danger btn-sm journal-delete-btn" title="Delete this journal entry" aria-label="Delete journal entry">🗑</button>':''}</div></td>
+      <td class="no-print" style="text-align:center;white-space:nowrap"><div class="flex-gap" style="justify-content:center;flex-wrap:nowrap">${canOpen?'<span style="color:var(--text3);align-self:center" title="Open entry">↗</span>':''}${canDelete?'<button type="button" class="btn btn-danger btn-sm journal-delete-btn" title="Delete this ledger entry" aria-label="Delete ledger entry">🗑</button>':''}</div></td>
     `;
     const deleteBtn=tr.querySelector('.journal-delete-btn');
     if(deleteBtn)deleteBtn.onclick=async ev=>{ev.preventDefault();ev.stopPropagation();await deleteJournalEntry(e);};
@@ -4324,14 +4320,14 @@ async function deleteJournalEntry(entry){
   const kind=entry.type||'entry';
   let detail='This will also remove the linked source record so balances remain correct.';
   if(entry.type==='Discount')detail='This removes only the discount from the linked payment. The payment itself will remain.';
-  const ok=await appConfirm(`Delete ${kind}?\n\n${detail}`,{yesText:'Delete',noText:'Cancel',type:'warning',title:'Delete journal entry'});
+  const ok=await appConfirm(`Delete ${kind}?\n\n${detail}`,{yesText:'Delete',noText:'Cancel',type:'warning',title:'Delete ledger entry'});
   if(!ok)return;
 
   if(entry.rawType==='invoice'){
     const old=DB.invoices().find(i=>i.id===entry.refId);
     DB.saveInvoices(DB.invoices().filter(i=>i.id!==entry.refId));
     DB.saveJournal(DB.journal().filter(j=>j.refId!==entry.refId));
-    if(old){addAudit('Invoice deleted from Journal',{invoice:old.invNo||entry.refId,party:old.partyName||'',total:old.grandTotal??old.net??0});if(old.partyId)updateInvoiceStatusFIFO(old.partyId);}
+    if(old){addAudit('Invoice deleted from Ledger',{invoice:old.invNo||entry.refId,party:old.partyName||'',total:old.grandTotal??old.net??0});if(old.partyId)updateInvoiceStatusFIFO(old.partyId);}
   }else if(entry.rawType==='payment'){
     const payments=DB.payments();
     const idx=payments.findIndex(p=>p.id===entry.refId);
@@ -4342,12 +4338,12 @@ async function deleteJournalEntry(entry){
         payments[idx]={...old,discount:0};
         DB.savePayments(payments);
         DB.saveJournal(DB.journal().filter(j=>!(j.refId===entry.refId&&(j.desc==='Discount Allowed'||j.debitAcc==='Discount'))));
-        addAudit('Payment discount deleted from Journal',{party:old.partyName||'',discount:removed,payment:old.receipt||entry.refId});
+        addAudit('Payment discount deleted from Ledger',{party:old.partyName||'',discount:removed,payment:old.receipt||entry.refId});
         if(old.partyId)updateInvoiceStatusFIFO(old.partyId);
       }else{
         DB.savePayments(payments.filter(p=>p.id!==entry.refId));
         DB.saveJournal(DB.journal().filter(j=>j.refId!==entry.refId));
-        addAudit('Payment deleted from Journal',{party:old.partyName||'',amount:old.amount||0,method:old.method||''});
+        addAudit('Payment deleted from Ledger',{party:old.partyName||'',amount:old.amount||0,method:old.method||''});
         if(old.partyId)updateInvoiceStatusFIFO(old.partyId);
       }
     }
@@ -4355,15 +4351,15 @@ async function deleteJournalEntry(entry){
     const old=DB.supplierPayments().find(p=>p.id===entry.refId);
     DB.saveSupplierPayments(DB.supplierPayments().filter(p=>p.id!==entry.refId));
     DB.saveJournal(DB.journal().filter(j=>j.refId!==entry.refId));
-    if(old)addAudit('Supplier payment deleted from Journal',{supplier:old.partyName||'',amount:old.amount||0,method:old.method||''});
+    if(old)addAudit('Supplier payment deleted from Ledger',{supplier:old.partyName||'',amount:old.amount||0,method:old.method||''});
   }else if(['purchase','sales-return','purchase-return'].includes(entry.rawType)){
     const old=DB.vouchers().find(v=>v.id===entry.refId);
     DB.saveVouchers(DB.vouchers().filter(v=>v.id!==entry.refId));
     DB.saveJournal(DB.journal().filter(j=>j.refId!==entry.refId));
-    if(old){addAudit(`${voucherLabels[old.type]||'Voucher'} deleted from Journal`,{reference:old.refNo||entry.refId,party:old.partyName||'',total:old.total||0});if(old.partyId)updateInvoiceStatusFIFO(old.partyId);}
+    if(old){addAudit(`${voucherLabels[old.type]||'Voucher'} deleted from Ledger`,{reference:old.refNo||entry.refId,party:old.partyName||'',total:old.total||0});if(old.partyId)updateInvoiceStatusFIFO(old.partyId);}
   }else{
     DB.saveJournal(DB.journal().filter(j=>j.id!==entry.id&&j.refId!==entry.refId));
-    addAudit('Journal entry deleted',{type:entry.type||'',reference:entry.ref||entry.refId});
+    addAudit('Ledger entry deleted',{type:entry.type||'',reference:entry.ref||entry.refId});
   }
 
   if(typeof renderStatement==='function')renderStatement();
@@ -4413,7 +4409,7 @@ function openJournalEntry(rawType,refId){
   const header=document.querySelector('#sec-'+secName+' .page-header');
   const btn=document.createElement('button');btn.type='button';
   btn.className='btn btn-secondary btn-sm no-print journal-return-button';
-  btn.textContent='✕ Close';btn.title='Back to statement (Esc)';btn.setAttribute('aria-label','Close item and return to statement');
+  btn.textContent='✕ Close';btn.title='Back to ledger (Esc)';btn.setAttribute('aria-label','Close item and return to ledger');
   btn.onclick=closeJournalItem;header.appendChild(btn);
  }
 }
@@ -4437,13 +4433,13 @@ function exportStatementXLSX(){
   const totalDr=entries.reduce((s,e)=>s+e.debit,0);
   const totalCr=entries.reduce((s,e)=>s+e.credit,0);
   data.push(['','','','CLOSING BALANCE',totalDr,totalCr,totalDr-totalCr]);
-  const ws=makeCompanyWorksheet('Account Statement / Journal',data[0],data.slice(1),{cols:[{wch:14},{wch:16},{wch:12},{wch:36},{wch:14},{wch:14},{wch:16}],meta:['Account: '+pname]});
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Journal');
+  const ws=makeCompanyWorksheet('Account Ledger',data[0],data.slice(1),{cols:[{wch:14},{wch:16},{wch:12},{wch:36},{wch:14},{wch:14},{wch:16}],meta:['Account: '+pname]});
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Ledger');
   const s=DB.settings();
   const company=(s.company||'FinPilot').replace(/\s+/g,'-');
   const from=document.getElementById('stmt-from').value||'All';
   const to=document.getElementById('stmt-to').value||'All';
-  XLSX.writeFile(wb,`Journal-${company}-${pname.replace(/\s+/g,'-')}-${from}-to-${to}.xlsx`);
+  XLSX.writeFile(wb,`Ledger-${company}-${pname.replace(/\s+/g,'-')}-${from}-to-${to}.xlsx`);
 }
 
 function printStatement(){
@@ -4468,7 +4464,7 @@ function printStatement(){
       <td style="padding:4px 6px;text-align:right;font-weight:600;font-family:monospace;font-size:8.5pt;color:${e.balance>0?'#c42d2d':'#2d7a4f'}">Rs. ${fmtI(Math.abs(e.balance))} ${e.balance>0?'Dr':'Cr'}</td>
     </tr>
   `).join('');
-  const html=buildReportHTML('Journal',`      <table style="width:100%;border-collapse:collapse">
+  const html=buildReportHTML('Ledger',`      <table style="width:100%;border-collapse:collapse">
         <thead><tr style="background:#1a1714;color:#fff">
           <th style="padding:5px 6px;text-align:left;font-size:8.5pt">Date</th>
           <th style="padding:5px 6px;text-align:left;font-size:8.5pt">Type</th>
@@ -4486,7 +4482,7 @@ function printStatement(){
           <td style="padding:6px;text-align:right;color:${bal>0?'#c42d2d':'#2d7a4f'};font-family:monospace">Rs. ${fmtI(Math.abs(bal))} ${bal>0?'Dr':'Cr'}</td>
         </tr></tfoot>
       </table>`, 'Account: '+pname+' · Period: '+from+' to '+to);
-  printDocument(html,'Journal');
+  printDocument(html,'Ledger');
 }
 
 // ══════════════════════════════════════════════════════
@@ -5418,6 +5414,209 @@ function organizeSettingsUI(){
   if(saveBtn){const row=document.createElement('div');row.className='settings-save-row';card.insertBefore(row,saveBtn);row.appendChild(saveBtn);}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',organizeSettingsUI);else organizeSettingsUI();
+</script>
+
+<script id="finpilot-ledger-fiscal-v2">
+// ══════════════════════════════════════════════════════════════
+// LEDGER + AUTOMATIC FISCAL YEARS (Shrawan 1) + deletion email
+// ══════════════════════════════════════════════════════════════
+
+function fpParseBSDate(date){
+  const m=String(date||'').trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  return m?{year:Number(m[1]),month:Number(m[2]),day:Number(m[3])}:null;
+}
+function fpBsMonthDays(year,month){
+  try{if(typeof bs_data!=='undefined'&&bs_data[year]&&Number(bs_data[year][month-1]))return Number(bs_data[year][month-1]);}catch(e){}
+  return month===3?32:32;
+}
+function fpFiscalMetaFromStartYear(startYear){
+  startYear=Number(startYear);
+  const next=startYear+1,endDay=fpBsMonthDays(next,3);
+  return {startYear,label:`${startYear}/${String(next).slice(-2)}`,startBS:`${startYear}-04-01`,endBS:`${next}-03-${String(endDay).padStart(2,'0')}`};
+}
+function fpFiscalMetaForDate(date){
+  const p=fpParseBSDate(date);if(!p)return null;
+  return fpFiscalMetaFromStartYear(p.month>=4?p.year:p.year-1);
+}
+function fpCurrentFiscalMeta(){return fpFiscalMetaForDate(dashboardActualTodayBS())||fpFiscalMetaFromStartYear(2083);}
+function fpFiscalEnabled(){return !!DB.settings().fiscalYearEnabled;}
+function fpFiscalAllDates(){
+  const out=[];
+  for(const r of DB.invoices())if(r.dateBS)out.push(r.dateBS);
+  for(const r of DB.payments())if(r.dateBS)out.push(r.dateBS);
+  for(const r of DB.supplierPayments())if(r.dateBS)out.push(r.dateBS);
+  for(const r of DB.vouchers())if(r.dateBS)out.push(r.dateBS);
+  for(const r of DB.contra())if(r.dateBS)out.push(r.dateBS);
+  return out;
+}
+function fpVisibleFiscalRanges(){
+  if(!fpFiscalEnabled())return [];
+  const current=fpCurrentFiscalMeta(),ranges=[{...current,current:true,visible:true}];
+  for(const r of DB.fiscal()){
+    if(r.startBS&&r.endBS&&r.visible===true&&r.startBS!==current.startBS)ranges.push({startBS:r.startBS,endBS:r.endBS,label:r.label||'',visible:true,id:r.id});
+  }
+  return ranges.sort((a,b)=>String(a.startBS).localeCompare(String(b.startBS)));
+}
+function fpFiscalDateVisible(date){
+  if(!fpFiscalEnabled())return true;
+  const d=String(date||'').trim();if(!d)return true;
+  return fpVisibleFiscalRanges().some(r=>d>=r.startBS&&d<=r.endBS);
+}
+function fpLedgerRawEntries(pid){
+  const rows=[];
+  DB.invoices().filter(x=>x.partyId===pid).forEach(x=>rows.push({date:x.dateBS||'',type:x.taxInvoice?'Tax Invoice':'Sales Invoice',ref:x.invNo||'—',desc:`Invoice to ${x.partyName||''}`,debit:Number(x.grandTotal??x.net??0)||0,credit:0,refId:x.id,rawType:'invoice'}));
+  DB.payments().filter(x=>x.partyId===pid).forEach(x=>{rows.push({date:x.dateBS||'',type:'Payment Received',ref:x.receipt||'—',desc:`Received via ${x.method||'Cash'}${x.note?' · '+x.note:''}`,debit:0,credit:Number(x.amount)||0,refId:x.id,rawType:'payment'});if(Number(x.discount)>0)rows.push({date:x.dateBS||'',type:'Discount',ref:x.receipt||'—',desc:'Discount Allowed',debit:0,credit:Number(x.discount)||0,refId:x.id,rawType:'payment'});});
+  DB.vouchers().filter(x=>x.partyId===pid).forEach(x=>{
+    if(x.type==='sales-return')rows.push({date:x.dateBS||'',type:'Credit Note',ref:x.refNo||'—',desc:`Sales return${x.ref?' · '+x.ref:''}`,debit:0,credit:Number(x.total)||0,refId:x.id,rawType:'sales-return'});
+    if(x.type==='purchase')rows.push({date:x.dateBS||'',type:'Purchase',ref:x.refNo||'—',desc:`Purchase${x.ref?' · '+x.ref:''}`,debit:0,credit:Number(x.total)||0,refId:x.id,rawType:'purchase'});
+    if(x.type==='purchase-return')rows.push({date:x.dateBS||'',type:'Debit Note',ref:x.refNo||'—',desc:`Purchase return${x.ref?' · '+x.ref:''}`,debit:Number(x.total)||0,credit:0,refId:x.id,rawType:'purchase-return'});
+  });
+  DB.supplierPayments().filter(x=>x.partyId===pid).forEach(x=>rows.push({date:x.dateBS||'',type:'Supplier Payment',ref:x.ref||'—',desc:`Paid via ${x.method||'Cash'}${x.note?' · '+x.note:''}`,debit:Number(x.amount)||0,credit:0,refId:x.id,rawType:'supplier-payment'}));
+  rows.sort((a,b)=>(a.date||'').localeCompare(b.date||'')||String(a.ref||'').localeCompare(String(b.ref||'')));
+  let bal=0;for(const r of rows){bal+=(Number(r.debit)||0)-(Number(r.credit)||0);r._fullBalance=bal;}
+  return rows;
+}
+function fpAccountBalanceAsOf(pid,endBS){
+  let bal=0;for(const r of fpLedgerRawEntries(pid)){if(!endBS||(r.date||'')<=endBS)bal+=(Number(r.debit)||0)-(Number(r.credit)||0);}return bal;
+}
+function fpMakeFiscalSnapshot(meta,existing=null){
+  const balances=DB.parties().map(p=>({partyId:p.id,partyName:p.name,balance:fpAccountBalanceAsOf(p.id,meta.endBS)})).filter(x=>Math.abs(Number(x.balance)||0)>.0001);
+  return {id:existing?.id||uid(),label:meta.label,startBS:meta.startBS,endBS:meta.endBS,startYear:meta.startYear,visible:existing?.visible===true,closingBalances:balances,openingBalances:balances.map(x=>({...x})),closedAt:existing?.closedAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
+}
+function fpStoreFiscalMeta(meta,force=false){
+  const rows=DB.fiscal(),i=rows.findIndex(x=>x.startBS===meta.startBS||Number(x.startYear)===Number(meta.startYear));
+  if(i>=0&&!force){if(typeof rows[i].visible!=='boolean'){rows[i]={...rows[i],visible:false};DB.saveFiscal(rows);}return rows[i];}
+  const rec=fpMakeFiscalSnapshot(meta,i>=0?rows[i]:null);if(i>=0)rows[i]=rec;else rows.push(rec);DB.saveFiscal(rows);return rec;
+}
+function fpSyncFiscalMetaSettings(){
+  const s=DB.settings(),m=fpCurrentFiscalMeta();let changed=false;
+  for(const [k,v] of [['fiscalYearLabel',m.label],['fiscalStartBS',m.startBS],['fiscalEndBS',m.endBS]])if(s[k]!==v){s[k]=v;changed=true;}
+  if(changed)DB.saveSettings(s);
+  for(const [id,v] of [['set-fiscal-label',m.label],['set-fiscal-start',m.startBS],['set-fiscal-end',m.endBS]]){const el=document.getElementById(id);if(el)el.value=v;}
+  const box=document.getElementById('fiscal-current-summary');if(box)box.innerHTML=`<strong>Current fiscal year: ${escH(m.label)}</strong><br><span class="mono">${escH(m.startBS)} → ${escH(m.endBS)}</span>`;
+  return m;
+}
+function ensureFiscalYearClosure(){
+  const s=DB.settings();if(!s.fiscalYearEnabled){renderFiscalHistory();return;}
+  const current=fpSyncFiscalMetaSettings(),years=new Set();
+  for(const d of fpFiscalAllDates()){const m=fpFiscalMetaForDate(d);if(m&&m.startYear<current.startYear)years.add(m.startYear);}
+  // If there is any older activity, also guarantee the immediately preceding FY has a closing snapshot for a clean current opening.
+  if(fpFiscalAllDates().some(d=>String(d)<current.startBS))years.add(current.startYear-1);
+  [...years].sort((a,b)=>a-b).forEach(y=>fpStoreFiscalMeta(fpFiscalMetaFromStartYear(y),false));
+  renderFiscalHistory();
+}
+function toggleFiscalSettingsUI(){
+  const on=!!document.getElementById('set-fiscal-enabled')?.checked,box=document.getElementById('fiscal-settings-fields');if(box)box.style.display=on?'block':'none';
+  if(on){fpSyncFiscalMetaSettings();setTimeout(()=>{if(DB.settings().fiscalYearEnabled)ensureFiscalYearClosure();},0);}renderFiscalHistory();
+}
+function toggleFiscalYearVisibility(id,visible){
+  const rows=DB.fiscal(),i=rows.findIndex(x=>x.id===id);if(i<0)return;rows[i]={...rows[i],visible:!!visible};DB.saveFiscal(rows);renderFiscalHistory();fpRefreshFiscalViews();
+}
+function renderFiscalHistory(){
+  const box=document.getElementById('fiscal-history');if(!box)return;
+  if(!document.getElementById('set-fiscal-enabled')?.checked){box.innerHTML='';return;}
+  const current=fpSyncFiscalMetaSettings(),rows=DB.fiscal().filter(x=>x.startBS!==current.startBS).slice().sort((a,b)=>String(b.startBS||'').localeCompare(String(a.startBS||'')));
+  let html=`<div class="fiscal-history-row"><label style="display:flex;align-items:center;gap:9px;min-width:0"><input type="checkbox" checked disabled style="width:auto"><span><strong>${escH(current.label)} · Current</strong><small>${escH(current.startBS)} → ${escH(current.endBS)} · always displayed</small></span></label></div>`;
+  if(!rows.length)html+=`<div style="font-size:11.5px;color:var(--text3);padding:8px 2px">No previous fiscal years have been recorded yet.</div>`;
+  html+=rows.map(x=>`<div class="fiscal-history-row"><label style="display:flex;align-items:center;gap:9px;min-width:0;cursor:pointer"><input type="checkbox" style="width:auto" ${x.visible===true?'checked':''} onchange="toggleFiscalYearVisibility('${x.id}',this.checked)"><span><strong>${escH(x.label||'Fiscal Year')}</strong><small>${escH(x.startBS||'')} → ${escH(x.endBS||'')} · ${x.visible===true?'records visible':'records hidden; closing carried forward'}</small></span></label><button class="btn btn-secondary btn-sm" type="button" onclick="printFiscalConfirmation('${x.id}')">Confirmation</button></div>`).join('');
+  box.innerHTML=html;
+}
+async function createFiscalClosureNow(){ensureFiscalYearClosure();appNotice('Fiscal-year closing and opening balances refreshed.','success');}
+
+function fpFiscalDisplayBounds(){
+  if(!fpFiscalEnabled())return {start:'',end:''};
+  const ranges=fpVisibleFiscalRanges();return {start:ranges.length?ranges[0].startBS:'',end:ranges.length?ranges[ranges.length-1].endBS:''};
+}
+function getStatementEntries(){
+  const pid=document.getElementById('stmt-party-id')?.value||'';if(!pid)return[];
+  const raw=fpLedgerRawEntries(pid),manualFrom=(document.getElementById('stmt-from')?.value||'').trim(),manualTo=(document.getElementById('stmt-to')?.value||'').trim(),bounds=fpFiscalDisplayBounds();
+  let lower=manualFrom||bounds.start||'',upper=manualTo||bounds.end||'';
+  if(fpFiscalEnabled()&&bounds.start&&(!lower||lower<bounds.start))lower=bounds.start;
+  if(fpFiscalEnabled()&&bounds.end&&(!upper||upper>bounds.end))upper=bounds.end;
+  const before=date=>raw.filter(r=>(r.date||'')<date).reduce((a,r)=>a+(Number(r.debit)||0)-(Number(r.credit)||0),0);
+  const out=[];
+  if(lower){const ob=before(lower);if(Math.abs(ob)>.0001)out.push({date:lower,type:'Opening Balance',ref:'—',desc:`Balance brought forward as of ${lower}`,debit:ob>0?ob:0,credit:ob<0?Math.abs(ob):0,balance:ob,isOpening:true});}
+  // Add carry-forward markers at the start of every additionally displayed fiscal year.
+  if(fpFiscalEnabled()){
+    for(const r of fpVisibleFiscalRanges()){
+      if(!r.startBS||r.startBS===lower||lower&&r.startBS<lower||upper&&r.startBS>upper)continue;
+      const bal=before(r.startBS);out.push({date:r.startBS,type:'Opening Balance',ref:'—',desc:`Opening balance for fiscal year ${r.label||''}`,debit:0,credit:0,balance:bal,isOpening:true,isCarry:true});
+    }
+  }
+  for(const r of raw){
+    const d=r.date||'';if(lower&&d<lower)continue;if(upper&&d>upper)continue;if(fpFiscalEnabled()&&!fpFiscalDateVisible(d))continue;out.push({...r,balance:r._fullBalance});
+  }
+  out.sort((a,b)=>{const c=(a.date||'').localeCompare(b.date||'');if(c)return c;if(!!a.isOpening!==!!b.isOpening)return a.isOpening?-1:1;return 0;});
+  return out;
+}
+function renderStatement(){
+  const pid=document.getElementById('stmt-party-id')?.value||'',tbody=document.getElementById('stmt-tbody'),sumEl=document.getElementById('stmt-summary');if(!tbody)return;
+  if(!pid){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="icon">📒</div><p>Select an account to view its ledger.</p></div></td></tr>`;if(sumEl)sumEl.innerHTML='';return;}
+  const entries=getStatementEntries();tbody.innerHTML='';
+  if(!entries.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="icon">📒</div><p>No ledger entries in the visible fiscal years / selected period.</p></div></td></tr>`;if(sumEl)sumEl.innerHTML='';return;}
+  const totalDr=entries.reduce((s,e)=>s+(Number(e.debit)||0),0),totalCr=entries.reduce((s,e)=>s+(Number(e.credit)||0),0),closingBal=Number(entries[entries.length-1]?.balance)||0;
+  if(sumEl)sumEl.innerHTML=`<span>Total Debit: <strong style="color:var(--red)">Rs. ${fmtI(totalDr)}</strong></span><span>Total Credit: <strong style="color:var(--green)">Rs. ${fmtI(totalCr)}</strong></span><span>Closing Balance: <strong style="color:${closingBal>0?'var(--red)':'var(--green)'}">Rs. ${fmtI(Math.abs(closingBal))} ${closingBal>0?'Dr':'Cr'}</strong></span>`;
+  entries.forEach(e=>{const isOB=!!e.isOpening,typeColor=isOB?'badge-orange':(e.type==='Sales Invoice'||e.type==='Tax Invoice'||e.type==='Purchase')?'badge-orange':(e.type==='Payment Received'||e.type==='Supplier Payment')?'badge-green':e.type==='Discount'?'badge-blue':'badge-red',canOpen=!!e.refId,canDelete=!!e.refId&&!isOB,tr=document.createElement('tr');if(isOB)tr.style.cssText='background:var(--accent-bg);font-weight:600;';if(canOpen){tr.style.cursor='pointer';tr.title='Open linked record';tr.onclick=()=>openJournalEntry(e.rawType,e.refId);}tr.innerHTML=`<td class="mono">${escH(e.date||'')}</td><td><span class="badge ${typeColor}">${escH(e.type||'')}</span></td><td class="mono" style="font-size:12px">${escH(e.ref||'')}</td><td style="font-size:12.5px">${escH(e.desc||'')}</td><td class="amount ${e.debit?'text-red':''}">${e.debit?`Rs. ${fmtI(e.debit)}`:'—'}</td><td class="amount ${e.credit?'text-green':''}">${e.credit?`Rs. ${fmtI(e.credit)}`:'—'}</td><td class="amount" style="font-weight:600;color:${e.balance>0?'var(--red)':'var(--green)'}">Rs. ${fmtI(Math.abs(Number(e.balance)||0))} ${(Number(e.balance)||0)>0?'Dr':'Cr'}</td><td class="no-print" style="text-align:center;white-space:nowrap"><div class="flex-gap" style="justify-content:center;flex-wrap:nowrap">${canOpen?'<span style="color:var(--text3);align-self:center" title="Open entry">↗</span>':''}${canDelete?'<button type="button" class="btn btn-danger btn-sm ledger-delete-btn" title="Delete this ledger entry">🗑</button>':''}</div></td>`;const del=tr.querySelector('.ledger-delete-btn');if(del)del.onclick=async ev=>{ev.preventDefault();ev.stopPropagation();await deleteJournalEntry(e);};tbody.appendChild(tr);});
+  const tr=document.createElement('tr');tr.style.background='var(--bg2)';tr.style.fontWeight='700';tr.innerHTML=`<td colspan="4" style="text-align:right;padding:10px 14px">Closing Balance</td><td class="amount text-red">Rs. ${fmtI(totalDr)}</td><td class="amount text-green">Rs. ${fmtI(totalCr)}</td><td class="amount" style="color:${closingBal>0?'var(--red)':'var(--green)'}">Rs. ${fmtI(Math.abs(closingBal))} ${closingBal>0?'Dr':'Cr'}</td><td class="no-print"></td>`;tbody.appendChild(tr);
+}
+
+// Ledger export / print with the actual carried balance, even when old fiscal-year transactions are hidden.
+function exportStatementXLSX(){
+  if(typeof XLSX==='undefined')return appAlert('SheetJS not loaded.');const pid=document.getElementById('stmt-party-id')?.value||'',pname=(document.getElementById('stmt-party-input')?.value||'').trim();if(!pid)return appAlert('Please select an account first.');const entries=getStatementEntries(),data=[['Date (BS)','Type','Ref No.','Description','Debit (Rs.)','Credit (Rs.)','Balance (Rs.)']];entries.forEach(e=>data.push([e.date,e.type,e.ref,e.desc,e.debit||0,e.credit||0,e.balance||0]));const totalDr=entries.reduce((s,e)=>s+(Number(e.debit)||0),0),totalCr=entries.reduce((s,e)=>s+(Number(e.credit)||0),0),closing=Number(entries[entries.length-1]?.balance)||0;data.push(['','','','CLOSING BALANCE',totalDr,totalCr,closing]);const ws=makeCompanyWorksheet('Account Ledger',data[0],data.slice(1),{cols:[{wch:14},{wch:18},{wch:14},{wch:38},{wch:14},{wch:14},{wch:16}],meta:['Account: '+pname]});const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Ledger');const company=(DB.settings().company||'FinPilot').replace(/\s+/g,'-'),from=document.getElementById('stmt-from')?.value||'Visible-FY',to=document.getElementById('stmt-to')?.value||'Current';XLSX.writeFile(wb,`Ledger-${company}-${pname.replace(/\s+/g,'-')}-${from}-to-${to}.xlsx`);
+}
+function printStatement(){
+  const pid=document.getElementById('stmt-party-id')?.value||'',pname=(document.getElementById('stmt-party-input')?.value||'').trim();if(!pid)return appAlert('Please select an account first.');const entries=getStatementEntries(),totalDr=entries.reduce((s,e)=>s+(Number(e.debit)||0),0),totalCr=entries.reduce((s,e)=>s+(Number(e.credit)||0),0),closing=Number(entries[entries.length-1]?.balance)||0,rows=entries.map(e=>`<tr><td>${escH(e.date||'')}</td><td>${escH(e.type||'')}</td><td>${escH(e.ref||'')}</td><td>${escH(e.desc||'')}</td><td style="text-align:right">${e.debit?'Rs. '+fmtI(e.debit):'—'}</td><td style="text-align:right">${e.credit?'Rs. '+fmtI(e.credit):'—'}</td><td style="text-align:right">Rs. ${fmtI(Math.abs(Number(e.balance)||0))} ${(Number(e.balance)||0)>0?'Dr':'Cr'}</td></tr>`).join('');const html=buildReportHTML('Ledger',`<table style="width:100%;border-collapse:collapse"><thead><tr><th>Date</th><th>Type</th><th>Ref</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td colspan="4" style="text-align:right;font-weight:700">Closing Balance</td><td style="text-align:right">Rs. ${fmtI(totalDr)}</td><td style="text-align:right">Rs. ${fmtI(totalCr)}</td><td style="text-align:right">Rs. ${fmtI(Math.abs(closing))} ${closing>0?'Dr':'Cr'}</td></tr></tfoot></table>`,`Account: ${pname}`);printDocument(html,'Ledger');
+}
+
+// Hide records from archived fiscal years throughout record lists unless enabled in Settings.
+function fpWithFiscalDisplay(fn){
+  if(!fpFiscalEnabled())return fn();
+  const names=['invoices','payments','supplierPayments','vouchers','contra'],orig={};
+  try{for(const n of names){orig[n]=DB[n];DB[n]=()=>orig[n]().filter(r=>fpFiscalDateVisible(r.dateBS||''));}return fn();}
+  finally{for(const n of names)DB[n]=orig[n];}
+}
+function fpWrapFiscalRenderer(name){const base=window[name];if(typeof base!=='function'||base.__fpFiscalWrapped)return;const wrapped=function(...args){return fpWithFiscalDisplay(()=>base.apply(this,args));};wrapped.__fpFiscalWrapped=true;window[name]=wrapped;}
+['renderInvoicesTable','renderPaymentHistory','renderVouchersTable','renderVatInvoices','renderContra','renderSupplierPaymentHistory','renderDashboard','renderDashboardPeriod','renderDueDetails','openDashboardActivity'].forEach(fpWrapFiscalRenderer);
+
+function fpRefreshFiscalViews(){
+  if(typeof renderDashboard==='function')renderDashboard();const active=document.querySelector('.section.active')?.id||'';
+  if(active==='sec-invoices')renderInvoicesTable();else if(active==='sec-payments')renderPaymentHistory();else if(active==='sec-purchase'){renderVouchersTable('purchase');renderSupplierPaymentHistory();}else if(active==='sec-sales-return')renderVouchersTable('sales-return');else if(active==='sec-purchase-return')renderVouchersTable('purchase-return');else if(active==='sec-due-details')renderDueDetails();else if(active==='sec-statement')renderStatement();else if(active==='sec-contra')renderContra();else if(active==='sec-tax-calculator')renderVatInvoices();
+}
+
+// Accounts open directly into their complete Ledger. Esc returns to the previous screen.
+let fpAccountLedgerReturn=null;
+function fpClearLedgerBackButton(){document.getElementById('ledger-back-button')?.remove();}
+function openPartyLedger(id){
+  const p=DB.parties().find(x=>x.id===id);if(!p)return;const active=document.querySelector('.section.active')?.id||'sec-parties';fpAccountLedgerReturn={section:active.replace(/^sec-/,''),scroll:document.getElementById('content')?.scrollTop||0};nav('statement',document.querySelector(`nav a[onclick*="'statement'"]`));document.getElementById('stmt-party-id').value=id;document.getElementById('stmt-party-input').value=p.name||'';document.getElementById('stmt-from').value='';document.getElementById('stmt-to').value='';renderStatement();fpClearLedgerBackButton();const host=document.querySelector('#sec-statement .page-header .flex-gap');if(host){const b=document.createElement('button');b.id='ledger-back-button';b.type='button';b.className='btn btn-secondary';b.textContent='✕ Back';b.title='Back to Accounts (Esc)';b.onclick=closePartyLedger;host.prepend(b);}
+}
+function closePartyLedger(){if(!fpAccountLedgerReturn)return;const state=fpAccountLedgerReturn;fpAccountLedgerReturn=null;fpClearLedgerBackButton();nav(state.section||'parties',document.querySelector(`nav a[onclick*="'${state.section||'parties'}'"]`));setTimeout(()=>{const c=document.getElementById('content');if(c)c.scrollTop=state.scroll||0;},0);}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&fpAccountLedgerReturn&&!journalReturn&&document.querySelector('.section.active')?.id==='sec-statement'){e.preventDefault();e.stopImmediatePropagation();closePartyLedger();}},true);
+
+// Final Accounts renderer: customer accounts only; clicking a party opens its Ledger.
+function renderPartiesTable(){
+  const q=(document.getElementById('party-search')?.value||'').toLowerCase(),tbody=document.getElementById('parties-tbody');if(!tbody)return;const parties=DB.parties().filter(p=>isCustomerParty(p)).filter(p=>!q||(p.name||'').toLowerCase().includes(q)||(p.phone||'').includes(q)||(p.panVat||'').toLowerCase().includes(q));tbody.innerHTML='';if(!parties.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon">👥</div><p>No customer accounts yet.</p></div></td></tr>';return;}parties.forEach(p=>{const billed=getTotalBilled(p.id),received=getTotalPaid(p.id),due=billed-received,tr=document.createElement('tr');tr.innerHTML=`<td><strong>${escH(p.name||'')}</strong></td><td class="mono">${escH(p.panVat||'—')}</td><td>${escH(p.phone||'—')}</td><td>${escH(p.address||'—')}</td><td class="amount">Rs. ${fmtI(billed)}</td><td class="amount">Rs. ${fmtI(received)}</td><td class="amount ${due>0?'text-red':'text-green'}">Rs. ${fmtI(due)}</td><td><div class="flex-gap"><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openPartyModal('${p.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteParty('${p.id}')">🗑</button></div></td>`;tr.tabIndex=0;tr.title='Open complete ledger';tr.style.cursor='pointer';tr.onclick=e=>{if(!e.target.closest('button'))openPartyLedger(p.id);};tr.onkeydown=e=>{if(e.target===tr&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openPartyLedger(p.id);}};tbody.appendChild(tr);});
+}
+
+// Account deletion is now a support request email instead of a broken client-side delete call.
+function requestFinPilotAccountDeletion(){
+  const email=currentCloudUser?.email||'',subject='FinPilot Account Deletion Request',body=`Hello FinPilot Support,\n\nI would like to request permanent deletion of my FinPilot account and all associated cloud data.\n\nAccount email: ${email||'[enter your FinPilot login email]'}\n\nI understand that account deletion may be permanent and that I should export any data I want to keep before deletion.\n\nPlease confirm once my account and associated data have been deleted.\n\nRegards,`;
+  window.location.href=`mailto:finpilot@niroulaarbin.com.np?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+// Keep the old function name harmless for any stale cached button markup.
+function deleteFinPilotAccount(){requestFinPilotAccountDeletion();}
+
+// Settings load/save extension: fiscal dates are automatic, never manually entered.
+const fpFiscalV2LoadSettings=loadSettings;
+loadSettings=function(){const out=fpFiscalV2LoadSettings.apply(this,arguments);fpSyncFiscalMetaSettings();toggleFiscalSettingsUI();renderFiscalHistory();return out;};
+const fpFiscalV2SaveSettings=saveSettings;
+saveSettings=function(){const meta=fpCurrentFiscalMeta();for(const [id,v] of [['set-fiscal-label',meta.label],['set-fiscal-start',meta.startBS],['set-fiscal-end',meta.endBS]]){const e=document.getElementById(id);if(e)e.value=v;}const out=fpFiscalV2SaveSettings.apply(this,arguments);setTimeout(()=>{ensureFiscalYearClosure();fpRefreshFiscalViews();},0);return out;};
+
+// Refresh the visible fiscal view when cloud fiscal settings/data change.
+const fpFiscalV2RefreshCloud=refreshVisibleCloudData;
+refreshVisibleCloudData=function(keys=[]){fpFiscalV2RefreshCloud(keys);if(keys.includes('fiscal')||keys.includes('settings')){if(document.querySelector('.section.active')?.id==='sec-settings')renderFiscalHistory();fpRefreshFiscalViews();}};
+
+setTimeout(()=>{try{if(DB.settings().fiscalYearEnabled)ensureFiscalYearClosure();fpSyncFiscalMetaSettings();}catch(e){console.error('Fiscal year initialization failed',e);}},100);
 </script>
 
 </body>

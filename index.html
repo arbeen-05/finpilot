@@ -1210,7 +1210,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
       <textarea id="my-ai-input" rows="3" placeholder="Ask MY AI to do FinPilot work…" onkeydown="myAiInputKey(event)"></textarea>
       <button id="my-ai-send" class="btn btn-primary" type="button" onclick="sendMyAI()">Send</button>
     </div>
-    <div class="my-ai-privacy">MY AI only handles FinPilot work. Relevant business data is sent to your configured AI backend only when you send a request.</div>
+    <div class="my-ai-privacy">MY AI only handles FinPilot work.</div>
   </div>
 </div>
 
@@ -1371,7 +1371,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
       <h3>🤖 MY AI</h3>
       <label class="setting-check"><input type="checkbox" id="set-my-ai-enabled" onchange="previewMyAISetting()"> Enable MY AI</label>
       <div style="font-size:11.5px;color:var(--text2);margin-top:8px;line-height:1.6">A work-only assistant that can answer questions about your FinPilot data and carry out supported accounting tasks. Destructive changes such as edits/deletions require one confirmation before execution.</div>
-      <div id="my-ai-setting-status" class="inline-info" style="margin-top:10px">Requires the secure <strong>my-ai</strong> Supabase Edge Function and an AI API key stored as a Supabase secret. Never place an AI secret key inside this HTML file.</div>
+      
     </div>
     <div class="setting-section">
       <h3>🔐 Change Login Credentials</h3>

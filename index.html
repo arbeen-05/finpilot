@@ -5735,9 +5735,81 @@ function myAiShowTyping(){const chat=document.getElementById('my-ai-chat');if(!c
 function myAiHideTyping(){document.getElementById('my-ai-typing')?.remove();}
 function setMyAIPrompt(text){const el=document.getElementById('my-ai-input');if(el){el.value=text;el.focus();}}
 function myAiInputKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMyAI();}}
-function myAiContext(){
-  const parties=DB.parties().map(p=>({id:p.id,name:p.name,address:p.address||'',phone:p.phone||'',panVat:p.panVat||'',customer:!!(window.isCustomerParty?isCustomerParty(p):p.isCustomer),supplier:!!(window.isSupplierParty?isSupplierParty(p):p.isSupplier),customerBalance:window.getTotalBilled&&window.getTotalPaid?getTotalBilled(p.id)-getTotalPaid(p.id):0,supplierDue:window.getSupplierDue?getSupplierDue(p.id):0}));
-  return {todayBS:dashboardActualTodayBS(),fiscalYear:fpCurrentFiscalMeta(),company:{name:DB.settings().company||'',address:DB.settings().address||'',phone:DB.settings().phone||'',panVat:DB.settings().pan||''},paymentMethods:getPaymentMethods(),parties,stock:DB.stock().map(x=>({id:x.id,name:x.name,rate:Number(x.rate)||0,quantity:stockQuantityEnabled()?getStockQuantityByName(x.name):null,unit:x.unit||''})),invoices:DB.invoices().slice(-300).map(x=>({id:x.id,invNo:x.invNo,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,total:Number(x.grandTotal??x.net??0)||0,paid:!!x.paid,partial:!!x.partial,taxInvoice:!!x.taxInvoice,items:(x.items||[]).map(i=>({name:i.name,qty:Number(i.qty)||0,rate:Number(i.rate)||0,discount:Number(i.disc)||0}))})),payments:DB.payments().slice(-300).map(x=>({id:x.id,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,amount:Number(x.amount)||0,discount:Number(x.discount)||0,method:x.method||'',receipt:x.receipt||''})),vouchers:DB.vouchers().slice(-300).map(x=>({id:x.id,type:x.type,refNo:x.refNo,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,total:Number(x.total)||0,ref:x.ref||''})),supplierPayments:DB.supplierPayments().slice(-300).map(x=>({id:x.id,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,amount:Number(x.amount)||0,method:x.method||'',ref:x.ref||''})),contra:DB.contra().slice(-150)};
+function myAiContext(message=''){
+  const q=String(message||'').trim().toLowerCase();
+  const qKey=stockNameKey(q);
+  const today=dashboardActualTodayBS();
+  const settings=DB.settings();
+  const allParties=DB.parties();
+  const allStock=DB.stock();
+  const allInvoices=DB.invoices();
+  const allPayments=DB.payments();
+  const allVouchers=DB.vouchers();
+  const allSupplierPayments=DB.supplierPayments();
+  const allContra=DB.contra();
+
+  const partyMatches=allParties.filter(p=>{
+    const n=String(p.name||'').trim().toLowerCase();
+    return n&&q.includes(n);
+  });
+  const partyIds=new Set(partyMatches.map(p=>p.id));
+
+  const stockMatches=allStock.filter(x=>{
+    const k=stockNameKey(x.name);
+    return !!k&&(qKey.includes(k)||k.includes(qKey));
+  });
+
+  const refTokens=(q.match(/\b(?:inv|vat|pur|sr|pr|rcpt|receipt)[-\s#:]?[a-z0-9-]+\b/gi)||[]).map(x=>x.toLowerCase().replace(/\s+/g,''));
+  const hasRef=(v)=>refTokens.some(t=>String(v||'').toLowerCase().replace(/\s+/g,'').includes(t));
+  const asksToday=/\btoday|today's|todays\b/i.test(q);
+  const asksTransactions=/invoice|sales|payment|received|purchase|return|ledger|due|statement|transaction|contra/i.test(q);
+  const asksStock=/stock|inventory|item|rate|price|qty|quantity/i.test(q);
+
+  const partyView=(partyMatches.length?partyMatches:allParties.slice(-80)).map(p=>({
+    id:p.id,name:p.name,address:p.address||'',phone:p.phone||'',panVat:p.panVat||'',
+    customer:!!(window.isCustomerParty?isCustomerParty(p):p.isCustomer),
+    supplier:!!(window.isSupplierParty?isSupplierParty(p):p.isSupplier),
+    customerBalance:window.getTotalBilled&&window.getTotalPaid?getTotalBilled(p.id)-getTotalPaid(p.id):0,
+    supplierDue:window.getSupplierDue?getSupplierDue(p.id):0
+  }));
+
+  let stockView=stockMatches.length?stockMatches:(asksStock?allStock.slice(-160):allStock.slice(-50));
+  stockView=stockView.map(x=>({id:x.id,name:x.name,rate:Number(x.rate)||0,quantity:stockQuantityEnabled()?getStockQuantityByName(x.name):null,unit:x.unit||''}));
+
+  function filterRows(rows, refGetter){
+    let out=rows;
+    if(partyIds.size)out=out.filter(x=>partyIds.has(x.partyId));
+    if(refTokens.length)out=out.filter(x=>hasRef(refGetter(x))||partyIds.has(x.partyId));
+    if(asksToday)out=out.filter(x=>x.dateBS===today);
+    const limit=partyIds.size||refTokens.length||asksToday?100:(asksTransactions?120:35);
+    return out.slice(-limit);
+  }
+
+  const invoices=filterRows(allInvoices,x=>x.invNo).map(x=>({
+    id:x.id,invNo:x.invNo,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,
+    total:Number(x.grandTotal??x.net??0)||0,paid:!!x.paid,partial:!!x.partial,taxInvoice:!!x.taxInvoice,
+    items:(x.items||[]).slice(0,40).map(i=>({name:i.name,qty:Number(i.qty)||0,rate:Number(i.rate)||0,discount:Number(i.disc)||0}))
+  }));
+  const payments=filterRows(allPayments,x=>x.receipt).map(x=>({id:x.id,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,amount:Number(x.amount)||0,discount:Number(x.discount)||0,method:x.method||'',receipt:x.receipt||''}));
+  const vouchers=filterRows(allVouchers,x=>x.refNo).map(x=>({id:x.id,type:x.type,refNo:x.refNo,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,total:Number(x.total)||0,ref:x.ref||''}));
+  const supplierPayments=filterRows(allSupplierPayments,x=>x.ref).map(x=>({id:x.id,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,amount:Number(x.amount)||0,method:x.method||'',ref:x.ref||''}));
+  const contra=(asksTransactions?allContra.slice(-80):allContra.slice(-20)).map(x=>({id:x.id,dateBS:x.dateBS,from:x.from,to:x.to,amount:Number(x.amount)||0,ref:x.ref||''}));
+
+  const todayInvoices=allInvoices.filter(x=>x.dateBS===today);
+  const todayPayments=allPayments.filter(x=>x.dateBS===today);
+  return {
+    todayBS:today,
+    fiscalYear:fpCurrentFiscalMeta(),
+    company:{name:settings.company||'',address:settings.address||'',phone:settings.phone||'',panVat:settings.pan||''},
+    paymentMethods:getPaymentMethods(),
+    summary:{
+      todaySales:todayInvoices.reduce((z,x)=>z+(Number(x.grandTotal??x.net)||0),0),
+      todayReceived:todayPayments.reduce((z,x)=>z+(Number(x.amount)||0),0),
+      todayInvoiceCount:todayInvoices.length,
+      todayPaymentCount:todayPayments.length
+    },
+    parties:partyView,stock:stockView,invoices,payments,vouchers,supplierPayments,contra
+  };
 }
 function myAiPartyByName(name,role){const k=String(name||'').trim().toLowerCase();return DB.parties().find(p=>(p.name||'').trim().toLowerCase()===k&&(!role||(role==='customer'?(window.isCustomerParty?isCustomerParty(p):p.isCustomer):(window.isSupplierParty?isSupplierParty(p):p.isSupplier))));}
 function myAiCreateParty(data={},role='customer'){const name=String(data.name||data.party_name||'').trim();if(!name)throw new Error('Party name is required.');let p=myAiPartyByName(name,role)||DB.parties().find(x=>(x.name||'').trim().toLowerCase()===name.toLowerCase());if(p){if(role==='supplier'&&window.markPartyRole)markPartyRole(p.id,'supplier');if(role==='customer'&&window.markPartyRole)markPartyRole(p.id,'customer');return DB.parties().find(x=>x.id===p.id)||p;}const rows=DB.parties(),obj={id:uid(),name,address:data.address||'',phone:data.phone||'',panVat:data.panVat||data.pan_vat||'',isCustomer:role==='customer',isSupplier:role==='supplier'};rows.push(obj);DB.saveParties(rows);return obj;}
@@ -5771,7 +5843,7 @@ async function sendMyAI(){
   const input=document.getElementById('my-ai-input'),send=document.getElementById('my-ai-send'),status=document.getElementById('my-ai-status'),message=(input?.value||'').trim();if(!message)return;if(!DB.settings().myAiEnabled)return appNotice('Enable MY AI in Settings first.','error',5000);if(!sbClient||!currentCloudUser)return appNotice('Sign in to use MY AI.','error',5000);myAiAddMessage('user',message);if(input)input.value='';if(send)send.disabled=true;if(status){status.textContent='Working…';status.className='badge badge-orange';}myAiShowTyping();
   let timer=null;
   try{
-    const request=sbClient.functions.invoke('my-ai',{body:{message,history:myAiHistory.slice(-10),context:myAiContext()}});
+    const request=sbClient.functions.invoke('my-ai',{body:{message,history:myAiHistory.slice(-6),context:myAiContext(message)}});
     const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('MY AI timed out after 55 seconds. Open Supabase → Edge Functions → my-ai → Logs to see where it stopped.')),55000);});
     const {data,error}=await Promise.race([request,timeout]);
     myAiHideTyping();

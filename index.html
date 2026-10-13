@@ -556,6 +556,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
     <li><a href="#" onclick="nav('due-details',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg></span> Due Details <span style="margin-left:auto;font-size:10px;opacity:.45;font-family:'DM Mono',monospace">F11</span></a></li>
     <li><a href="#" onclick="nav('statement',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h16v18H4zM8 3v18M11 8h6M11 12h6M11 16h6"/></svg></span> Ledger <span style="margin-left:auto;font-size:10px;opacity:.45;font-family:'DM Mono',monospace">F12</span></a></li>
     <li class="nav-label">WORKSPACE</li><li><a href="#" onclick="nav('tax-calculator',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg></span> VAT Billing</a></li>
+<li id="nav-li-my-ai" style="display:none"><a href="#" onclick="nav('my-ai',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a7 7 0 0 0-7 7v4a4 4 0 0 0 4 4h1v-6H7v-2a5 5 0 0 1 10 0v2h-3v6h1a4 4 0 0 0 4-4v-4a7 7 0 0 0-7-7Z"/><path d="M10 21h4"/></svg></span> MY AI</a></li>
 <li><a href="#" onclick="nav('settings',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></span> Settings</a></li>
 
 <li><a href="#" onclick="nav('notes',this)"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H5v18h14V8zM14 3v5h5M8 12h8M8 16h6"/></svg></span> Notes</a></li>
@@ -1194,6 +1195,25 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
  </div>
 </div>
 
+<div id="sec-my-ai" class="section">
+  <div class="page-header"><div><h2>MY AI</h2><p>Work-only FinPilot assistant for accounting, invoices, payments, inventory and reports.</p></div><button class="btn btn-secondary no-print" type="button" onclick="clearMyAIChat()">Clear chat</button></div>
+  <div class="card my-ai-card">
+    <div class="my-ai-head"><div><strong>MY AI</strong><span>FinPilot work assistant</span></div><span id="my-ai-status" class="badge badge-green">Ready</span></div>
+    <div id="my-ai-chat" class="my-ai-chat" aria-live="polite"></div>
+    <div class="my-ai-examples no-print">
+      <button type="button" onclick="setMyAIPrompt('What is the current rate and available quantity of 677-2A?')">Stock rate</button>
+      <button type="button" onclick="setMyAIPrompt('Show me who owes us the most right now.')">Top dues</button>
+      <button type="button" onclick="setMyAIPrompt('Create a cash-paid sales invoice for a new party and print it.')">Create invoice</button>
+      <button type="button" onclick="setMyAIPrompt('Record multiple payments received from customers.')">Multiple payments</button>
+    </div>
+    <div class="my-ai-compose no-print">
+      <textarea id="my-ai-input" rows="3" placeholder="Ask MY AI to do FinPilot work…" onkeydown="myAiInputKey(event)"></textarea>
+      <button id="my-ai-send" class="btn btn-primary" type="button" onclick="sendMyAI()">Send</button>
+    </div>
+    <div class="my-ai-privacy">MY AI only handles FinPilot work. Relevant business data is sent to your configured AI backend only when you send a request.</div>
+  </div>
+</div>
+
 <div id="sec-settings" class="section">
   <div class="page-header"><h2>Settings</h2></div>
   <div class="card" style="max-width:540px">
@@ -1348,6 +1368,12 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
       </div>
     </div>
     <div class="setting-section">
+      <h3>🤖 MY AI</h3>
+      <label class="setting-check"><input type="checkbox" id="set-my-ai-enabled" onchange="previewMyAISetting()"> Enable MY AI</label>
+      <div style="font-size:11.5px;color:var(--text2);margin-top:8px;line-height:1.6">A work-only assistant that can answer questions about your FinPilot data and carry out supported accounting tasks. Destructive changes such as edits/deletions require one confirmation before execution.</div>
+      <div id="my-ai-setting-status" class="inline-info" style="margin-top:10px">Requires the secure <strong>my-ai</strong> Supabase Edge Function and an AI API key stored as a Supabase secret. Never place an AI secret key inside this HTML file.</div>
+    </div>
+    <div class="setting-section">
       <h3>🔐 Change Login Credentials</h3>
       <div class="form-group"><label>Current Login Email</label><input type="email" id="login-current-email" readonly></div>
       <div class="form-group"><label>New Email</label><input type="email" id="login-new-email" autocomplete="email" placeholder="Leave blank to keep current email"></div>
@@ -1372,7 +1398,7 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
       <h4 style="margin:18px 0 8px">Recent activity</h4>
       <div id="audit-log" class="audit-list"><div class="empty-state" style="padding:16px"><p>No activity recorded yet.</p></div></div>
       <div class="flex-gap" style="margin-top:9px"><button class="btn btn-secondary btn-sm" type="button" onclick="exportAuditLog()">Export Audit Log</button></div>
-      <div class="danger-zone" style="margin-top:18px"><h4>Delete FinPilot Account</h4><p>Account deletion is handled by FinPilot support. Clicking below opens a ready-to-send deletion request addressed to finpilot@niroulaarbin.com.np.</p><button class="btn btn-danger btn-sm" type="button" onclick="requestFinPilotAccountDeletion()">Request Account Deletion</button></div>
+      <div class="danger-zone" style="margin-top:18px"><h4>Delete FinPilot Account</h4><p>Account deletion is handled by FinPilot support. Clicking below opens a ready-to-send deletion request addressed to contact@finpilot.niroulaarbin.com.np.</p><button class="btn btn-danger btn-sm" type="button" onclick="requestFinPilotAccountDeletion()">Request Account Deletion</button></div>
     </div>
     <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
   </div>
@@ -1380,12 +1406,20 @@ body:not(.fp-authenticated) #app,body:not(.fp-authenticated) #menu-btn,body:not(
 
 <!-- STOCK ITEM STATEMENT MODAL -->
 <div class="modal-overlay" id="stock-stmt-modal">
-  <div class="modal" style="max-width:700px">
+  <div class="modal" style="max-width:900px">
     <button class="close-btn" onclick="closeModal('stock-stmt-modal')">✕</button>
     <h3 id="stock-stmt-title">Item Statement</h3>
-    <div id="stock-stmt-summary" style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--text2);margin-bottom:14px"></div>
+    <div class="stock-stmt-controls no-print">
+      <div class="form-group"><label>From (BS)</label><input id="stock-stmt-from" type="text" placeholder="YYYY-MM-DD"></div>
+      <div class="form-group"><label>To (BS)</label><input id="stock-stmt-to" type="text" placeholder="YYYY-MM-DD"></div>
+      <button class="btn btn-secondary btn-sm" type="button" onclick="renderStockStatementFiltered()">Apply</button>
+      <button class="btn btn-secondary btn-sm" type="button" onclick="clearStockStatementFilters()">Clear</button>
+      <button class="btn btn-print btn-sm" type="button" onclick="printStockItemStatement()">🖨 Print</button>
+      <button class="btn btn-secondary btn-sm" type="button" onclick="exportStockItemStatementExcel()">📊 Export Excel</button>
+    </div>
+    <div id="stock-stmt-summary" style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--text2);margin:12px 0 14px"></div>
     <div class="table-wrap">
-      <table>
+      <table id="stock-stmt-table">
         <thead><tr><th>Date (BS)</th><th>Type</th><th>Account</th><th>Ref No.</th><th class="amount">Qty</th><th class="amount">Rate</th><th class="amount">Amount</th></tr></thead>
         <tbody id="stock-stmt-tbody"></tbody>
       </table>
@@ -5393,6 +5427,7 @@ function organizeSettingsUI(){
     inventory:mk('Inventory','Stock quantity behaviour'),
     display:mk('Display & Personalization','Logo and invoice appearance'),
     tax:mk('VAT & Fiscal Year','Tax defaults and fiscal closing system'),
+    ai:mk('MY AI','Work-only assistant and automation'),
     account:mk('Account Settings','Login, sessions, backups and activity'),
     danger:mk('Danger Zone','Permanent account actions',false,true)
   };
@@ -5402,6 +5437,7 @@ function organizeSettingsUI(){
     if(h.includes('stock quantity'))key='inventory';
     else if(h.includes('vat billing')||h.includes('fiscal year'))key='tax';
     else if(h.includes('logo')||h.includes('invoice print'))key='display';
+    else if(h.includes('my ai'))key='ai';
     else if(h.includes('login credentials')||h.includes('session, security'))key='account';
     groups[key].querySelector('.settings-group-body').appendChild(sec);
   }
@@ -5600,7 +5636,7 @@ function renderPartiesTable(){
 // Account deletion is now a support request email instead of a broken client-side delete call.
 function requestFinPilotAccountDeletion(){
   const email=currentCloudUser?.email||'',subject='FinPilot Account Deletion Request',body=`Hello FinPilot Support,\n\nI would like to request permanent deletion of my FinPilot account and all associated cloud data.\n\nAccount email: ${email||'[enter your FinPilot login email]'}\n\nI understand that account deletion may be permanent and that I should export any data I want to keep before deletion.\n\nPlease confirm once my account and associated data have been deleted.\n\nRegards,`;
-  window.location.href=`mailto:finpilot@niroulaarbin.com.np?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href=`mailto:contact@finpilot.niroulaarbin.com.np?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 // Keep the old function name harmless for any stale cached button markup.
@@ -5619,5 +5655,120 @@ refreshVisibleCloudData=function(keys=[]){fpFiscalV2RefreshCloud(keys);if(keys.i
 setTimeout(()=>{try{if(DB.settings().fiscalYearEnabled)ensureFiscalYearClosure();fpSyncFiscalMetaSettings();}catch(e){console.error('Fiscal year initialization failed',e);}},100);
 </script>
 
+
+<style id="finpilot-confirmation-stock-ai-style">
+.stock-stmt-controls{display:flex;align-items:end;gap:8px;flex-wrap:wrap;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface2)}
+.stock-stmt-controls .form-group{margin:0;min-width:145px}.stock-stmt-controls input{padding:8px 10px}
+.my-ai-card{max-width:1000px;margin:auto;padding:0;overflow:hidden}.my-ai-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--surface2),var(--accent-bg))}.my-ai-head strong{display:block;font-size:18px}.my-ai-head span:not(.badge){display:block;font-size:11px;color:var(--text3);margin-top:2px}.my-ai-chat{min-height:390px;max-height:58vh;overflow:auto;padding:18px;background:var(--bg);display:flex;flex-direction:column;gap:12px}.my-ai-msg{max-width:min(760px,88%);padding:12px 14px;border-radius:14px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.my-ai-msg.user{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px}.my-ai-msg.assistant{align-self:flex-start;background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px}.my-ai-msg.system{align-self:center;background:var(--surface2);border:1px dashed var(--border);font-size:12px;color:var(--text2);text-align:center}.my-ai-examples{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:7px;flex-wrap:wrap}.my-ai-examples button{border:1px solid var(--border);background:var(--surface2);color:var(--text2);padding:6px 9px;border-radius:999px;font-size:11px;cursor:pointer}.my-ai-compose{display:grid;grid-template-columns:1fr auto;gap:10px;padding:14px;border-top:1px solid var(--border);background:var(--surface)}.my-ai-compose textarea{min-height:74px;resize:vertical}.my-ai-compose .btn{align-self:stretch;min-width:90px}.my-ai-privacy{padding:0 14px 13px;font-size:10.5px;color:var(--text3);background:var(--surface)}
+@media(max-width:700px){.my-ai-compose{grid-template-columns:1fr}.my-ai-compose .btn{min-height:42px}.my-ai-msg{max-width:94%}.stock-stmt-controls{align-items:stretch}.stock-stmt-controls .form-group{width:100%}}
+</style>
+<script id="finpilot-confirmation-stock-ai">
+// ══════════════════════════════════════════════════════════════
+// Fiscal balance confirmation letter, item-wise statement tools, MY AI
+// ══════════════════════════════════════════════════════════════
+
+function fpBalanceBeforeDate(pid,date){return fpLedgerRawEntries(pid).filter(r=>(r.date||'')<String(date||'')).reduce((a,r)=>a+(Number(r.debit)||0)-(Number(r.credit)||0),0);}
+function fpFiscalCustomerMetrics(rec,pid){
+  const start=rec.startBS||'',end=rec.endBS||'';
+  const opening=fpBalanceBeforeDate(pid,start);
+  const invoices=DB.invoices().filter(x=>x.partyId===pid&&(!start||(x.dateBS||'')>=start)&&(!end||(x.dateBS||'')<=end)).reduce((a,x)=>a+(Number(x.grandTotal??x.net??0)||0),0);
+  const returns=DB.vouchers().filter(x=>x.partyId===pid&&x.type==='sales-return'&&(!start||(x.dateBS||'')>=start)&&(!end||(x.dateBS||'')<=end)).reduce((a,x)=>a+(Number(x.total)||0),0);
+  const payments=DB.payments().filter(x=>x.partyId===pid&&(!start||(x.dateBS||'')>=start)&&(!end||(x.dateBS||'')<=end)).reduce((a,x)=>a+(Number(x.amount)||0)+(Number(x.discount)||0),0);
+  const sales=invoices-returns,closing=opening+sales-payments;
+  return {opening,sales,payments,closing};
+}
+function fpBalanceCell(v){const n=Number(v)||0;return `${fmt(Math.abs(n))}${Math.abs(n)>.0001?' '+(n>=0?'Dr':'Cr'):''}`;}
+fiscalConfirmationHTML=function(rec){
+  const s=DB.settings(),items=(rec.closingBalances||[]).filter(x=>{const p=DB.parties().find(y=>y.id===x.partyId);return p&&(!window.isCustomerParty||isCustomerParty(p));});
+  if(!items.length)return `<div class="print-page" style="font-family:Arial,sans-serif;color:#111"><div style="text-align:center"><div style="font-size:20pt;font-weight:700">${escH(s.company||'Company')}</div><div>${escH(s.address||'')}</div></div><h2 style="text-align:center;margin-top:40px">Account Balance Confirmation</h2><p>No customer balances were recorded for ${escH(rec.label||'this fiscal year')}.</p></div>`;
+  return items.map(x=>{const p=DB.parties().find(y=>y.id===x.partyId)||{},m=fpFiscalCustomerMetrics(rec,x.partyId);return `<div class="print-page" style="font-family:Arial,sans-serif;color:#111;padding:8mm 10mm;box-sizing:border-box">
+    <div style="text-align:center;margin-bottom:24px"><div style="font-size:20pt;font-weight:800;letter-spacing:.2px">${escH(s.company||'Company')}</div><div style="font-size:10.5pt;margin-top:3px">${escH(s.address||'')}${s.phone?' · '+escH(s.phone):''}</div></div>
+    <div style="line-height:1.55;margin-bottom:20px">To,<br><strong>${escH(p.name||x.partyName||'Account')}</strong>${p.address?'<br>'+escH(p.address):''}${p.panVat?'<br>PAN/VAT: '+escH(p.panVat):''}</div>
+    <div style="text-align:center;margin:20px 0 24px"><span style="font-weight:700;text-decoration:underline;text-underline-offset:4px">Subject: Account Balance Confirmation</span></div>
+    <p>Dear Sir/Madam,</p>
+    <p style="line-height:1.65">With reference to the above subject, the transactions between us for fiscal year <strong>${escH(rec.label||'')}</strong> are summarized below:</p>
+    <table style="width:66%;min-width:420px;border-collapse:collapse;margin:18px 0 22px"><thead><tr><th style="border:1px solid #111;padding:5px;text-align:left;width:50px">S.N.</th><th style="border:1px solid #111;padding:5px;text-align:left">DESCRIPTION</th><th style="border:1px solid #111;padding:5px;text-align:right;width:155px">AMOUNT</th></tr></thead><tbody>
+      <tr><td style="border:1px solid #111;padding:5px;text-align:right">1</td><td style="border:1px solid #111;padding:5px;font-weight:700">Opening Balance</td><td style="border:1px solid #111;padding:5px;text-align:right;font-weight:700">${fpBalanceCell(m.opening)}</td></tr>
+      <tr><td style="border:1px solid #111;padding:5px;text-align:right">2</td><td style="border:1px solid #111;padding:5px">Total Sales</td><td style="border:1px solid #111;padding:5px;text-align:right">${fmt(m.sales)}</td></tr>
+      <tr><td style="border:1px solid #111;padding:5px;text-align:right">3</td><td style="border:1px solid #111;padding:5px">Total Payments</td><td style="border:1px solid #111;padding:5px;text-align:right">${fmt(m.payments)}</td></tr>
+      <tr><td style="border:1px solid #111;padding:5px;text-align:right">4</td><td style="border:1px solid #111;padding:5px;font-weight:700">Closing Balance</td><td style="border:1px solid #111;padding:5px;text-align:right;font-weight:700">${fpBalanceCell(m.closing)}</td></tr>
+    </tbody></table>
+    <p style="line-height:1.65">Kindly confirm the above balance and return this confirmation duly signed and stamped. If you find any difference, please contact us so the records can be reconciled.</p>
+    <p style="line-height:1.65;margin-top:26px">Your confirmation will be highly appreciated.<br>Thank you for your cooperation.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:70px;margin-top:48px"><div><div>Regards,</div><div style="margin-top:34px;font-weight:700">${escH(s.company||'Company')}</div></div><div><div>Confirmed by:</div><div style="margin-top:42px">Designation: __________________</div><div style="margin-top:10px">Signature: ____________________</div><div style="margin-top:10px">Company Stamp</div></div></div>
+  </div>`;}).join('');
+};
+
+// Item-wise stock statement with date filter, print and Excel.
+let fpActiveStockStatementId=null;
+function fpStockStatementAllRows(stock){
+  const name=stockNameKey(stock.name),rows=[];
+  DB.invoices().forEach(inv=>(inv.items||[]).forEach(item=>{if(stockNameKey(item.name)===name)rows.push({date:inv.dateBS||'',type:'Sale',party:inv.partyName||'',ref:inv.invNo||'',qty:Number(item.qty)||0,rate:Number(item.rate)||0,amount:Number(item.total)||0,typeColor:'badge-orange'});}));
+  DB.vouchers().filter(v=>['purchase','sales-return','purchase-return'].includes(v.type)).forEach(v=>(v.items||[]).forEach(item=>{if(stockNameKey(item.name)!==name)return;const map={purchase:['Purchase','badge-blue',1],'sales-return':['Credit Note','badge-red',1],'purchase-return':['Debit Note','badge-red',-1]},m=map[v.type];rows.push({date:v.dateBS||'',type:m[0],party:v.partyName||'',ref:v.refNo||'',qty:Number(item.qty)||0,rate:Number(item.rate)||0,amount:Number(item.total)||0,typeColor:m[1],qtyEffect:m[2]});}));
+  rows.sort((a,b)=>(a.date||'').localeCompare(b.date||'')||String(a.ref||'').localeCompare(String(b.ref||'')));
+  const qtyOn=stockQuantityEnabled();if(qtyOn){let running=Number(stock.openingQty)||0;for(const r of rows){const eff=r.type==='Purchase'||r.type==='Credit Note'?1:-1;running+=eff*(Number(r.qty)||0);r.balanceQty=running;}}
+  return rows;
+}
+function fpStockStatementFilteredData(){
+  const stock=DB.stock().find(x=>x.id===fpActiveStockStatementId);if(!stock)return null;const from=(document.getElementById('stock-stmt-from')?.value||'').trim(),to=(document.getElementById('stock-stmt-to')?.value||'').trim();let rows=fpStockStatementAllRows(stock);if(fpFiscalEnabled())rows=rows.filter(r=>fpFiscalDateVisible(r.date));if(from)rows=rows.filter(r=>(r.date||'')>=from);if(to)rows=rows.filter(r=>(r.date||'')<=to);return {stock,rows,from,to,qtyOn:stockQuantityEnabled()};
+}
+function openStockStatement(stockId){fpActiveStockStatementId=stockId;const from=document.getElementById('stock-stmt-from'),to=document.getElementById('stock-stmt-to');if(from)from.value='';if(to)to.value='';renderStockStatementFiltered();document.getElementById('stock-stmt-modal')?.classList.add('open');}
+function clearStockStatementFilters(){const a=document.getElementById('stock-stmt-from'),b=document.getElementById('stock-stmt-to');if(a)a.value='';if(b)b.value='';renderStockStatementFiltered();}
+function renderStockStatementFiltered(){
+  const d=fpStockStatementFilteredData();if(!d)return;const {stock,rows,from,to,qtyOn}=d;document.getElementById('stock-stmt-title').textContent=`📊 ${stock.name} — Item Statement`;
+  const all=fpStockStatementAllRows(stock),sold=rows.filter(r=>r.type==='Sale').reduce((a,r)=>a+(Number(r.qty)||0),0),purchased=rows.filter(r=>r.type==='Purchase').reduce((a,r)=>a+(Number(r.qty)||0),0),revenue=rows.filter(r=>r.type==='Sale').reduce((a,r)=>a+(Number(r.amount)||0),0),sum=document.getElementById('stock-stmt-summary');
+  if(sum)sum.innerHTML=`${qtyOn?`<span>Opening Qty: <strong>${fmtQty(Number(stock.openingQty)||0)}${stock.unit?' '+escH(stock.unit):''}</strong></span><span>Available: <strong>${fmtQty(getStockQuantityByName(stock.name))}${stock.unit?' '+escH(stock.unit):''}</strong></span>`:''}<span>Shown Entries: <strong>${rows.length}</strong></span><span style="color:var(--red)">Sold: <strong>${fmtQty(sold)}</strong></span><span style="color:var(--green)">Purchased: <strong>${fmtQty(purchased)}</strong></span><span style="color:var(--accent)">Sales Value: <strong>Rs. ${fmt(revenue)}</strong></span><span>Current Rate: <strong>Rs. ${fmt(stock.rate)}</strong></span>${from||to?`<span>Period: <strong>${escH(from||'Beginning')} → ${escH(to||'Latest')}</strong></span>`:''}`;
+  const table=document.getElementById('stock-stmt-table'),head=table?.querySelector('thead');if(head)head.innerHTML=qtyOn?'<tr><th>Date (BS)</th><th>Type</th><th>Account</th><th>Ref No.</th><th class="amount">Qty</th><th class="amount">Balance Qty</th><th class="amount">Rate</th><th class="amount">Amount</th></tr>':'<tr><th>Date (BS)</th><th>Type</th><th>Account</th><th>Ref No.</th><th class="amount">Qty</th><th class="amount">Rate</th><th class="amount">Amount</th></tr>';
+  const tbody=document.getElementById('stock-stmt-tbody');if(!tbody)return;tbody.innerHTML=rows.length?rows.map(r=>`<tr><td class="mono">${escH(r.date)}</td><td><span class="badge ${r.typeColor}">${escH(r.type)}</span></td><td>${escH(r.party)}</td><td class="mono">${escH(r.ref)}</td><td class="amount">${fmtQty(r.qty)}</td>${qtyOn?`<td class="amount">${fmtQty(r.balanceQty)}</td>`:''}<td class="amount">Rs. ${fmt(r.rate)}</td><td class="amount">Rs. ${fmt(r.amount)}</td></tr>`).join(''):`<tr><td colspan="${qtyOn?8:7}"><div class="empty-state"><p>No transactions in this period.</p></div></td></tr>`;
+}
+function printStockItemStatement(){const d=fpStockStatementFilteredData();if(!d)return appAlert('Open an item statement first.');const {stock,rows,from,to,qtyOn}=d,headers=['Date (BS)','Type','Account','Ref No.','Qty',...(qtyOn?['Balance Qty']:[]),'Rate','Amount'],body=rows.map(r=>`<tr><td>${escH(r.date)}</td><td>${escH(r.type)}</td><td>${escH(r.party)}</td><td>${escH(r.ref)}</td><td style="text-align:right">${fmtQty(r.qty)}</td>${qtyOn?`<td style="text-align:right">${fmtQty(r.balanceQty)}</td>`:''}<td style="text-align:right">Rs. ${fmt(r.rate)}</td><td style="text-align:right">Rs. ${fmt(r.amount)}</td></tr>`).join('');printDocument(buildReportHTML(`${stock.name} — Item Statement`,`<table><thead><tr>${headers.map(h=>`<th>${escH(h)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>`,`${from||'Beginning'} to ${to||'Latest'}`),`${stock.name} - Item Statement`);}
+function exportStockItemStatementExcel(){const d=fpStockStatementFilteredData();if(!d)return appAlert('Open an item statement first.');if(typeof XLSX==='undefined')return appAlert('Excel library not loaded.');const {stock,rows,from,to,qtyOn}=d,headers=['Date (BS)','Type','Account','Ref No.','Qty',...(qtyOn?['Balance Qty']:[]),'Rate (Rs.)','Amount (Rs.)'],data=rows.map(r=>[r.date,r.type,r.party,r.ref,Number(r.qty)||0,...(qtyOn?[Number(r.balanceQty)||0]:[]),Number(r.rate)||0,Number(r.amount)||0]),ws=makeCompanyWorksheet('Item Statement',headers,data,{meta:[`Item: ${stock.name}`,`Period: ${from||'Beginning'} to ${to||'Latest'}`]});ws['!cols']=[{wch:14},{wch:16},{wch:24},{wch:16},{wch:10},...(qtyOn?[{wch:12}]:[]),{wch:14},{wch:16}];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Item Statement');XLSX.writeFile(wb,`Item-Statement-${String(stock.name||'Item').replace(/[^a-z0-9]+/gi,'-')}-${from||'All'}-to-${to||'Latest'}.xlsx`);}
+
+// MY AI UI + secure action executor.
+let myAiHistory=[];
+function previewMyAISetting(){const on=!!document.getElementById('set-my-ai-enabled')?.checked,st=document.getElementById('my-ai-setting-status');if(st)st.style.opacity=on?'1':'.65';}
+function syncMyAIVisibility(){const on=!!DB.settings().myAiEnabled,li=document.getElementById('nav-li-my-ai');if(li)li.style.display=on?'':'none';if(!on&&document.querySelector('.section.active')?.id==='sec-my-ai')nav('dashboard',document.querySelector(`nav a[onclick*="'dashboard'"]`));}
+function initMyAI(){const chat=document.getElementById('my-ai-chat');if(chat&&!chat.dataset.ready){chat.dataset.ready='1';myAiAddMessage('assistant','I can help with FinPilot work: accounts, stock, invoices, purchases, payments, supplier payments, contra, reports, and record management. I will ask once before destructive edits or deletions.');}}
+function clearMyAIChat(){myAiHistory=[];const chat=document.getElementById('my-ai-chat');if(chat){chat.dataset.ready='';chat.innerHTML='';initMyAI();}}
+function myAiAddMessage(role,text){const chat=document.getElementById('my-ai-chat');if(!chat)return;const el=document.createElement('div');el.className='my-ai-msg '+role;el.textContent=String(text||'');chat.appendChild(el);chat.scrollTop=chat.scrollHeight;if(role==='user'||role==='assistant'){myAiHistory.push({role,text:String(text||'')});if(myAiHistory.length>12)myAiHistory=myAiHistory.slice(-12);}}
+function setMyAIPrompt(text){const el=document.getElementById('my-ai-input');if(el){el.value=text;el.focus();}}
+function myAiInputKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMyAI();}}
+function myAiContext(){
+  const parties=DB.parties().map(p=>({id:p.id,name:p.name,address:p.address||'',phone:p.phone||'',panVat:p.panVat||'',customer:!!(window.isCustomerParty?isCustomerParty(p):p.isCustomer),supplier:!!(window.isSupplierParty?isSupplierParty(p):p.isSupplier),customerBalance:window.getTotalBilled&&window.getTotalPaid?getTotalBilled(p.id)-getTotalPaid(p.id):0,supplierDue:window.getSupplierDue?getSupplierDue(p.id):0}));
+  return {todayBS:dashboardActualTodayBS(),fiscalYear:fpCurrentFiscalMeta(),company:{name:DB.settings().company||'',address:DB.settings().address||'',phone:DB.settings().phone||'',panVat:DB.settings().pan||''},paymentMethods:getPaymentMethods(),parties,stock:DB.stock().map(x=>({id:x.id,name:x.name,rate:Number(x.rate)||0,quantity:stockQuantityEnabled()?getStockQuantityByName(x.name):null,unit:x.unit||''})),invoices:DB.invoices().slice(-300).map(x=>({id:x.id,invNo:x.invNo,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,total:Number(x.grandTotal??x.net??0)||0,paid:!!x.paid,partial:!!x.partial,taxInvoice:!!x.taxInvoice,items:(x.items||[]).map(i=>({name:i.name,qty:Number(i.qty)||0,rate:Number(i.rate)||0,discount:Number(i.disc)||0}))})),payments:DB.payments().slice(-300).map(x=>({id:x.id,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,amount:Number(x.amount)||0,discount:Number(x.discount)||0,method:x.method||'',receipt:x.receipt||''})),vouchers:DB.vouchers().slice(-300).map(x=>({id:x.id,type:x.type,refNo:x.refNo,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,total:Number(x.total)||0,ref:x.ref||''})),supplierPayments:DB.supplierPayments().slice(-300).map(x=>({id:x.id,dateBS:x.dateBS,partyId:x.partyId,partyName:x.partyName,amount:Number(x.amount)||0,method:x.method||'',ref:x.ref||''})),contra:DB.contra().slice(-150)};
+}
+function myAiPartyByName(name,role){const k=String(name||'').trim().toLowerCase();return DB.parties().find(p=>(p.name||'').trim().toLowerCase()===k&&(!role||(role==='customer'?(window.isCustomerParty?isCustomerParty(p):p.isCustomer):(window.isSupplierParty?isSupplierParty(p):p.isSupplier))));}
+function myAiCreateParty(data={},role='customer'){const name=String(data.name||data.party_name||'').trim();if(!name)throw new Error('Party name is required.');let p=myAiPartyByName(name,role)||DB.parties().find(x=>(x.name||'').trim().toLowerCase()===name.toLowerCase());if(p){if(role==='supplier'&&window.markPartyRole)markPartyRole(p.id,'supplier');if(role==='customer'&&window.markPartyRole)markPartyRole(p.id,'customer');return DB.parties().find(x=>x.id===p.id)||p;}const rows=DB.parties(),obj={id:uid(),name,address:data.address||'',phone:data.phone||'',panVat:data.panVat||data.pan_vat||'',isCustomer:role==='customer',isSupplier:role==='supplier'};rows.push(obj);DB.saveParties(rows);return obj;}
+function myAiItems(items){return (Array.isArray(items)?items:[]).map(x=>{const name=String(x.name||'').trim();let rate=Number(x.rate);if(!(rate>0)){const st=DB.stock().find(s=>stockNameKey(s.name)===stockNameKey(name));rate=Number(st?.rate)||0;}const qty=Number(x.qty||x.quantity)||0,disc=Number(x.discount_percent??x.discount??x.disc)||0,gross=qty*rate,discAmt=gross*disc/100;return {name,qty,rate,disc,discAmt,total:gross-discAmt};}).filter(x=>x.name&&x.qty>0&&x.rate>0);}
+function myAiNextInvoiceNo(){return 'INV-'+String(DB.invoices().length+1).padStart(4,'0');}
+function myAiFindInvoice(sel={}){if(sel.last_created&&window.myAiLastInvoiceId)return DB.invoices().find(x=>x.id===window.myAiLastInvoiceId);const no=String(sel.invoice_no||sel.invNo||sel.ref||'').trim().toLowerCase(),id=sel.id||'';return DB.invoices().find(x=>(id&&x.id===id)||(no&&String(x.invNo||'').trim().toLowerCase()===no));}
+function myAiFindPayment(sel={}){const id=sel.id||'',ref=String(sel.receipt||sel.ref||'').trim().toLowerCase();return DB.payments().find(x=>(id&&x.id===id)||(ref&&String(x.receipt||'').trim().toLowerCase()===ref));}
+function myAiFindStock(sel={}){const name=String(sel.name||'').trim();return DB.stock().find(x=>stockNameKey(x.name)===stockNameKey(name));}
+async function myAiCreateInvoice(a){const partyData=a.party||{name:a.party_name,address:a.address,phone:a.phone,panVat:a.pan_vat},party=myAiCreateParty(partyData,'customer'),items=myAiItems(a.items);if(!items.length)throw new Error('Invoice needs at least one valid item.');if(!await confirmNegativeStock(items,'sale',{}))throw new Error('Invoice cancelled because of stock warning.');const sub=items.reduce((z,x)=>z+x.qty*x.rate,0),disc=items.reduce((z,x)=>z+x.discAmt,0),adjustments=(a.adjustments||[]).map(x=>({name:String(x.name||''),value:Number(x.value)||0})),net=sub-disc+adjustments.reduce((z,x)=>z+x.value,0),grandTotal=Math.round(net),dateBS=a.date_bs||a.dateBS||dashboardActualTodayBS(),invNo=a.invoice_no||a.invNo||myAiNextInvoiceNo(),paid=!!a.paid,method=a.payment_method||a.method||'Cash',inv={id:uid(),invNo,dateBS,partyId:party.id,partyName:party.name,note:a.note||'',termsHtml:a.terms_html??null,documentType:'sales',items,sub,disc,net,grandTotal,paid:false,partial:false,taxInvoice:false,taxTotal:0,adjustments,createdAt:Date.now()};for(const it of items)syncStockFromItem(it.name,it.rate,dateBS);const rows=DB.invoices();rows.push(inv);DB.saveInvoices(rows);addJournalEntry(dateBS,party.name,`Sales Invoice ${invNo}`,'Accounts Receivable','Sales',grandTotal,inv.id,false,'invoice');addAudit('Invoice created by MY AI',{invoice:invNo,party:party.name,total:grandTotal});if(paid){const pay={id:uid(),partyId:party.id,partyName:party.name,amount:grandTotal,discount:0,method,receipt:a.receipt||'',note:'MY AI · paid on invoice',dateBS,refInvId:inv.id,createdAt:Date.now()};const ps=DB.payments();ps.push(pay);DB.savePayments(ps);addJournalEntry(dateBS,party.name,`Payment on Invoice (${method})${pay.receipt?' Ref:'+pay.receipt:''}`,method,'Accounts Receivable',grandTotal,pay.id,false,'payment');updateInvoiceStatusFIFO(party.id);}window.myAiLastInvoiceId=inv.id;if(a.print_after)setTimeout(()=>printInvoice(inv.id),100);return `Created invoice ${invNo} for ${party.name} (Rs. ${fmt(grandTotal)}).`;}
+function myAiRecordPayment(a){const p=myAiPartyByName(a.party_name||a.party?.name,'customer');if(!p)throw new Error('Customer account not found.');const amount=Number(a.amount)||0;if(!(amount>0))throw new Error('Payment amount must be greater than zero.');const dateBS=a.date_bs||dashboardActualTodayBS(),method=a.method||'Cash',pay={id:uid(),partyId:p.id,partyName:p.name,amount,discount:Number(a.discount)||0,method,receipt:a.receipt||'',note:a.note||'',dateBS,createdAt:Date.now()};const rows=DB.payments();rows.push(pay);DB.savePayments(rows);addJournalEntry(dateBS,p.name,`Payment Received (${method})${pay.receipt?' Ref:'+pay.receipt:''}`,method,'Accounts Receivable',amount,pay.id,false,'payment');if(pay.discount>0)addJournalEntry(dateBS,p.name,'Discount Allowed','Discount','Accounts Receivable',pay.discount,pay.id,false,'payment');updateInvoiceStatusFIFO(p.id);addAudit('Payment created by MY AI',{party:p.name,amount,method});return `Recorded Rs. ${fmt(amount)} from ${p.name} via ${method}.`;}
+function myAiCreateVoucher(type,a){const role=type==='sales-return'?'customer':'supplier';let party=myAiPartyByName(a.party_name||a.party?.name,role);if(!party&&type==='purchase')party=myAiCreateParty(a.party||{name:a.party_name,address:a.address,phone:a.phone,panVat:a.pan_vat},'supplier');if(!party)throw new Error(role==='supplier'?'Supplier not found. New suppliers can only be created with a Purchase.':'Customer account not found.');const items=myAiItems(a.items);if(!items.length)throw new Error('At least one valid item is required.');const total=items.reduce((z,x)=>z+(Number(x.total)||0),0),dateBS=a.date_bs||dashboardActualTodayBS(),prefix={purchase:'PUR-', 'sales-return':'SR-', 'purchase-return':'PR-'}[type],count=DB.vouchers().filter(x=>x.type===type).length+1,refNo=a.ref_no||a.reference_no||prefix+String(count).padStart(4,'0'),v={id:uid(),type,refNo,dateBS,partyId:party.id,partyName:party.name,items,total,ref:a.ref||'',note:a.note||'',createdAt:Date.now()};if(type==='purchase')for(const it of items)syncStockFromItem(it.name,it.rate,dateBS);const rows=DB.vouchers();rows.push(v);DB.saveVouchers(rows);const accounts={purchase:['Purchases','Accounts Payable'],'sales-return':['Credit Note','Accounts Receivable'],'purchase-return':['Accounts Payable','Debit Note']}[type];addJournalEntry(dateBS,party.name,`${voucherLabels[type]} ${refNo}`,accounts[0],accounts[1],Math.round(total),v.id,false,type);addAudit(`${voucherLabels[type]} created by MY AI`,{party:party.name,total,refNo});return `${voucherLabels[type]} ${refNo} created for ${party.name} (Rs. ${fmt(total)}).`;}
+function myAiSupplierPayment(a){const p=myAiPartyByName(a.party_name||a.party?.name,'supplier');if(!p)throw new Error('Supplier not found. New suppliers can only be created from Purchases.');const amount=Number(a.amount)||0;if(!(amount>0))throw new Error('Supplier payment amount must be greater than zero.');const dateBS=a.date_bs||dashboardActualTodayBS(),method=a.method||'Cash',row={id:uid(),partyId:p.id,partyName:p.name,amount,dateBS,method,ref:a.ref||a.receipt||'',note:a.note||'',createdAt:Date.now()},rows=DB.supplierPayments();rows.push(row);DB.saveSupplierPayments(rows);addJournalEntry(dateBS,p.name,`Payment to Supplier (${method})${row.ref?' Ref:'+row.ref:''}`,'Accounts Payable',method,amount,row.id,false,'supplier-payment');addAudit('Supplier payment created by MY AI',{supplier:p.name,amount,method});return `Recorded Rs. ${fmt(amount)} paid to ${p.name} via ${method}.`;}
+function myAiCreateContra(a){const from=String(a.from||a.from_account||'').trim(),to=String(a.to||a.to_account||'').trim(),amount=Number(a.amount)||0;if(!from||!to||!(amount>0))throw new Error('Contra needs From, To and Amount.');const rows=DB.contra(),x={id:uid(),from,to,amount,dateBS:a.date_bs||dashboardActualTodayBS(),ref:a.ref||'',note:a.note||'',createdAt:Date.now()};rows.push(x);DB.saveContra(rows);addAudit('Contra created by MY AI',{from,to,amount});return `Created contra of Rs. ${fmt(amount)} from ${from} to ${to}.`;}
+function myAiUpdateStock(a){const st=myAiFindStock(a.selector||{name:a.name});if(!st)throw new Error('Stock item not found.');const rows=DB.stock(),i=rows.findIndex(x=>x.id===st.id),ch=a.changes||a;if(ch.name)rows[i].name=ch.name;if(ch.rate!==undefined)rows[i].rate=Number(ch.rate)||0;if(ch.opening_qty!==undefined)rows[i].openingQty=Number(ch.opening_qty)||0;if(ch.unit!==undefined)rows[i].unit=String(ch.unit||'');rows[i].updatedAt=dashboardActualTodayBS();DB.saveStock(rows);addAudit('Stock edited by MY AI',{item:rows[i].name});return `Updated stock item ${rows[i].name}.`;}
+function myAiUpdateInvoice(a){const inv=myAiFindInvoice(a.selector||{});if(!inv)throw new Error('Invoice not found.');const rows=DB.invoices(),i=rows.findIndex(x=>x.id===inv.id),ch=a.changes||{};if(ch.date_bs)rows[i].dateBS=ch.date_bs;if(ch.note!==undefined)rows[i].note=ch.note;if(ch.party_name){const p=myAiCreateParty({name:ch.party_name,address:ch.address||'',phone:ch.phone||'',panVat:ch.pan_vat||''},'customer');rows[i].partyId=p.id;rows[i].partyName=p.name;}if(ch.items){const items=myAiItems(ch.items);if(!items.length)throw new Error('Updated invoice needs valid items.');const sub=items.reduce((z,x)=>z+x.qty*x.rate,0),disc=items.reduce((z,x)=>z+x.discAmt,0);rows[i].items=items;rows[i].sub=sub;rows[i].disc=disc;rows[i].net=sub-disc;rows[i].grandTotal=Math.round(sub-disc);}DB.saveInvoices(rows);DB.saveJournal(DB.journal().filter(j=>j.refId!==inv.id));addJournalEntry(rows[i].dateBS,rows[i].partyName,`Sales Invoice ${rows[i].invNo}`,'Accounts Receivable','Sales',Number(rows[i].grandTotal??rows[i].net)||0,rows[i].id,false,'invoice');addAudit('Invoice edited by MY AI',{invoice:rows[i].invNo});return `Updated invoice ${rows[i].invNo}.`;}
+function myAiUpdatePayment(a){const pay=myAiFindPayment(a.selector||{});if(!pay)throw new Error('Payment not found.');const rows=DB.payments(),i=rows.findIndex(x=>x.id===pay.id),ch=a.changes||{};if(ch.amount!==undefined)rows[i].amount=Number(ch.amount)||0;if(ch.discount!==undefined)rows[i].discount=Number(ch.discount)||0;if(ch.method!==undefined)rows[i].method=String(ch.method||'Cash');if(ch.receipt!==undefined)rows[i].receipt=String(ch.receipt||'');if(ch.note!==undefined)rows[i].note=String(ch.note||'');if(ch.date_bs)rows[i].dateBS=ch.date_bs;DB.savePayments(rows);DB.saveJournal(DB.journal().filter(j=>j.refId!==pay.id));addJournalEntry(rows[i].dateBS,rows[i].partyName,`Payment Received (${rows[i].method})${rows[i].receipt?' Ref:'+rows[i].receipt:''}`,rows[i].method,'Accounts Receivable',rows[i].amount,rows[i].id,false,'payment');if(rows[i].discount>0)addJournalEntry(rows[i].dateBS,rows[i].partyName,'Discount Allowed','Discount','Accounts Receivable',rows[i].discount,rows[i].id,false,'payment');updateInvoiceStatusFIFO(rows[i].partyId);addAudit('Payment edited by MY AI',{party:rows[i].partyName,amount:rows[i].amount});return 'Payment updated.';}
+async function myAiExecuteAction(a){switch(a.type){case'create_invoice':return await myAiCreateInvoice(a);case'record_payment':return myAiRecordPayment(a);case'create_purchase':return myAiCreateVoucher('purchase',a);case'create_sales_return':return myAiCreateVoucher('sales-return',a);case'create_purchase_return':return myAiCreateVoucher('purchase-return',a);case'record_supplier_payment':return myAiSupplierPayment(a);case'create_contra':return myAiCreateContra(a);case'update_stock':return myAiUpdateStock(a);case'update_invoice':return myAiUpdateInvoice(a);case'update_payment':return myAiUpdatePayment(a);case'delete_invoice':{const x=myAiFindInvoice(a.selector||{});if(!x)throw new Error('Invoice not found.');DB.saveInvoices(DB.invoices().filter(y=>y.id!==x.id));DB.saveJournal(DB.journal().filter(j=>j.refId!==x.id));addAudit('Invoice deleted by MY AI',{invoice:x.invNo});return `Deleted invoice ${x.invNo}.`;}case'delete_payment':{const x=myAiFindPayment(a.selector||{});if(!x)throw new Error('Payment not found.');DB.savePayments(DB.payments().filter(y=>y.id!==x.id));DB.saveJournal(DB.journal().filter(j=>j.refId!==x.id));updateInvoiceStatusFIFO(x.partyId);addAudit('Payment deleted by MY AI',{party:x.partyName,amount:x.amount});return 'Payment deleted.';}case'delete_stock':{const x=myAiFindStock(a.selector||{});if(!x)throw new Error('Stock item not found.');DB.saveStock(DB.stock().filter(y=>y.id!==x.id));addAudit('Stock deleted by MY AI',{item:x.name});return `Deleted stock item ${x.name}.`;}case'print_invoice':{const x=myAiFindInvoice(a.selector||{});if(!x)throw new Error('Invoice not found.');setTimeout(()=>printInvoice(x.id),100);return `Opened print for ${x.invNo}.`;}case'navigate':{const sec=String(a.section||'dashboard');if(document.getElementById('sec-'+sec))nav(sec,document.querySelector(`nav a[onclick*="'${sec}'"]`));return `Opened ${sec}.`;}default:throw new Error(`Unsupported MY AI action: ${a.type||'unknown'}`);}}
+function myAiNeedsConfirmation(actions){return actions.filter(a=>/^delete_|^update_/.test(String(a.type||'')));}
+async function sendMyAI(){
+  const input=document.getElementById('my-ai-input'),send=document.getElementById('my-ai-send'),status=document.getElementById('my-ai-status'),message=(input?.value||'').trim();if(!message)return;if(!DB.settings().myAiEnabled)return appNotice('Enable MY AI in Settings first.','error',5000);if(!sbClient||!currentCloudUser)return appNotice('Sign in to use MY AI.','error',5000);myAiAddMessage('user',message);if(input)input.value='';if(send)send.disabled=true;if(status){status.textContent='Working…';status.className='badge badge-orange';}
+  try{const {data,error}=await sbClient.functions.invoke('my-ai',{body:{message,history:myAiHistory.slice(-10),context:myAiContext()}});if(error)throw error;if(!data||typeof data!=='object')throw new Error('MY AI returned an invalid response.');const actions=Array.isArray(data.actions)?data.actions:[],destructive=myAiNeedsConfirmation(actions);if(destructive.length){const list=destructive.map(a=>a.type.replaceAll('_',' ')).join(', '),ok=await appConfirm(`MY AI wants to perform ${destructive.length} change${destructive.length===1?'':'s'}: ${list}. Continue?`,{yesText:'Confirm once',noText:'Cancel',type:'warning',title:'Confirm MY AI changes'});if(!ok){myAiAddMessage('assistant','Cancelled. No destructive changes were applied.');return;}}
+    const results=[];for(const a of actions){try{results.push(await myAiExecuteAction(a));}catch(e){results.push(`Could not complete ${a.type||'action'}: ${e.message||e}`);}}
+    fpRefreshFiscalViews();if(typeof renderSupplierSection==='function')renderSupplierSection();if(typeof renderStockTable==='function'&&document.querySelector('.section.active')?.id==='sec-stock')renderStockTable();const reply=[data.message||'',results.length?'\n'+results.join('\n'):''].join('').trim()||'Done.';myAiAddMessage('assistant',reply);
+  }catch(e){logAppError('my-ai',e);myAiAddMessage('assistant',`MY AI could not complete that request. ${e?.message||e}`);}finally{if(send)send.disabled=false;if(status){status.textContent='Ready';status.className='badge badge-green';}}
+}
+
+const fpMyAiLoadSettings=loadSettings;
+loadSettings=function(){const out=fpMyAiLoadSettings.apply(this,arguments),s=DB.settings(),el=document.getElementById('set-my-ai-enabled');if(el)el.checked=!!s.myAiEnabled;previewMyAISetting();syncMyAIVisibility();return out;};
+const fpMyAiSaveSettings=saveSettings;
+saveSettings=function(){const out=fpMyAiSaveSettings.apply(this,arguments),s=DB.settings();s.myAiEnabled=!!document.getElementById('set-my-ai-enabled')?.checked;DB.saveSettings(s);syncMyAIVisibility();return out;};
+const fpMyAiNav=nav;
+nav=function(sec,el){const out=fpMyAiNav(sec,el);if(sec==='my-ai')initMyAI();return out;};
+setTimeout(()=>{syncMyAIVisibility();if(DB.settings().myAiEnabled)initMyAI();},100);
+</script>
 </body>
 </html>

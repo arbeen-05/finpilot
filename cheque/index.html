@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#23211D">
+<title>FINPILOT CHEQUE FILLER</title>
+<link rel="icon" href="assets/logo-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --brand:#23211D; --brand-d:#15140F; --brand-l:#4A4740; --brand-t:#EDEBE5;
+  --accent:#C4841E; --accent-t:#FBF1E1;
+  --danger:#AA3B2E; --danger-t:#F5E2DE;
+  --bg:#F1EEE6; --card:#FFFFFF; --line:#E4DFD4; --line2:#EFEBE1;
+  --text:#23211D; --muted:#7A7566; --muted2:#A39D8A;
+  --paper:#FEFDFA; --ok:#0E8F6F;
+  --r:8px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Instrument Serif','IBM Plex Sans',serif;font-weight:400;letter-spacing:-.005em;margin:0}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.specimen{position:fixed;top:0;left:0;right:0;height:3px;z-index:70;background:repeating-linear-gradient(90deg,var(--accent) 0 26px,var(--brand-l) 26px 52px)}
+
+header{background:var(--brand);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:60}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.logo{width:36px;height:36px;border-radius:9px;background:#fff;color:var(--brand);display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow';font-weight:800;font-size:12.5px;flex:none;overflow:hidden;position:relative}
+.logo img{width:100%;height:100%;object-fit:contain}
+.logo .dot{position:absolute;right:3px;top:3px;width:6px;height:6px;border-radius:50% 50% 50% 0;background:var(--accent);transform:rotate(45deg)}
+.brand h1{font-size:16.5px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand span{display:block;font-size:10px;color:#C9C2AE;letter-spacing:.16em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-top:2px}
+.spacer{flex:1}
+.modesw{display:flex;background:rgba(255,255,255,.13);border-radius:22px;padding:3px;gap:2px}
+.modesw button{border:0;background:none;color:#D9D3C2;padding:6px 15px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans'}
+.modesw button[aria-pressed=true]{background:#fff;color:var(--brand)}
+header .btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:#fff}
+header .btn:hover{background:rgba(255,255,255,.22)}
+header .btn.primary{background:#fff;color:var(--brand);border-color:#fff}
+header .btn.primary:hover{background:var(--brand-t)}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 430px}
+@media(max-width:1040px){.layout{grid-template-columns:1fr}}
+
+.bench{padding:16px 16px 44px;min-width:0}
+.benchbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;overflow:auto;position:relative;box-shadow:0 1px 3px rgba(35,33,29,.06)}
+.stage.adjust{padding:28px 14px 14px 30px}
+.sheetwrap{position:relative;display:inline-block;min-width:100%}
+.rulerX,.rulerY{position:absolute;background:var(--brand-t);color:var(--muted);overflow:hidden;border-radius:3px;display:none}
+.adjust .rulerX,.adjust .rulerY{display:block}
+.rulerX{left:0;top:-22px;height:18px}
+.rulerY{top:0;left:-26px;width:22px}
+.tick{position:absolute;background:var(--muted2)}
+.tlab{position:absolute;font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--muted);line-height:1}
+.paper{position:relative;background:var(--paper);color:#0E1720;box-shadow:0 2px 16px rgba(35,33,29,.15),0 0 0 1px var(--line);overflow:hidden;touch-action:none;user-select:none}
+.paper .tint{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(115deg,transparent 0 3px,rgba(35,33,29,.03) 3px 4px)}
+.paper .overlayimg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none}
+.corner{position:absolute;width:14px;height:14px;pointer-events:none;opacity:.45;display:none}
+.adjust .corner{display:block}
+.corner:before,.corner:after{content:'';position:absolute;background:var(--accent)}
+.corner:before{left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%)}
+.corner:after{top:50%;left:0;right:0;height:1px;transform:translateY(-50%)}
+.fld{position:absolute;outline:none;cursor:pointer}
+.adjust .fld{cursor:grab}
+.fld .hit{position:absolute;border:1px dashed transparent;border-radius:4px}
+.fld:hover .hit{border-color:rgba(35,33,29,.45);background:rgba(35,33,29,.05)}
+.adjust .fld:hover .hit{border-color:rgba(196,132,30,.5)}
+.adjust .fld.sel .hit{border:1px solid var(--accent);background:rgba(196,132,30,.07)}
+.fld .tagx{position:absolute;left:-4px;top:-17px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;background:var(--accent);color:#fff;padding:1px 5px;border-radius:3px;white-space:nowrap;display:none}
+.adjust .fld.sel .tagx{display:block}
+.svgfld{position:absolute;left:0;top:0;pointer-events:none}
+.adjustonly{display:none}
+.adjust-on .adjustonly{display:block}
+.filltip{text-align:center;color:var(--muted);font-size:12px;margin-top:10px}
+
+.panel{border-left:1px solid var(--line);background:var(--card);min-height:100vh;padding-bottom:60px}
+@media(max-width:1040px){.panel{border-left:0;border-top:1px solid var(--line);min-height:auto}}
+.tabs{display:flex;border-bottom:1px solid var(--line);position:sticky;top:58px;background:var(--card);z-index:50}
+.tab{flex:1;padding:13px 4px;background:none;border:0;border-bottom:2.5px solid transparent;color:var(--muted);
+  font-family:'Barlow',sans-serif;font-weight:700;font-size:12.5px;letter-spacing:.02em;cursor:pointer}
+.tab[aria-selected=true]{color:var(--brand);border-bottom-color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.pane{padding:16px;display:none}
+.pane.on{display:block}
+
+fieldset{border:0;padding:0;margin:0 0 22px}
+legend,.grouptitle{font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted2);
+  padding:0 0 7px;display:block;width:100%;border-bottom:1px solid var(--line);margin-bottom:13px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500}
+input,select,textarea,button{font-family:inherit;font-size:14px}
+input[type=text],input[type=number],input[type=date],input[type=search],select,textarea{
+  width:100%;background:#fff;border:1px solid var(--line);color:var(--text);padding:10px 11px;border-radius:var(--r)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brand-l);outline-offset:-1px;border-color:transparent}
+input.big{font-size:16px;padding:12px 12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.f{margin-bottom:13px}
+.chk{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px;color:var(--text);cursor:pointer;line-height:1.35}
+.chk input{width:17px;height:17px;accent-color:var(--brand);flex:none;margin-top:1px}
+.chk small{display:block;color:var(--muted);font-size:11.5px}
+
+.btn{background:#fff;color:var(--brand);border:1px solid var(--line);padding:10px 14px;border-radius:var(--r);cursor:pointer;font-weight:600;font-size:13px}
+.btn:hover{border-color:var(--brand-l)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand-l)}
+.btn.danger{color:var(--danger);border-color:#E3C7C0}
+.btn.danger:hover{background:var(--danger-t);border-color:var(--danger)}
+.btn.sm{padding:6px 11px;font-size:12px}
+.btn.big{padding:14px;font-size:15px}
+.btn.wide{width:100%;display:block;text-align:center}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--brand);border-color:var(--line)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+
+.hint{font-size:12px;color:var(--muted);line-height:1.55;margin:6px 0 0}
+.warnbox{background:#FFF8E8;border:1px solid #F0DCAE;color:#7A5A18;padding:11px 12px;border-radius:var(--r);font-size:12.5px;margin-bottom:14px}
+.okbox{background:var(--brand-t);border:1px solid #DCD5C4;color:var(--brand);padding:11px 12px;border-radius:var(--r);font-size:12.5px;margin-bottom:13px}
+.words{background:var(--brand-t);border:1px solid #DCD5C4;border-radius:var(--r);padding:11px 13px;margin-bottom:13px}
+.words .w{font-size:14px;font-weight:600;color:var(--brand);line-height:1.4}
+.words .fig{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--accent);margin-top:4px;font-weight:600}
+.words.dim .w{color:var(--muted2);font-weight:400}
+
+.steps{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:16px}
+.steps h3{font-size:14.5px;margin-bottom:9px;color:var(--brand)}
+.steps ol{margin:0;padding-left:19px;font-size:12.5px;color:var(--muted);line-height:1.7}
+.steps ol b{color:var(--text)}
+
+.fieldlist{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.pill{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:20px;padding:6px 13px;font-size:12px;cursor:pointer}
+.pill[aria-pressed=true]{border-color:var(--brand);color:#fff;background:var(--brand)}
+.pill.off{opacity:.45}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);
+  border-bottom:1px solid var(--line);padding:7px 6px;font-weight:500;background:#fff;position:sticky;top:0;z-index:2}
+td{padding:5px 6px;border-bottom:1px solid var(--line2);vertical-align:middle}
+tr.bad td{background:var(--danger-t)}
+.tablewrap{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:var(--r)}
+.gridin{width:100%;border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:5px;font-size:12.5px}
+.gridin:hover{border-color:var(--line)}
+.gridin:focus{border-color:transparent;background:#fff}
+.gridin.num{text-align:right;font-family:'IBM Plex Mono',monospace}
+.rowwords{font-size:10.5px;color:var(--muted);padding:0 6px 5px;line-height:1.3}
+
+.drop{border:2px dashed var(--line);border-radius:var(--r);padding:26px 14px;text-align:center;color:var(--muted);cursor:pointer;background:#FAFCFF}
+.drop.over{border-color:var(--brand);background:var(--brand-t)}
+.drop strong{display:block;color:var(--brand);font-family:'Barlow';font-weight:700;font-size:15px;margin-bottom:3px}
+
+.item{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:7px;background:#fff}
+.item:hover{border-color:var(--brand-l)}
+.item .main{flex:1;min-width:0}
+.item .nm{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .sub{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .acts{display:flex;gap:5px;flex:none}
+.badge{display:inline-block;background:var(--brand-t);color:var(--brand);border-radius:4px;padding:1px 6px;font-size:9.5px;font-family:'IBM Plex Mono',monospace;margin-left:6px}
+.badge.b{background:var(--accent-t);color:var(--accent)}
+.empty{text-align:center;color:var(--muted2);padding:26px 10px;font-size:12.5px}
+.swatches{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--brand)}
+
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,90px);background:var(--brand);color:#fff;padding:12px 20px;border-radius:var(--r);
+  font-size:13.5px;z-index:200;transition:transform .28s cubic-bezier(.2,.8,.3,1);box-shadow:0 8px 26px rgba(21,34,47,.3);max-width:90vw}
+#toast.show{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.zoomval{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);min-width:44px}
+input[type=range]{accent-color:var(--brand);width:110px;vertical-align:middle}
+details{border:1px solid var(--line);border-radius:var(--r);margin-bottom:13px;background:#FAFCFF}
+summary{padding:10px 12px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted)}
+details[open] summary{border-bottom:1px solid var(--line);color:var(--brand)}
+.dbody{padding:13px}
+
+/* ---------- FinPilot UI refresh (presentation only) ---------- */
+:root{
+  --brand:#171717; --brand-d:#090909; --brand-l:#3d3d3d; --brand-t:#f1f1f1;
+  --accent:#555555; --accent-t:#eeeeee;
+  --danger:#a32929; --danger-t:#faeaea;
+  --bg:#f5f5f5; --card:#ffffff; --line:#dedede; --line2:#eeeeee;
+  --text:#171717; --muted:#666666; --muted2:#929292;
+  --paper:#fff; --ok:#246b50; --r:10px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);font-size:14px;line-height:1.5}
+button,input,select,textarea{transition:border-color .16s ease,background-color .16s ease,box-shadow .16s ease,color .16s ease}
+button{ -webkit-tap-highlight-color:transparent }
+.specimen{height:3px;background:#171717}
+header{
+  min-height:68px;padding:12px 24px;background:#111;color:#fff;
+  box-shadow:0 3px 16px rgba(0,0,0,.12);gap:14px
+}
+.brand{gap:12px}
+.logo{width:40px;height:40px;border-radius:11px;background:#fff;color:#111}
+.logo .dot{background:#555}
+.brand-copy{min-width:0}
+.brand h1{font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:.055em;line-height:1.2}
+.brand span{font-size:10px;color:#bdbdbd;letter-spacing:.08em;text-transform:uppercase}
+header .btn{border-radius:8px}
+header .btn.primary{background:#fff;color:#111}
+.modesw{background:rgba(255,255,255,.1);padding:4px}
+.modesw button{padding:7px 14px}
+.layout{grid-template-columns:minmax(0,1fr) minmax(390px,440px);max-width:1800px;margin:0 auto}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.panel{border-left:0;border-top:1px solid var(--line);min-height:auto}}
+.bench{padding:24px 24px 38px;min-width:0}
+.benchbar{gap:10px;margin-bottom:15px}
+.stage{padding:20px;border:1px solid #e5e5e5;border-radius:12px;box-shadow:0 4px 18px rgba(0,0,0,.045);background:#fff}
+.stage.adjust{padding:30px 16px 16px 32px}
+.paper{box-shadow:0 5px 22px rgba(0,0,0,.14),0 0 0 1px #d8d8d8}
+.panel{border-left:1px solid var(--line);background:#fff;padding-bottom:48px}
+.tabs{top:68px;box-shadow:0 2px 8px rgba(0,0,0,.035)}
+.tab{font-family:'IBM Plex Sans',sans-serif;font-size:12px;padding:15px 5px}
+.tab[aria-selected=true]{color:#111;border-bottom-color:#111}
+.pane{padding:22px}
+fieldset{margin-bottom:26px}
+legend,.grouptitle{font-size:10px;color:#777;letter-spacing:.12em;border-bottom-color:#e7e7e7}
+label{font-size:12px;color:#555;font-weight:600}
+input[type=text],input[type=number],input[type=date],input[type=search],select,textarea{
+  border:1px solid #d9d9d9;border-radius:8px;padding:11px 12px;background:#fff;
+  box-shadow:0 1px 2px rgba(0,0,0,.025)
+}
+input:focus,select:focus,textarea:focus{outline:0;border-color:#555;box-shadow:0 0 0 3px rgba(0,0,0,.08)}
+input.big{padding:13px 14px;font-size:16px}
+.btn{border-radius:8px;padding:10px 14px;border-color:#d8d8d8;background:#fff}
+.btn:hover{border-color:#777;background:#fafafa}
+.btn.primary{background:#171717;border-color:#171717;color:#fff}
+.btn.primary:hover{background:#383838;border-color:#383838}
+.btn.danger{color:var(--danger)}
+.btn.sm{padding:7px 11px}
+.btn.big{padding:14px 16px}
+.btn.wide{border-radius:9px}
+.steps{border:1px solid #e5e5e5;border-radius:10px;background:#fafafa;padding:16px}
+.steps h3{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:14px}
+.words{background:#f5f5f5;border-color:#e2e2e2}
+.words .w{color:#222}
+.words .fig{color:#555}
+.warnbox{background:#faf6ed;border-color:#e9dfc9;color:#70551f;border-radius:9px}
+.okbox{background:#f1f5f2;border-color:#d7e4db;color:#24563d;border-radius:9px}
+.fieldlist{gap:7px}
+.pill{border-radius:7px;padding:7px 11px}
+.pill[aria-pressed=true]{background:#171717;border-color:#171717}
+.tablewrap{border-radius:9px}
+th{background:#fafafa;color:#777}
+.drop{background:#fafafa;border-color:#ccc;border-radius:10px;padding:30px 14px}
+.drop strong{font-family:'IBM Plex Sans',sans-serif;color:#222}
+.drop.over{border-color:#222;background:#f0f0f0}
+.item{border-radius:9px;padding:11px}
+details{background:#fafafa;border-radius:9px}
+summary{padding:12px 13px}
+#toast{border-radius:9px;background:#171717;box-shadow:0 8px 28px rgba(0,0,0,.2)}
+.filltip{margin:13px 0;color:#777}
+.app-footer{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:17px 24px;background:#fff;border-top:1px solid #e5e5e5;
+  color:#777;font-size:11.5px
+}
+.app-footer strong{color:#333;font-weight:600}
+.app-footer a{color:#222;text-decoration:underline;text-underline-offset:3px}
+.app-footer a:hover{color:#666}
+@media(max-width:700px){
+  header{padding:11px 14px;gap:9px}
+  .brand{flex:1 1 100%}
+  .brand h1{font-size:14px}
+  header .spacer{display:none}
+  .modesw{margin-right:auto}
+  .layout{display:block}
+  .bench{padding:15px 12px 26px}
+  .stage{padding:12px}
+  .pane{padding:16px 13px}
+  .tabs{top:0}
+  .tab{font-size:11px}
+  .app-footer{padding:15px;display:block}
+  .app-footer span{display:block;margin:3px 0}
+}
+@media(max-width:420px){
+  .brand h1{font-size:12px}
+  .modesw button{padding:7px 10px;font-size:11px}
+  header .btn{padding:7px 9px}
+  .row{gap:7px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+
+</style>
+</head>
+<body class="fill-on">
+<div class="specimen" aria-hidden="true"></div>
+
+<header>
+  <a class="brand" href="../index.html" style="text-decoration:none;color:inherit">
+    <div class="logo" id="logoBox"><span>IN</span><i class="dot"></i></div>
+    <div class="brand-copy"><h1>FINPILOT CHEQUE FILLER</h1><span id="orgName">FinPilot Nepal</span></div>
+  </a>
+  <div class="spacer"></div>
+  <div class="modesw" role="group" aria-label="Mode">
+    <button id="modeFill" aria-pressed="true">Fill</button>
+    <button id="modeAdjust" aria-pressed="false">Adjust layout</button>
+  </div>
+  <button class="btn sm" id="btnRepeat">Repeat last</button>
+  <button class="btn primary" id="btnPrint">Save PDF</button>
+</header>
+
+<div class="layout">
+  <main class="bench">
+    <div class="benchbar">
+      <select id="tplPick" style="width:auto;min-width:230px" aria-label="Cheque template"></select>
+      <span class="adjustonly" style="display:none"></span>
+      <button class="btn sm adjustonly" id="btnNewTpl">Duplicate</button>
+      <button class="btn sm adjustonly" id="btnAlign">Alignment sheet</button>
+      <button class="btn sm ghost adjustonly" id="btnReset">Reset positions</button>
+      <div class="spacer"></div>
+      <span class="zoomval" id="zoomLbl">100%</span>
+      <input type="range" id="zoom" min="1.4" max="6" step="0.1" value="3.4" aria-label="Zoom">
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="sheetwrap">
+        <div class="rulerX" id="rulerX"></div>
+        <div class="rulerY" id="rulerY"></div>
+        <div class="paper" id="paper" tabindex="0"><div class="tint"></div></div>
+      </div>
+    </div>
+
+    <p class="filltip" id="filltip">Click anything on the cheque to jump to that box.</p>
+    <div class="adjustonly">
+      <p class="hint">Drag a field to move it. Arrow keys nudge 0.5&nbsp;mm, Shift+arrows 0.1&nbsp;mm. Positions are millimetres from the top-left corner of the leaf.</p>
+      <div class="fieldlist" id="fieldPills" style="margin-top:12px"></div>
+      <div id="inspector"></div>
+    </div>
+  </main>
+
+  <aside class="panel">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-pane="one">Write one</button>
+      <button class="tab" role="tab" aria-selected="false" data-pane="batch">Many at once</button>
+      <button class="tab" role="tab" aria-selected="false" data-pane="saved">Saved</button>
+      <button class="tab" role="tab" aria-selected="false" data-pane="tpl">Settings</button>
+    </div>
+
+    <!-- ============ ONE ============ -->
+    <section class="pane on" id="pane-one">
+      <div class="steps" id="setupCard">
+        <h3>First time here? Three steps.</h3>
+        <ol>
+          <li><b>Measure your cheque leaf</b> and enter its size under Settings.</li>
+          <li><b>Print the alignment sheet</b> at 100% and lay it over a real cheque.</li>
+          <li>Switch to <b>Adjust layout</b> and drag each field until it matches.</li>
+        </ol>
+        <button class="btn sm ghost" id="dismissSetup" style="margin-top:8px">Got it, hide this</button>
+      </div>
+
+      <div class="f">
+        <label for="fPayee">Pay to</label>
+        <input type="text" id="fPayee" class="big" list="payeeList" placeholder="Type a name — saved ones will suggest" autocomplete="off">
+        <datalist id="payeeList"></datalist>
+        <p class="hint" id="payeeHint"></p>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="fAmount">Amount (Rs.)</label>
+          <input type="text" id="fAmount" class="big mono" inputmode="decimal" placeholder="150000.50" autocomplete="off">
+        </div>
+        <div>
+          <label for="fCopies">How many sheets</label>
+          <input type="number" id="fCopies" class="big" value="1" min="1" max="200">
+        </div>
+      </div>
+
+      <div class="words dim" id="wordsBox"><div class="w" id="wordsTxt">The amount in words will appear here</div><div class="fig" id="figTxt"></div></div>
+
+      <div class="row">
+        <div>
+          <label for="fDateMode">Date</label>
+          <select id="fDateMode">
+            <option value="ad">AD — pick a date</option>
+            <option value="manual">BS / type it myself</option>
+          </select>
+        </div>
+        <div>
+          <label for="fDate" id="fDateLbl">Value</label>
+          <input type="date" id="fDate">
+          <input type="text" id="fDateTxt" placeholder="15082082" maxlength="12" style="display:none" autocomplete="off">
+        </div>
+      </div>
+
+      <label class="chk"><input type="checkbox" id="fAcPayee" checked> <span>Cross as A/C Payee only<small>Draws the two diagonal lines in the corner</small></span></label>
+      <label class="chk"><input type="checkbox" id="fBearer" checked> <span>Strike out “or Bearer”<small>Draws a line through the printed words</small></span></label>
+
+      <div class="f" style="margin-top:6px">
+        <label for="fMemo">Memo / cheque no. <span style="color:var(--muted2)">— optional</span></label>
+        <input type="text" id="fMemo" placeholder="Supplies purchase — inv. 2082/117" autocomplete="off">
+      </div>
+
+      <label class="chk"><input type="checkbox" id="fRemember" checked> <span>Remember this name for next time</span></label>
+
+      <button class="btn primary wide big" id="btnPrint2" style="margin-top:8px">Save PDF</button>
+      <p class="hint">Print at <b>100% / Actual size</b>. Any page scaling shifts every field on the leaf.</p>
+    </section>
+
+    <!-- ============ BATCH ============ -->
+    <section class="pane" id="pane-batch">
+      <p class="hint" style="margin:0 0 12px">Your file only needs two columns: <b>Pay to</b> and <b>Amount</b>. Everything else is optional.</p>
+
+      <div class="drop" id="drop" tabindex="0" role="button">
+        <strong>Drop your Excel file here</strong>
+        or tap to choose · .xlsx, .xls, .csv
+      </div>
+      <input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
+
+      <details style="margin-top:12px">
+        <summary>Or paste straight from Excel</summary>
+        <div class="dbody">
+          <textarea id="pasteBox" rows="5" placeholder="Copy two columns in Excel, then paste here:&#10;Himalayan Print Supplies&#9;150000&#10;Sagarmatha Traders&#9;87250"></textarea>
+          <button class="btn sm wide" id="btnPaste" style="margin-top:8px">Add these rows</button>
+        </div>
+      </details>
+
+      <div class="btnrow" style="margin:12px 0 14px">
+        <button class="btn sm" id="btnSample">Download a sample file</button>
+        <button class="btn sm" id="btnAddRow">Add a blank row</button>
+        <button class="btn sm ghost" id="btnClear">Clear all</button>
+      </div>
+
+      <div id="batchStatus"></div>
+      <div class="tablewrap" id="batchWrap" style="display:none"><table id="batchTable"></table></div>
+
+      <div id="batchOut" style="display:none;margin-top:14px">
+        <label>What should come out</label>
+        <label class="chk"><input type="radio" name="outmode" value="one" checked> <span>One PDF, one page per cheque<small>Easiest — feed the leaves in and print all pages</small></span></label>
+        <label class="chk"><input type="radio" name="outmode" value="many"> <span>A separate PDF for each payee<small>Downloads one file per name. Your browser may ask to allow multiple downloads.</small></span></label>
+        <label class="chk"><input type="checkbox" id="fRememberBatch" checked> <span>Remember these names for next time</span></label>
+        <button class="btn primary wide big" id="btnBatchPdf" style="margin-top:8px">Save PDF</button>
+      </div>
+
+      <details style="margin-top:14px">
+        <summary>Column names it understands</summary>
+        <div class="dbody">
+          <table>
+            <tr><th>Column</th><th>Also accepts</th></tr>
+            <tr><td class="mono">Payee</td><td>pay to, name, party</td></tr>
+            <tr><td class="mono">Amount</td><td>rs, figure, total</td></tr>
+            <tr><td class="mono">Date</td><td>a date, or text for BS</td></tr>
+            <tr><td class="mono">AC Payee</td><td>yes/no, y/n, 1/0</td></tr>
+            <tr><td class="mono">Bearer</td><td>yes = strike it out</td></tr>
+            <tr><td class="mono">Copies</td><td>qty, repeat</td></tr>
+            <tr><td class="mono">Memo</td><td>remarks, cheque no</td></tr>
+            <tr><td class="mono">Template</td><td>bank template name</td></tr>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <!-- ============ SAVED ============ -->
+    <section class="pane" id="pane-saved">
+      <fieldset>
+        <legend>Recent prints</legend>
+        <p class="hint" style="margin:0 0 10px">Print the same cheque again, or load it back to change something first.</p>
+        <div id="historyList"></div>
+        <button class="btn sm ghost wide" id="btnClearHist" style="margin-top:4px">Clear history</button>
+      </fieldset>
+      <fieldset>
+        <legend>Saved names</legend>
+        <div class="f"><input type="search" id="payeeSearch" placeholder="Search names…" autocomplete="off"></div>
+        <div class="btnrow" style="margin-bottom:12px">
+          <button class="btn sm" id="btnAddPayee">Add a name</button>
+          <button class="btn sm" id="btnExportPayees">Export</button>
+          <button class="btn sm" id="btnImportPayees">Import</button>
+        </div>
+        <input type="file" id="payeeFile" accept=".json,.csv,.xlsx,.xls" hidden>
+        <div id="payeeList2"></div>
+      </fieldset>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="pane" id="pane-tpl">
+      <fieldset>
+        <legend>Business identity</legend>
+        <div class="f"><label for="tOrg">Name in the header</label><input type="text" id="tOrg" value="FinPilot Nepal"></div>
+        <div class="row">
+          <div><label for="tLogo">Logo image</label><input type="file" id="tLogo" accept="image/*"></div>
+          <div><label>&nbsp;</label><button class="btn sm wide" id="tLogoClear">Remove logo</button></div>
+        </div>
+        <div class="f">
+          <label>Brand colour</label>
+          <div class="swatches" id="swatches">
+            <button class="sw" data-c="#23211D" style="background:#23211D" title="FinPilot ink"></button>
+            <button class="sw" data-c="#1E3A5F" style="background:#1E3A5F" title="Navy"></button>
+            <button class="sw" data-c="#0E6F4A" style="background:#0E6F4A" title="Forest"></button>
+            <button class="sw" data-c="#7A1F3D" style="background:#7A1F3D" title="Maroon"></button>
+            <input type="color" id="brandCustom" value="#23211D" style="width:44px;height:32px;padding:2px;border-radius:16px" aria-label="Custom colour">
+          </div>
+          <p class="hint">Set it to the exact swatch from your brand sheet if you have one.</p>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Cheque leaf</legend>
+        <div class="f"><label for="tName">Template name</label><input type="text" id="tName"></div>
+        <div class="row">
+          <div><label for="tW">Width (mm)</label><input type="number" id="tW" step="0.5"></div>
+          <div><label for="tH">Height (mm)</label><input type="number" id="tH" step="0.5"></div>
+        </div>
+        <p class="hint">Most Nepali bank cheques are 203 × 92 mm. Measure yours and match it exactly.</p>
+        <div class="btnrow" style="margin-top:10px">
+          <button class="btn sm danger" id="btnDelete">Delete this template</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Printer offset</legend>
+        <div class="row">
+          <div><label for="tOX">Shift right (mm)</label><input type="number" id="tOX" step="0.5" value="0"></div>
+          <div><label for="tOY">Shift down (mm)</label><input type="number" id="tOY" step="0.5" value="0"></div>
+        </div>
+        <p class="hint">If everything lands a few millimetres off, fix it here instead of moving each field. Negative shifts left and up.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Wording</legend>
+        <div class="f"><label for="tWordStyle">Number naming</label>
+          <select id="tWordStyle"><option value="sa">South Asian — Lakh, Crore, Arab</option><option value="int">International — Thousand, Million</option></select></div>
+        <div class="row">
+          <div><label for="tWordPre">Words start with</label><input type="text" id="tWordPre" value="Rupees "></div>
+          <div><label for="tWordPost">Words end with</label><input type="text" id="tWordPost" value=" Only"></div>
+        </div>
+        <div class="row">
+          <div><label for="tFigPre">Figure prefix</label><input type="text" id="tFigPre" value=""></div>
+          <div><label for="tFigPost">Figure suffix</label><input type="text" id="tFigPost" value="/-"></div>
+        </div>
+        <div class="row">
+          <div><label for="tPayPre">Payee prefix</label><input type="text" id="tPayPre" value=""></div>
+          <div><label for="tPayPost">Payee suffix</label><input type="text" id="tPayPost" value=""></div>
+        </div>
+        <div class="f"><label for="tFill">Fill the rest of the words line with</label>
+          <select id="tFill"><option value="">Nothing</option><option value="-">Dashes ---</option><option value="=">Equals ===</option><option value="*">Asterisks ***</option><option value="/">Slashes ///</option></select></div>
+        <label class="chk"><input type="checkbox" id="tCaps" checked> <span>Always print the name in CAPITALS<small>Type it however you like — it prints in capitals</small></span></label>
+        <label class="chk"><input type="checkbox" id="tPaisa" checked> <span>Say the paisa when the amount has decimals</span></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Alignment scan</legend>
+        <p class="hint" style="margin-top:0">Scan a blank cheque and load it here. It sits behind the fields as a guide and is never printed.</p>
+        <input type="file" id="ovFile" accept="image/*" style="margin:8px 0">
+        <div class="row">
+          <div><label for="ovOp">Visibility</label><input type="range" id="ovOp" min="0" max="1" step="0.05" value="0.5"></div>
+          <div><label>&nbsp;</label><button class="btn sm wide" id="ovClear">Remove scan</button></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Backup</legend>
+        <div class="btnrow">
+          <button class="btn sm" id="btnExport">Export templates</button>
+          <button class="btn sm" id="btnImport">Import templates</button>
+        </div>
+        <input type="file" id="impFile" accept=".json" hidden>
+        <p class="hint">Send the .json to another branch so they get your calibrated positions.</p>
+      </fieldset>
+    </section>
+  </aside>
+</div>
+
+<footer class="app-footer">
+  <span>© <span id="copyrightYear">2026</span> FinPilot. All rights reserved.</span>
+  <span>Created by <strong>Arbin Niroula</strong> ·
+    <a href="https://www.niroulaarbin.com.np" target="_blank" rel="noopener noreferrer">niroulaarbin.com.np</a>
+  </span>
+</footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+const { jsPDF } = window.jspdf;
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+$('#copyrightYear').textContent = String(new Date().getFullYear());
+let toastT;
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3400);};
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const round1=v=>Math.round(v*10)/10;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const mem={};
+const store={
+  async get(k){
+    try{if(window.storage){const r=await window.storage.get(k,false);return r?r.value:null;}}catch(e){}
+    try{const v=localStorage.getItem(k);if(v!=null)return v;}catch(e){}
+    return mem[k]??null;
+  },
+  async set(k,v){mem[k]=v;
+    try{if(window.storage){await window.storage.set(k,v,false);return;}}catch(e){}
+    try{localStorage.setItem(k,v);}catch(e){}
+  }
+};
+
+/* ---------- words ---------- */
+const ONES=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+const TENS=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+const under100=n=>n<20?ONES[n]:TENS[Math.floor(n/10)]+(n%10?' '+ONES[n%10]:'');
+function under1000(n){const h=Math.floor(n/100),r=n%100;let s='';if(h)s+=ONES[h]+' Hundred';if(r)s+=(s?' ':'')+under100(r);return s;}
+const SA=[[1e11,'Kharab'],[1e9,'Arab'],[1e7,'Crore'],[1e5,'Lakh'],[1e3,'Thousand']];
+const INT=[[1e12,'Trillion'],[1e9,'Billion'],[1e6,'Million'],[1e3,'Thousand']];
+function intToWords(n,st){n=Math.floor(n);if(n===0)return'Zero';const u=st==='int'?INT:SA,o=[];
+  for(const[v,nm]of u){if(n>=v){o.push(under1000(Math.floor(n/v))+' '+nm);n%=v;}}
+  if(n>0)o.push(under1000(n));return o.join(' ').replace(/\s+/g,' ').trim();}
+function amountToWords(a,t){if(!isFinite(a)||a<0)return'';
+  const r=Math.floor(a+1e-9),p=Math.round((a-r)*100);
+  let s=intToWords(r,t.wordStyle);
+  if(t.sayPaisa&&p>0)s+=' and '+under100(p)+' Paisa';
+  return (t.wordPre||'')+s+(t.wordPost||'');}
+function formatFigure(a,t){if(!isFinite(a))return'';
+  const neg=a<0;a=Math.abs(a);
+  const r=Math.floor(a+1e-9),p=Math.round((a-r)*100);
+  let s=String(r),g;
+  if(t.wordStyle==='int')g=s.replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  else if(s.length>3)g=s.slice(0,-3).replace(/\B(?=(\d{2})+(?!\d))/g,',')+','+s.slice(-3);
+  else g=s;
+  let o=g;if(p>0)o+='.'+String(p).padStart(2,'0');
+  return (neg?'-':'')+(t.figPre||'')+o+(t.figPost||'');}
+const parseAmount=v=>(v==null?NaN:parseFloat(String(v).replace(/[^0-9.\-]/g,'')));
+
+/* ---------- templates ---------- */
+function baseTemplate(name){return{id:'tpl_'+Math.random().toString(36).slice(2,9),name:name||'Nepal standard 203 × 92',
+  v:2,w:203,h:92,offX:0,offY:0,font:'helvetica',wordStyle:'sa',sayPaisa:true,wordPre:'Rupees ',wordPost:' Only',
+  figPre:'',figPost:'/-',payPre:'',payPost:'',payeeCaps:true,fill:'',
+  fields:{
+    date:{on:true,label:'Date',x:150,y:12,size:11,bold:false,boxed:true,pitch:5},
+    payee:{on:true,label:'Pay to',x:25,y:27,size:11,bold:false,maxW:110},
+    words1:{on:true,label:'Words line 1',x:25,y:37.5,size:10,bold:false,maxW:118},
+    words2:{on:true,label:'Words line 2',x:14,y:45.5,size:10,bold:false,maxW:128},
+    figures:{on:true,label:'Figures',x:152,y:45.5,size:12,bold:true,maxW:44,align:'left'},
+    memo:{on:false,label:'Memo',x:14,y:70,size:8,bold:false,maxW:70},
+    acpayee:{on:true,label:'A/C Payee',x:11,y:22,size:6,len:24,gap:5,angle:-45,text:'A/C PAYEE ONLY'},
+    bearer:{on:true,label:'Bearer strike',x:92,y:28,len:24,angle:0}
+  }};}
+let TEMPLATES=[],tplIndex=0;
+const tpl=()=>TEMPLATES[tplIndex];
+const tplById=id=>TEMPLATES.find(t=>t.id===id)||tpl();
+
+/* ---------- measurement ---------- */
+const ruler=new jsPDF({unit:'mm',format:[210,297]});
+function textW(s,fn,b,sz){ruler.setFont(fn,b?'bold':'normal');ruler.setFontSize(sz);return ruler.getTextWidth(s||'');}
+function wrapWords(text,widths,fn,b,sz){
+  const words=String(text).split(/\s+/).filter(Boolean),lines=[];let cur='',li=0;
+  for(const w of words){const lim=widths[Math.min(li,widths.length-1)],tr=cur?cur+' '+w:w;
+    if(textW(tr,fn,b,sz)<=lim||!cur)cur=tr;else{lines.push(cur);cur=w;li++;if(li>=widths.length)break;}}
+  if(cur&&lines.length<widths.length)lines.push(cur);
+  while(lines.length<widths.length)lines.push('');
+  return lines.slice(0,widths.length);}
+function fitSize(s,fn,b,sz,mw){let x=sz;while(x>5&&textW(s,fn,b,x)>mw)x-=.25;return x;}
+function padFill(l,ch,fn,b,sz,mw){if(!ch||!l)return l;const o=l+' ',u=textW(ch,fn,b,sz);
+  if(u<=0)return l;const n=Math.max(0,Math.floor((mw-textW(o,fn,b,sz))/u));return n>1?o+ch.repeat(n):l;}
+
+/* ---------- build ---------- */
+function buildCheque(d,t){
+  const f=t.fields,fn=t.font,amt=parseFloat(d.amount),out={ops:[],warnings:[]};
+  if(f.date.on&&d.date){
+    const raw=String(d.date).replace(/[^0-9A-Za-z]/g,'');
+    if(f.date.boxed){raw.split('').forEach((c,i)=>out.ops.push({k:'text',s:c,x:f.date.x+i*f.date.pitch,y:f.date.y,size:f.date.size,bold:f.date.bold,align:'center'}));
+      if(raw.length>10)out.warnings.push('Date is '+raw.length+' characters — check the boxes fit');}
+    else out.ops.push({k:'text',s:String(d.date),x:f.date.x,y:f.date.y,size:f.date.size,bold:f.date.bold});
+  }
+  if(f.payee.on){
+    let nm=String(d.payee||'');
+    if(t.payeeCaps!==false)nm=nm.toUpperCase();
+    const s=(t.payPre||'')+nm+(t.payPost||'');
+    const sz=fitSize(s,fn,f.payee.bold,f.payee.size,f.payee.maxW);
+    if(sz<f.payee.size-1.5)out.warnings.push('Payee name was shrunk to fit');
+    out.ops.push({k:'text',s,x:f.payee.x,y:f.payee.y,size:sz,bold:f.payee.bold});}
+  const words=isFinite(amt)?amountToWords(amt,t):'';
+  if(words){
+    const wd=[];if(f.words1.on)wd.push(f.words1.maxW);if(f.words2.on)wd.push(f.words2.maxW);
+    if(wd.length){const sz=f.words1.size,lines=wrapWords(words,wd,fn,f.words1.bold,sz);
+      if(lines.join(' ').replace(/\s+/g,' ').trim().length<words.replace(/\s+/g,' ').trim().length)
+        out.warnings.push('Amount in words is too long for the lines available');
+      let i=0;
+      if(f.words1.on){let l=lines[i];if(!f.words2.on||!lines[1])l=padFill(l,t.fill,fn,f.words1.bold,sz,f.words1.maxW);
+        out.ops.push({k:'text',s:l,x:f.words1.x,y:f.words1.y,size:sz,bold:f.words1.bold});i++;}
+      if(f.words2.on){let l=lines[i]||'';if(l)l=padFill(l,t.fill,fn,f.words2.bold,f.words2.size,f.words2.maxW);
+        out.ops.push({k:'text',s:l,x:f.words2.x,y:f.words2.y,size:f.words2.size,bold:f.words2.bold});}}
+  }
+  if(f.figures.on&&isFinite(amt)){const s=formatFigure(amt,t);
+    out.ops.push({k:'text',s,x:f.figures.x,y:f.figures.y,size:fitSize(s,fn,f.figures.bold,f.figures.size,f.figures.maxW),bold:f.figures.bold,align:f.figures.align==='right'?'right':'left'});}
+  if(f.memo.on&&d.memo){const s=String(d.memo);
+    out.ops.push({k:'text',s,x:f.memo.x,y:f.memo.y,size:fitSize(s,fn,false,f.memo.size,f.memo.maxW),bold:false});}
+  if(f.acpayee.on&&d.acPayee){const a=f.acpayee,rd=a.angle*Math.PI/180,dx=Math.cos(rd)*a.len,dy=Math.sin(rd)*a.len;
+    out.ops.push({k:'line',x1:a.x,y1:a.y,x2:a.x+dx,y2:a.y+dy,wt:.5});
+    out.ops.push({k:'line',x1:a.x+a.gap,y1:a.y,x2:a.x+a.gap+dx,y2:a.y+dy,wt:.5});
+    if(a.text)out.ops.push({k:'text',s:a.text,x:a.x+a.gap/2+dx/2,y:a.y+dy/2,size:a.size,bold:false,align:'center',angle:-a.angle});}
+  if(f.bearer.on&&d.bearer){const b=f.bearer,rd=(b.angle||0)*Math.PI/180;
+    out.ops.push({k:'line',x1:b.x,y1:b.y,x2:b.x+Math.cos(rd)*b.len,y2:b.y+Math.sin(rd)*b.len,wt:.45});}
+  return out;
+}
+
+/* ---------- pdf ---------- */
+const newDoc=t=>new jsPDF({unit:'mm',format:[t.w,t.h],orientation:t.w>=t.h?'landscape':'portrait'});
+function drawOps(doc,ops,t){
+  doc.setTextColor(0,0,0);doc.setDrawColor(0,0,0);
+  for(const o of ops){
+    if(o.k==='text'){if(!o.s)continue;
+      doc.setFont(t.font,o.bold?'bold':'normal');doc.setFontSize(o.size);
+      const p={baseline:'middle'};if(o.align)p.align=o.align;if(o.angle)p.angle=o.angle;
+      doc.text(String(o.s),o.x+t.offX,o.y+t.offY,p);}
+    else{doc.setLineWidth(o.wt||.4);doc.line(o.x1+t.offX,o.y1+t.offY,o.x2+t.offX,o.y2+t.offY);}}
+}
+function saveDoc(doc,name){
+  const url=URL.createObjectURL(doc.output('blob'));
+  const a=document.createElement('a');a.href=url;a.download=name;a.rel='noopener';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+function makePdf(list,name){
+  if(!list.length){toast('Nothing to print yet');return;}
+  let doc=null,warn=0;
+  list.forEach(it=>{const t=it.tpl;
+    if(!doc)doc=newDoc(t);else doc.addPage([t.w,t.h],t.w>=t.h?'landscape':'portrait');
+    const b=buildCheque(it.data,t);warn+=b.warnings.length;drawOps(doc,b.ops,t);});
+  saveDoc(doc,name);
+  toast(list.length+' cheque'+(list.length>1?'s':'')+' saved'+(warn?' · '+warn+' warning(s)':''));
+}
+const safeName=s=>String(s||'cheque').replace(/[^A-Za-z0-9 _.-]/g,'').replace(/\s+/g,'-').slice(0,48)||'cheque';
+function makeSeparatePdfs(list){
+  if(!list.length){toast('Nothing to print yet');return;}
+  toast('Saving '+list.length+' files — allow multiple downloads if asked');
+  list.forEach((it,i)=>setTimeout(()=>{
+    const t=it.tpl,doc=newDoc(t);
+    drawOps(doc,buildCheque(it.data,t).ops,t);
+    saveDoc(doc,String(i+1).padStart(2,'0')+'-'+safeName(it.data.payee)+'.pdf');
+  },i*450));
+}
+function alignmentSheet(){
+  const t=tpl(),doc=newDoc(t);
+  doc.setLineWidth(.1);doc.setDrawColor(198,198,198);
+  for(let x=0;x<=t.w;x+=5)doc.line(x,0,x,t.h);
+  for(let y=0;y<=t.h;y+=5)doc.line(0,y,t.w,y);
+  doc.setDrawColor(125,125,125);doc.setLineWidth(.25);
+  for(let x=0;x<=t.w;x+=10)doc.line(x,0,x,t.h);
+  for(let y=0;y<=t.h;y+=10)doc.line(0,y,t.w,y);
+  doc.setFontSize(4);doc.setTextColor(110,110,110);doc.setFont(t.font,'normal');
+  for(let x=0;x<=t.w;x+=10)doc.text(String(x),x+.6,3);
+  for(let y=10;y<=t.h;y+=10)doc.text(String(y),.6,y-.6);
+  doc.setTextColor(0,0,0);
+  drawOps(doc,buildCheque({payee:'SAMPLE PAYEE NAME',amount:1234567.5,date:'01012082',acPayee:true,bearer:true,memo:'alignment proof'},t).ops,t);
+  doc.setDrawColor(0,0,0);doc.setLineWidth(.2);
+  for(const k in t.fields){const f=t.fields[k];if(!f.on)continue;
+    const x=f.x+t.offX,y=f.y+t.offY;doc.line(x-2,y,x+2,y);doc.line(x,y-2,x,y+2);}
+  doc.setLineWidth(.3);doc.rect(.15,.15,t.w-.3,t.h-.3);
+  saveDoc(doc,'alignment-sheet.pdf');
+  toast('Print at 100%, lay it over a real cheque, then adjust');
+}
+
+/* ---------- preview ---------- */
+let SCALE=3.4,selected=null,overlaySrc=null,overlayOpacity=.5,MODE='fill';
+const mm2px=v=>v*SCALE;
+const CSS_FONT={helvetica:"Helvetica,Arial,sans-serif",times:"'Times New Roman',serif",courier:"'Courier New',monospace"};
+const FOCUS_MAP={payee:'#fPayee',words1:'#fAmount',words2:'#fAmount',figures:'#fAmount',date:'#fDate',memo:'#fMemo',acpayee:'#fAcPayee',bearer:'#fBearer'};
+
+function currentData(){
+  const m=$('#fDateMode').value;let d;
+  if(m==='manual')d=$('#fDateTxt').value.trim();
+  else{const v=$('#fDate').value;d=v?(()=>{const[Y,M,D]=v.split('-');return D+M+Y;})():'';}
+  return{payee:$('#fPayee').value||'',amount:parseAmount($('#fAmount').value),date:d,
+    acPayee:$('#fAcPayee').checked,bearer:$('#fBearer').checked,memo:$('#fMemo').value||''};
+}
+function renderRulers(t){
+  const rx=$('#rulerX'),ry=$('#rulerY');
+  rx.style.width=mm2px(t.w)+'px';ry.style.height=mm2px(t.h)+'px';
+  let hx='',hy='';
+  for(let x=0;x<=t.w;x+=5){const b=x%20===0;
+    hx+=`<div class="tick" style="left:${mm2px(x)}px;bottom:0;width:1px;height:${b?9:5}px"></div>`;
+    if(b)hx+=`<div class="tlab" style="left:${mm2px(x)+2}px;top:2px">${x}</div>`;}
+  for(let y=0;y<=t.h;y+=5){const b=y%20===0;
+    hy+=`<div class="tick" style="top:${mm2px(y)}px;right:0;height:1px;width:${b?9:5}px"></div>`;
+    if(b)hy+=`<div class="tlab" style="top:${mm2px(y)+2}px;left:2px">${y}</div>`;}
+  rx.innerHTML=hx;ry.innerHTML=hy;
+}
+function renderPreview(skipInspector=false){
+  const t=tpl(),d=currentData(),paper=$('#paper');
+  paper.style.width=mm2px(t.w)+'px';paper.style.height=mm2px(t.h)+'px';
+  renderRulers(t);
+  const built=buildCheque(d,t),fam=CSS_FONT[t.font]||CSS_FONT.helvetica;
+  let html='<div class="tint"></div>';
+  if(overlaySrc)html+=`<img class="overlayimg" src="${overlaySrc}" style="opacity:${overlayOpacity}" alt="">`;
+  html+=`<div class="corner" style="left:2px;top:2px"></div><div class="corner" style="right:2px;top:2px"></div>
+         <div class="corner" style="left:2px;bottom:2px"></div><div class="corner" style="right:2px;bottom:2px"></div>`;
+  const lines=built.ops.filter(o=>o.k==='line');
+  if(lines.length)html+=`<svg class="svgfld" width="${mm2px(t.w)}" height="${mm2px(t.h)}">`+
+    lines.map(o=>`<line x1="${mm2px(o.x1+t.offX)}" y1="${mm2px(o.y1+t.offY)}" x2="${mm2px(o.x2+t.offX)}" y2="${mm2px(o.y2+t.offY)}" stroke="#0E1720" stroke-width="${Math.max(1,mm2px(o.wt))}"/>`).join('')+`</svg>`;
+  built.ops.filter(o=>o.k==='text').forEach(o=>{
+    const px=mm2px(o.x+t.offX),py=mm2px(o.y+t.offY),fs=o.size*25.4/72*SCALE;
+    let tf='translate(0,-50%)';
+    if(o.align==='center')tf='translate(-50%,-50%)';
+    if(o.align==='right')tf='translate(-100%,-50%)';
+    if(o.angle)tf+=` rotate(${-o.angle}deg)`;
+    html+=`<div style="position:absolute;left:${px}px;top:${py}px;transform:${tf};font-family:${fam};font-size:${fs}px;
+      font-weight:${o.bold?700:400};white-space:pre;color:#0E1720;pointer-events:none;
+      transform-origin:${o.align==='center'?'center':'left'} center">${esc(o.s)}</div>`;});
+  for(const k in t.fields){const f=t.fields[k];
+    html+=`<div class="fld ${selected===k?'sel':''}" data-k="${k}" title="${esc(f.label)}" style="left:${mm2px(f.x+t.offX)}px;top:${mm2px(f.y+t.offY)}px;width:1px;height:1px;opacity:${f.on?1:.35}">
+      <div class="hit" style="width:${Math.max(30,mm2px(f.maxW||f.len||24))}px;height:${Math.max(16,mm2px((f.size||8)*.42))}px;left:-5px;top:50%;transform:translateY(-50%)"></div>
+      <div class="tagx">${f.label} · ${round1(f.x)},${round1(f.y)}</div></div>`;}
+  paper.innerHTML=html;
+  attachFields();
+  if(MODE==='adjust'&&!skipInspector){renderPills();renderInspector();}
+  const w=isFinite(d.amount)?amountToWords(d.amount,t):'';
+  $('#wordsBox').classList.toggle('dim',!w);
+  $('#wordsTxt').textContent=w||'The amount in words will appear here';
+  $('#figTxt').textContent=w?formatFigure(d.amount,t):'';
+  const old=$('#benchWarn');if(old)old.remove();
+  if(built.warnings.length){const el=document.createElement('div');
+    el.className='warnbox';el.id='benchWarn';el.style.marginTop='12px';
+    el.textContent=built.warnings.join(' · ');$('.bench').appendChild(el);}
+}
+function attachFields(){
+  $$('#paper .fld').forEach(el=>{
+    const key=el.dataset.k;
+    if(MODE==='fill'){
+      el.onclick=()=>{
+        showTab('one');
+        const sel=FOCUS_MAP[key];if(!sel)return;
+        const n=$(sel);
+        if(n.type==='checkbox'){n.checked=!n.checked;n.dispatchEvent(new Event('change'));toast(tpl().fields[key].label+(n.checked?' on':' off'));}
+        else{n.focus();n.select&&n.select();}
+      };
+      return;
+    }
+    el.addEventListener('pointerdown',e=>{
+      e.preventDefault();selected=key;renderPreview();
+      const t=tpl(),f=t.fields[key],sx=e.clientX,sy=e.clientY,ox=f.x,oy=f.y;
+      const mv=ev=>{f.x=round1(clamp(ox+(ev.clientX-sx)/SCALE,-20,t.w+20));f.y=round1(clamp(oy+(ev.clientY-sy)/SCALE,-20,t.h+20));renderPreview();};
+      const up=()=>{window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',up);saveTemplates();$('#paper').focus();};
+      window.addEventListener('pointermove',mv);window.addEventListener('pointerup',up);});
+  });
+}
+$('#paper').addEventListener('keydown',e=>{
+  if(MODE!=='adjust'||!selected)return;
+  const st=e.shiftKey?.1:.5,f=tpl().fields[selected];let hit=true;
+  if(e.key==='ArrowLeft')f.x=round1(f.x-st);
+  else if(e.key==='ArrowRight')f.x=round1(f.x+st);
+  else if(e.key==='ArrowUp')f.y=round1(f.y-st);
+  else if(e.key==='ArrowDown')f.y=round1(f.y+st);
+  else hit=false;
+  if(hit){e.preventDefault();renderPreview();saveTemplates();}
+});
+function renderPills(){
+  const t=tpl();
+  $('#fieldPills').innerHTML=Object.keys(t.fields).map(k=>
+    `<button class="pill ${t.fields[k].on?'':'off'}" data-k="${k}" aria-pressed="${selected===k}">${t.fields[k].label}</button>`).join('');
+  $$('#fieldPills .pill').forEach(b=>b.onclick=()=>{selected=b.dataset.k;renderPreview();});
+}
+function renderInspector(){
+  const box=$('#inspector');
+  if(!selected){box.innerHTML='<p class="hint">Pick a field above, or drag one on the cheque.</p>';return;}
+  const f=tpl().fields[selected];
+  const num=(l,p,st,mn)=>`<div><label for="in_${p}">${l}</label><input class="insp" type="number" id="in_${p}" data-p="${p}" step="${st||.5}" ${mn!==undefined?`min="${mn}"`:''} value="${f[p]}"></div>`;
+  let ex='';
+  if('size'in f)ex+=num('Text size (pt)','size',.5,4);
+  if('maxW'in f)ex+=num('Max width (mm)','maxW',1,4);
+  if('pitch'in f)ex+=num('Box spacing (mm)','pitch',.1,1);
+  if('len'in f)ex+=num('Length (mm)','len',.5,1);
+  if('gap'in f)ex+=num('Gap (mm)','gap',.5,0);
+  if('angle'in f)ex+=num('Angle (°)','angle',1);
+  if(selected==='acpayee')ex+=`<div><label for="in_dir">Slant</label><select id="in_dir">
+    <option value="up" ${f.angle<0?'selected':''}>Bottom to top &nbsp;//</option>
+    <option value="down" ${f.angle>=0?'selected':''}>Top to bottom &nbsp;\\\\</option></select></div>`;
+  box.innerHTML=`<fieldset style="margin-top:14px;max-width:600px">
+    <span class="grouptitle">${f.label}</span>
+    <label class="chk"><input type="checkbox" id="in_on" ${f.on?'checked':''}> <span>Print this field</span></label>
+    <div class="row3">${num('X from left (mm)','x',.1)}${num('Y from top (mm)','y',.1)}
+      ${'bold'in f?`<div><label for="in_bold">Weight</label><select class="insp" id="in_bold" data-p="bold"><option value="0" ${!f.bold?'selected':''}>Normal</option><option value="1" ${f.bold?'selected':''}>Bold</option></select></div>`:'<div></div>'}</div>
+    <div class="row3">${ex}</div>
+    ${'boxed'in f?`<label class="chk"><input type="checkbox" id="in_boxed" ${f.boxed?'checked':''}> <span>One character per box</span></label>`:''}
+    ${'align'in f?`<div class="f"><label for="in_align">Align</label><select class="insp" id="in_align" data-p="align"><option value="left" ${f.align==='left'?'selected':''}>Left of the anchor</option><option value="right" ${f.align==='right'?'selected':''}>Right of the anchor</option></select></div>`:''}
+    ${'text'in f?`<div class="f"><label for="in_text">Crossing text</label><input class="insp" type="text" id="in_text" data-p="text" value="${esc(f.text)}"></div>`:''}
+  </fieldset>`;
+  $$('#inspector .insp').forEach(i=>{
+    i.oninput=()=>{const p=i.dataset.p;let v=i.value;
+      if(i.type==='number'){v=parseFloat(v);if(!isFinite(v))return;}
+      else if(p==='bold')v=v==='1';
+      f[p]=v;renderPreview(true);saveTemplates();};});
+  const on=$('#in_on');if(on)on.onchange=()=>{f.on=on.checked;renderPreview();saveTemplates();};
+  const bx=$('#in_boxed');if(bx)bx.onchange=()=>{f.boxed=bx.checked;renderPreview();saveTemplates();};
+  const dir=$('#in_dir');if(dir)dir.onchange=()=>{
+    const want=dir.value==='up'?-Math.abs(f.angle||45):Math.abs(f.angle||45);
+    if(want!==f.angle){f.y=round1(f.y+Math.sin(f.angle*Math.PI/180)*f.len);f.angle=want;}
+    renderPreview();saveTemplates();};
+}
+
+/* ---------- mode ---------- */
+function setMode(m){
+  MODE=m;
+  document.body.classList.toggle('adjust-on',m==='adjust');
+  $('#stage').classList.toggle('adjust',m==='adjust');
+  $('#modeFill').setAttribute('aria-pressed',String(m==='fill'));
+  $('#modeAdjust').setAttribute('aria-pressed',String(m==='adjust'));
+  $$('.adjustonly').forEach(e=>e.style.display=m==='adjust'?'':'none');
+  $('#filltip').style.display=m==='fill'?'':'none';
+  if(m==='adjust'&&!selected)selected='payee';
+  renderPreview();
+  if(m==='adjust')toast('Drag the fields to match your real cheque. Changes save as you go.');
+}
+$('#modeFill').onclick=()=>setMode('fill');
+$('#modeAdjust').onclick=()=>setMode('adjust');
+
+/* ---------- template form ---------- */
+const BIND=[['#tName','name','s'],['#tW','w','n'],['#tH','h','n'],['#tOX','offX','n'],['#tOY','offY','n'],
+  ['#tWordStyle','wordStyle','s'],['#tWordPre','wordPre','s'],['#tWordPost','wordPost','s'],
+  ['#tFigPre','figPre','s'],['#tFigPost','figPost','s'],['#tPayPre','payPre','s'],['#tPayPost','payPost','s'],['#tFill','fill','s']];
+function fillTplForm(){const t=tpl();BIND.forEach(([s,p])=>{$(s).value=t[p];});$('#tPaisa').checked=t.sayPaisa;$('#tCaps').checked=t.payeeCaps!==false;}
+BIND.forEach(([sel,prop,kind])=>$(sel).addEventListener('input',()=>{
+  const v=kind==='n'?parseFloat($(sel).value):$(sel).value;
+  if(kind==='n'&&!isFinite(v))return;
+  tpl()[prop]=v;if(prop==='name')renderTplPicker();
+  renderPreview();renderBatchTable();saveTemplates();}));
+$('#tPaisa').onchange=()=>{tpl().sayPaisa=$('#tPaisa').checked;renderPreview();renderBatchTable();saveTemplates();};
+$('#tCaps').onchange=()=>{tpl().payeeCaps=$('#tCaps').checked;renderPreview();saveTemplates();};
+const renderTplPicker=()=>$('#tplPick').innerHTML=TEMPLATES.map((t,i)=>`<option value="${i}" ${i===tplIndex?'selected':''}>${esc(t.name)}</option>`).join('');
+$('#tplPick').onchange=e=>{tplIndex=+e.target.value;selected=null;fillTplForm();renderPreview();renderBatchTable();saveTemplates();};
+$('#btnNewTpl').onclick=()=>{const c=JSON.parse(JSON.stringify(tpl()));
+  c.id='tpl_'+Math.random().toString(36).slice(2,9);c.name+=' (copy)';
+  TEMPLATES.push(c);tplIndex=TEMPLATES.length-1;
+  renderTplPicker();fillTplForm();renderPreview();saveTemplates();toast('Duplicated — rename it in Settings');};
+$('#btnDelete').onclick=()=>{if(TEMPLATES.length===1){toast('You need at least one template');return;}
+  TEMPLATES.splice(tplIndex,1);tplIndex=0;renderTplPicker();fillTplForm();renderPreview();saveTemplates();toast('Template deleted');};
+$('#btnAlign').onclick=alignmentSheet;
+$('#btnReset').onclick=()=>{const t=tpl();t.fields=baseTemplate().fields;t.offX=0;t.offY=0;
+  fillTplForm();renderPreview();saveTemplates();toast('Positions reset to the standard layout');};
+$('#btnExport').onclick=()=>{const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(TEMPLATES,null,2)],{type:'application/json'}));
+  a.download='cheque-templates.json';a.click();toast('Exported '+TEMPLATES.length+' template(s)');};
+$('#btnImport').onclick=()=>$('#impFile').click();
+$('#impFile').onchange=e=>{const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{try{const arr=JSON.parse(r.result),l=Array.isArray(arr)?arr:[arr];
+    let n=0;l.forEach(t=>{if(t&&t.fields){TEMPLATES.push(t);n++;}});
+    renderTplPicker();saveTemplates();toast('Imported '+n+' template(s)');}catch(err){toast('That file is not a template export');}};
+  r.readAsText(f);e.target.value='';};
+$('#ovFile').onchange=e=>{const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{overlaySrc=r.result;setMode('adjust');toast('Scan loaded — it is never printed');};r.readAsDataURL(f);};
+$('#ovOp').oninput=e=>{overlayOpacity=+e.target.value;renderPreview();};
+$('#ovClear').onclick=()=>{overlaySrc=null;$('#ovFile').value='';renderPreview();};
+
+/* ---------- identity ---------- */
+let IDENT={org:'FinPilot Nepal',logo:'assets/logo-icon.png',brand:'#23211D'};
+function shade(hex,p){const n=parseInt(hex.slice(1),16);
+  let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  r=Math.round(r+(255-r)*p);g=Math.round(g+(255-g)*p);b=Math.round(b+(255-b)*p);
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');}
+function applyIdentity(){
+  $('#orgName').textContent=IDENT.org||'FinPilot Nepal';
+  document.title='FINPILOT CHEQUE FILLER';
+  const b=IDENT.brand||'#23211D';
+  const rs=document.documentElement.style;
+  rs.setProperty('--brand',b);
+  rs.setProperty('--brand-l',shade(b,.22));
+  rs.setProperty('--brand-t',shade(b,.9));
+  document.querySelector('meta[name=theme-color]').setAttribute('content',b);
+  const box=$('#logoBox');
+  if(IDENT.logo)box.innerHTML=`<img src="${IDENT.logo}" alt="">`;
+  else{const i=(IDENT.org||'FinPilot Nepal').split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();
+    box.innerHTML=`<span>${esc(i)}</span><i class="dot"></i>`;}
+  $$('#swatches .sw').forEach(s=>s.setAttribute('aria-pressed',String(s.dataset.c.toLowerCase()===b.toLowerCase())));
+}
+$('#tOrg').addEventListener('input',()=>{IDENT.org=$('#tOrg').value;applyIdentity();saveIdent();});
+$('#tLogo').onchange=e=>{const f=e.target.files[0];if(!f)return;
+  if(f.size>400000){toast('Please use a logo under 400 KB');return;}
+  const r=new FileReader();r.onload=()=>{IDENT.logo=r.result;applyIdentity();saveIdent();toast('Logo updated');};r.readAsDataURL(f);};
+$('#tLogoClear').onclick=()=>{IDENT.logo=null;$('#tLogo').value='';applyIdentity();saveIdent();};
+$$('#swatches .sw').forEach(s=>s.onclick=()=>{IDENT.brand=s.dataset.c;$('#brandCustom').value=s.dataset.c;applyIdentity();saveIdent();});
+$('#brandCustom').oninput=e=>{IDENT.brand=e.target.value;applyIdentity();saveIdent();};
+
+/* ---------- payees ---------- */
+let PAYEES=[];
+const keyOf=s=>String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+function rememberPayee(name,amount,memo){
+  const k=keyOf(name);if(!k)return;
+  let p=PAYEES.find(x=>keyOf(x.name)===k);
+  if(!p){p={name:String(name).trim(),count:0,lastAmount:null,lastMemo:'',last:0};PAYEES.push(p);}
+  p.count++;p.last=Date.now();
+  if(isFinite(amount))p.lastAmount=amount;
+  if(memo)p.lastMemo=memo;
+  savePayees();renderPayees();}
+function renderPayees(){
+  PAYEES.sort((a,b)=>(b.count-a.count)||(b.last-a.last));
+  $('#payeeList').innerHTML=PAYEES.map(p=>`<option value="${esc(p.name)}"></option>`).join('');
+  const q=keyOf($('#payeeSearch')?.value);
+  const list=q?PAYEES.filter(p=>keyOf(p.name).includes(q)):PAYEES;
+  const box=$('#payeeList2');
+  if(!list.length){box.innerHTML=`<div class="empty">${PAYEES.length?'No name matches that search.':'No names yet. They are saved automatically when you save a PDF.'}</div>`;return;}
+  box.innerHTML=list.map(p=>{const i=PAYEES.indexOf(p);
+    const sub=[p.lastAmount!=null?formatFigure(p.lastAmount,tpl()):null,p.count+'×'].filter(Boolean).join(' · ');
+    return `<div class="item"><div class="main"><div class="nm">${esc(p.name)}</div>
+      <div class="sub">${esc(sub)}${p.lastMemo?' · '+esc(p.lastMemo):''}</div></div>
+      <div class="acts"><button class="btn sm" data-use="${i}">Use</button>
+      <button class="btn sm danger" data-del="${i}" aria-label="Delete ${esc(p.name)}">✕</button></div></div>`;}).join('');
+  box.querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>usePayee(PAYEES[+b.dataset.use]));
+  box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const p=PAYEES[+b.dataset.del];
+    PAYEES.splice(+b.dataset.del,1);savePayees();renderPayees();toast('Removed '+p.name);});
+}
+function usePayee(p){if(!p)return;
+  $('#fPayee').value=p.name;
+  if(p.lastAmount!=null&&!$('#fAmount').value)$('#fAmount').value=p.lastAmount;
+  if(p.lastMemo&&!$('#fMemo').value)$('#fMemo').value=p.lastMemo;
+  showTab('one');renderPreview();updatePayeeHint();toast('Loaded '+p.name);}
+function updatePayeeHint(){
+  const k=keyOf($('#fPayee').value),p=k?PAYEES.find(x=>keyOf(x.name)===k):null;
+  $('#payeeHint').textContent=p?`Saved name · used ${p.count}×${p.lastAmount!=null?' · last '+formatFigure(p.lastAmount,tpl()):''}`:'';}
+$('#payeeSearch').addEventListener('input',renderPayees);
+$('#btnAddPayee').onclick=()=>{const n=prompt('Name to save');if(!n||!n.trim())return;rememberPayee(n.trim(),NaN,'');toast('Saved '+n.trim());};
+$('#btnExportPayees').onclick=()=>{const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(PAYEES,null,2)],{type:'application/json'}));
+  a.download='saved-names.json';a.click();toast('Exported '+PAYEES.length+' name(s)');};
+$('#btnImportPayees').onclick=()=>$('#payeeFile').click();
+$('#payeeFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  const done=names=>{let n=0;names.forEach(o=>{const nm=typeof o==='string'?o:o.name;
+    if(!nm||!String(nm).trim())return;
+    if(PAYEES.some(p=>keyOf(p.name)===keyOf(nm)))return;
+    PAYEES.push({name:String(nm).trim(),count:o.count||0,lastAmount:o.lastAmount??null,lastMemo:o.lastMemo||'',last:o.last||0});n++;});
+    savePayees();renderPayees();toast('Added '+n+' new name(s)');};
+  if(/\.json$/i.test(f.name)){r.onload=()=>{try{const d=JSON.parse(r.result);done(Array.isArray(d)?d:[]);}catch(err){toast('Could not read that file');}};r.readAsText(f);}
+  else{r.onload=ev=>{try{const wb=XLSX.read(ev.target.result,{type:'array'});
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:'',raw:false});
+    const h=rows.length?Object.keys(rows[0]):[];const k=pickKey(h,'payee')||h[0];
+    done(rows.map(x=>({name:x[k]})));}catch(err){toast('Could not read that file');}};r.readAsArrayBuffer(f);}
+  e.target.value='';};
+
+/* ---------- history ---------- */
+let HISTORY=[];
+function logPrint(e){e.id='h_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);e.ts=Date.now();
+  HISTORY.unshift(e);HISTORY=HISTORY.slice(0,60);saveHistory();renderHistory();}
+function ago(ts){const s=(Date.now()-ts)/1000;
+  if(s<60)return'just now';if(s<3600)return Math.floor(s/60)+' min ago';if(s<86400)return Math.floor(s/3600)+' hr ago';
+  const d=new Date(ts);return d.toLocaleDateString(undefined,{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});}
+function renderHistory(){
+  const box=$('#historyList');
+  if(!HISTORY.length){box.innerHTML='<div class="empty">Nothing printed yet.</div>';return;}
+  box.innerHTML=HISTORY.slice(0,25).map(h=>{const t=tplById(h.tplId);let title,sub;
+    if(h.kind==='batch'){const tot=h.rows.reduce((s,r)=>s+(isFinite(r.amount)?r.amount*(r.copies||1):0),0);
+      title=h.rows.length+' cheques from a list';sub=formatFigure(tot,t)+' total · '+ago(h.ts);}
+    else{title=h.data.payee||'(no name)';sub=formatFigure(h.data.amount,t)+(h.copies>1?' × '+h.copies:'')+' · '+ago(h.ts);}
+    return `<div class="item"><div class="main"><div class="nm">${esc(title)}${h.kind==='batch'?'<span class="badge b">list</span>':''}</div>
+      <div class="sub">${esc(sub)}</div></div><div class="acts">
+      ${h.kind==='single'?`<button class="btn sm" data-load="${h.id}">Edit</button>`:''}
+      <button class="btn sm primary" data-again="${h.id}">Print again</button></div></div>`;}).join('');
+  box.querySelectorAll('[data-again]').forEach(b=>b.onclick=()=>reprint(b.dataset.again));
+  box.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>loadIntoForm(b.dataset.load));
+}
+function reprint(id){const h=HISTORY.find(x=>x.id===id);if(!h)return;const t=tplById(h.tplId);
+  if(h.kind==='batch'){const l=[];h.rows.forEach(r=>{for(let i=0;i<(r.copies||1);i++)l.push({data:r,tpl:tplById(r.tplId||h.tplId)});});
+    makePdf(l,'cheques-'+l.length+'.pdf');}
+  else makePdf(Array.from({length:h.copies||1},()=>({data:h.data,tpl:t})),'cheque-'+safeName(h.data.payee)+'.pdf');}
+function loadIntoForm(id){const h=HISTORY.find(x=>x.id===id);if(!h||h.kind!=='single')return;const d=h.data;
+  $('#fPayee').value=d.payee||'';$('#fAmount').value=isFinite(d.amount)?d.amount:'';
+  $('#fMemo').value=d.memo||'';$('#fAcPayee').checked=!!d.acPayee;$('#fBearer').checked=!!d.bearer;
+  $('#fCopies').value=h.copies||1;
+  if(d.date&&/^\d{8}$/.test(d.date)){$('#fDateMode').value='ad';$('#fDateMode').dispatchEvent(new Event('change'));
+    $('#fDate').value=d.date.slice(4)+'-'+d.date.slice(2,4)+'-'+d.date.slice(0,2);}
+  else if(d.date){$('#fDateMode').value='manual';$('#fDateMode').dispatchEvent(new Event('change'));$('#fDateTxt').value=d.date;}
+  const i=TEMPLATES.findIndex(t=>t.id===h.tplId);
+  if(i>=0){tplIndex=i;renderTplPicker();fillTplForm();}
+  showTab('one');renderPreview();updatePayeeHint();toast('Loaded — change what you need, then save');}
+$('#btnRepeat').onclick=()=>{if(!HISTORY.length){toast('Nothing has been printed yet');return;}reprint(HISTORY[0].id);};
+$('#btnClearHist').onclick=()=>{HISTORY=[];saveHistory();renderHistory();toast('History cleared');};
+
+/* ---------- tabs / form ---------- */
+function showTab(n){$$('.tab').forEach(x=>x.setAttribute('aria-selected',String(x.dataset.pane===n)));
+  $$('.pane').forEach(p=>p.classList.remove('on'));$('#pane-'+n).classList.add('on');}
+$$('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.pane));
+$('#zoom').oninput=e=>{SCALE=+e.target.value;$('#zoomLbl').textContent=Math.round(SCALE/3.7795*100)+'%';renderPreview();};
+$('#fDateMode').onchange=()=>{const m=$('#fDateMode').value;
+  $('#fDate').style.display=m==='ad'?'':'none';
+  $('#fDateTxt').style.display=m==='ad'?'none':'';
+  $('#fDateLbl').textContent=m==='ad'?'Value':'Digits only, e.g. 15082082';renderPreview();};
+['#fPayee','#fAmount','#fDate','#fDateTxt','#fMemo'].forEach(s=>$(s).addEventListener('input',renderPreview));
+$('#fPayee').addEventListener('input',updatePayeeHint);
+['#fAcPayee','#fBearer'].forEach(s=>$(s).addEventListener('change',renderPreview));
+$('#dismissSetup').onclick=()=>{$('#setupCard').remove();store.set('ink_setup_seen','1');};
+
+function printSingle(){
+  const n=clamp(parseInt($('#fCopies').value)||1,1,200),d=currentData();
+  if(!d.payee){toast('Enter a name in “Pay to” first');showTab('one');$('#fPayee').focus();return;}
+  if(!isFinite(d.amount)){toast('Enter an amount first');showTab('one');$('#fAmount').focus();return;}
+  makePdf(Array.from({length:n},()=>({data:d,tpl:tpl()})),'cheque-'+safeName(d.payee)+'.pdf');
+  if($('#fRemember').checked)rememberPayee(d.payee,d.amount,d.memo);
+  logPrint({kind:'single',data:d,copies:n,tplId:tpl().id});
+}
+$('#btnPrint').onclick=()=>{($('#pane-batch').classList.contains('on')&&ROWS.length)?printBatch():printSingle();};
+$('#btnPrint2').onclick=printSingle;
+
+/* ---------- batch ---------- */
+let ROWS=[];
+const ALIASES={
+  payee:['payee','payeename','name','partyname','party','payto','paidto','beneficiary'],
+  amount:['amount','amt','rs','rupees','figure','figures','total','value'],
+  date:['date','chequedate','dt','miti'],
+  ac:['acpayee','a/cpayee','accountpayee','ac','crossed','crossing','acpayeeonly'],
+  bearer:['bearer','strikebearer','orbearer','cancelbearer'],
+  copies:['copies','qty','quantity','repeat','count','nos'],
+  memo:['memo','remarks','remark','note','notes','narration','chequeno','chequenumber','purpose','description'],
+  tpl:['template','bank','banktemplate','chequetemplate']};
+const norm=s=>String(s||'').toLowerCase().replace(/[\s._\-()\/]/g,'');
+function pickKey(h,kind){const w=ALIASES[kind].map(norm);
+  for(const x of h)if(w.includes(norm(x)))return x;
+  for(const x of h){const n=norm(x);if(w.some(y=>n.includes(y)||y.includes(n)))return x;}
+  return null;}
+const truthy=v=>{const s=norm(v);if(s==='')return null;return['y','yes','true','1','tick','cross','crossed','ok'].includes(s);};
+function excelDate(v){if(v instanceof Date&&!isNaN(v)){const p=n=>String(n).padStart(2,'0');
+  return p(v.getDate())+p(v.getMonth()+1)+v.getFullYear();}return String(v==null?'':v).trim();}
+const blankRow=()=>({payee:'',amount:NaN,date:'',acPayee:true,bearer:true,copies:1,memo:'',tplName:''});
+
+function readFile(file){
+  const r=new FileReader();
+  r.onload=ev=>{try{
+    const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});
+    const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:'',raw:false,dateNF:'dd/mm/yyyy'});
+    if(!json.length){toast('That sheet has no rows under the headings');return;}
+    const h=Object.keys(json[0]);
+    const K={payee:pickKey(h,'payee'),amount:pickKey(h,'amount'),date:pickKey(h,'date'),ac:pickKey(h,'ac'),
+      bearer:pickKey(h,'bearer'),copies:pickKey(h,'copies'),memo:pickKey(h,'memo'),tpl:pickKey(h,'tpl')};
+    if(!K.payee||!K.amount){toast('Could not find a name column and an amount column');
+      $('#batchStatus').innerHTML=`<div class="warnbox">Headings found: <span class="mono">${esc(h.join(', '))}</span>. Rename one to <b>Payee</b> and one to <b>Amount</b>, then load it again.</div>`;return;}
+    ROWS=json.map(x=>{const ac=K.ac?truthy(x[K.ac]):null,be=K.bearer?truthy(x[K.bearer]):null;
+      return{payee:String(x[K.payee]||'').trim(),amount:parseAmount(x[K.amount]),
+        date:K.date?excelDate(x[K.date]):'',acPayee:ac===null?true:ac,bearer:be===null?true:be,
+        copies:K.copies?clamp(parseInt(x[K.copies])||1,1,200):1,
+        memo:K.memo?String(x[K.memo]||'').trim():'',tplName:K.tpl?String(x[K.tpl]||'').trim():''};})
+      .filter(x=>x.payee||isFinite(x.amount));
+    renderBatchTable();toast(ROWS.length+' row(s) loaded — check them, then save the PDF');
+  }catch(err){console.error(err);toast('Could not read that file');}};
+  r.readAsArrayBuffer(file);
+}
+$('#btnPaste').onclick=()=>{
+  const txt=$('#pasteBox').value.trim();
+  if(!txt){toast('Paste two columns first');return;}
+  let n=0;
+  txt.split(/\r?\n/).forEach(line=>{
+    if(!line.trim())return;
+    const parts=line.split(/\t|,(?=\s*[\d"'-])|\s{2,}/);
+    const name=(parts[0]||'').trim().replace(/^["']|["']$/g,'');
+    const amt=parseAmount(parts[1]);
+    if(!name||/^(payee|name|pay to)$/i.test(name))return;
+    ROWS.push({...blankRow(),payee:name,amount:amt});n++;});
+  $('#pasteBox').value='';
+  renderBatchTable();
+  toast(n?n+' row(s) added':'Nothing recognisable in that paste');
+};
+function tplFor(r){if(r.tplName){
+    const hit=TEMPLATES.find(t=>norm(t.name)===norm(r.tplName))||TEMPLATES.find(t=>norm(t.name).includes(norm(r.tplName)));
+    if(hit)return hit;}
+  return tpl();}
+function batchSummary(){
+  let bad=0,total=0,sheets=0;
+  ROWS.forEach(r=>{if(!r.payee||!isFinite(r.amount))bad++;else{total+=r.amount*(r.copies||1);sheets+=(r.copies||1);}});
+  $('#batchStatus').innerHTML=`<div class="${bad?'warnbox':'okbox'}">${sheets} sheet${sheets===1?'':'s'} from ${ROWS.length} row${ROWS.length===1?'':'s'} · total ${esc(formatFigure(total,tpl()))}`+
+    (bad?` · <b>${bad} row(s) still need a name and amount</b>`:'')+`</div>`;
+}
+function renderBatchTable(){
+  const wrap=$('#batchWrap'),tb=$('#batchTable');
+  if(!ROWS.length){wrap.style.display='none';$('#batchOut').style.display='none';$('#batchStatus').innerHTML='';return;}
+  tb.innerHTML=`<thead><tr><th style="width:26px">#</th><th>Pay to</th><th style="width:96px;text-align:right">Amount</th>
+    <th style="width:44px">Qty</th><th style="width:36px">A/C</th><th style="width:30px"></th></tr></thead>
+    <tbody>${ROWS.map((r,i)=>`
+      <tr data-i="${i}" class="${(!r.payee||!isFinite(r.amount))?'bad':''}">
+        <td class="mono" style="color:var(--muted2)">${i+1}</td>
+        <td><input class="gridin" data-f="payee" data-i="${i}" value="${esc(r.payee)}" placeholder="Name" list="payeeList"></td>
+        <td><input class="gridin num" data-f="amount" data-i="${i}" value="${isFinite(r.amount)?r.amount:''}" placeholder="0" inputmode="decimal"></td>
+        <td><input class="gridin num" data-f="copies" data-i="${i}" value="${r.copies||1}" inputmode="numeric"></td>
+        <td style="text-align:center"><input type="checkbox" data-f="acPayee" data-i="${i}" ${r.acPayee?'checked':''} style="accent-color:var(--brand)"></td>
+        <td><button class="btn sm ghost" data-del="${i}" aria-label="Remove row ${i+1}">✕</button></td>
+      </tr>
+      <tr><td></td><td colspan="5" class="rowwords" id="rw${i}">${esc(isFinite(r.amount)?amountToWords(r.amount,tplFor(r)):'')}</td></tr>`).join('')}</tbody>`;
+  wrap.style.display='';$('#batchOut').style.display='';
+  tb.querySelectorAll('.gridin').forEach(inp=>{
+    inp.oninput=()=>{const i=+inp.dataset.i,f=inp.dataset.f;
+      if(f==='amount')ROWS[i].amount=parseAmount(inp.value);
+      else if(f==='copies')ROWS[i].copies=clamp(parseInt(inp.value)||1,1,200);
+      else ROWS[i][f]=inp.value;
+      const rw=$('#rw'+i);
+      if(rw)rw.textContent=isFinite(ROWS[i].amount)?amountToWords(ROWS[i].amount,tplFor(ROWS[i])):'';
+      const tr=inp.closest('tr');
+      tr.classList.toggle('bad',!ROWS[i].payee||!isFinite(ROWS[i].amount));
+      batchSummary();};
+  });
+  tb.querySelectorAll('input[type=checkbox]').forEach(c=>c.onchange=()=>{ROWS[+c.dataset.i].acPayee=c.checked;});
+  tb.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ROWS.splice(+b.dataset.del,1);renderBatchTable();});
+  batchSummary();
+}
+function printBatch(){
+  const good=ROWS.filter(r=>r.payee&&isFinite(r.amount));
+  if(!good.length){toast('Add at least one name and amount');return;}
+  const list=[];
+  good.forEach(r=>{for(let i=0;i<(r.copies||1);i++)list.push({data:r,tpl:tplFor(r)});});
+  const mode=document.querySelector('input[name=outmode]:checked').value;
+  if(mode==='many')makeSeparatePdfs(list);
+  else makePdf(list,'cheques-'+list.length+'.pdf');
+  if($('#fRememberBatch').checked)good.forEach(r=>rememberPayee(r.payee,r.amount,r.memo));
+  logPrint({kind:'batch',rows:good.map(r=>({...r,tplId:tplFor(r).id})),tplId:tpl().id});
+}
+$('#btnBatchPdf').onclick=printBatch;
+$('#btnClear').onclick=()=>{ROWS=[];renderBatchTable();toast('List cleared');};
+$('#btnAddRow').onclick=()=>{ROWS.push(blankRow());renderBatchTable();
+  const last=document.querySelector(`#batchTable .gridin[data-i="${ROWS.length-1}"]`);if(last)last.focus();};
+const drop=$('#drop');
+drop.onclick=()=>$('#file').click();
+drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#file').click();}};
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)readFile(f);});
+$('#file').onchange=e=>{const f=e.target.files[0];if(f)readFile(f);e.target.value='';};
+$('#btnSample').onclick=()=>{
+  const data=[['Payee','Amount','Date','AC Payee','Bearer','Copies','Memo','Template'],
+    ['Himalayan Print Supplies Pvt. Ltd.',150000.5,'15/08/2026','Yes','Yes',1,'DTF vinyl restock — inv. 2082/117',''],
+    ['Sagarmatha Traders',87250,'15/08/2026','Yes','Yes',1,'Office stationery & consumables',''],
+    ['Ram Bahadur Thapa',45000,'16/08/2026','No','No',1,'Salary — Shrawan',''],
+    ['Everest Logistics Pvt. Ltd.',1234567,'16/08/2026','Yes','Yes',2,'Courier & freight AMC','']];
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=[{wch:34},{wch:12},{wch:12},{wch:10},{wch:8},{wch:8},{wch:26},{wch:16}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Cheques');
+  XLSX.writeFile(wb,'cheque-list-sample.xlsx');
+  toast('Sample saved — keep the headings, replace the rows');};
+
+/* ---------- persistence ---------- */
+const saveTemplates=()=>store.set('ink_templates_v1',JSON.stringify({TEMPLATES,tplIndex}));
+const savePayees=()=>store.set('ink_payees_v1',JSON.stringify(PAYEES));
+const saveHistory=()=>store.set('ink_history_v1',JSON.stringify(HISTORY));
+const saveIdent=()=>store.set('ink_identity_v1',JSON.stringify(IDENT));
+async function loadAll(){
+  try{const raw=await store.get('ink_templates_v1');
+    if(raw){const d=JSON.parse(raw);if(d.TEMPLATES?.length){TEMPLATES=d.TEMPLATES;tplIndex=clamp(d.tplIndex||0,0,d.TEMPLATES.length-1);}}}catch(e){}
+  if(!TEMPLATES.length){TEMPLATES=[baseTemplate('Nepal standard 203 × 92')];tplIndex=0;}
+  /* v2: the A/C Payee crossing now slants bottom-left to top-right.
+     Keep the block in the same place on the leaf, just flip its direction. */
+  TEMPLATES.forEach(t=>{
+    if(t.v===2)return;
+    const a=t.fields&&t.fields.acpayee;
+    if(a&&a.angle>0){a.y=round1(a.y+Math.sin(a.angle*Math.PI/180)*a.len);a.angle=-a.angle;}
+    t.v=2;
+  });
+  try{const p=await store.get('ink_payees_v1');if(p)PAYEES=JSON.parse(p)||[];}catch(e){}
+  try{const h=await store.get('ink_history_v1');if(h)HISTORY=JSON.parse(h)||[];}catch(e){}
+  try{const i=await store.get('ink_identity_v1');if(i)IDENT=Object.assign(IDENT,JSON.parse(i)||{});}catch(e){}
+  try{if(await store.get('ink_setup_seen'))$('#setupCard')?.remove();}catch(e){}
+}
+
+/* ---------- boot ---------- */
+(async function init(){
+  await loadAll();
+  $('#tOrg').value=IDENT.org;$('#brandCustom').value=IDENT.brand||'#23211D';
+  applyIdentity();
+  renderTplPicker();fillTplForm();
+  $('#fDate').value=new Date().toISOString().slice(0,10);
+  $('#zoomLbl').textContent=Math.round(SCALE/3.7795*100)+'%';
+  setMode('fill');
+  renderPayees();renderHistory();updatePayeeHint();
+  window.addEventListener('beforeunload',()=>{try{saveTemplates();savePayees();saveHistory();}catch(e){}});
+})();
+</script>
+</body>
+</html>
